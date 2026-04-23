@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Order Delivery — Loongdingxuan (龙鼎轩)</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="firebase-config.js"></script>
+    <style>
+        :root {
+            --bg-base: #2B4B3E;
+            --bg-sec: #1e3a2f;
+            --bg-surface: rgba(27, 58, 44, 0.88);
+            --accent: #D2A67A;
+            --accent-light: #e8c8a0;
+            --accent-glow: rgba(210, 166, 122, 0.25);
+            --text-main: #F5EDD8;
+            --text-muted: #b8a890;
+            --border: rgba(210, 166, 122, 0.22);
+            --shadow-soft: 0 4px 30px rgba(0, 0, 0, 0.5);
+            --radius-lg: 2rem;
+            --green: #4ADE80;
+            --green-dim: rgba(74, 222, 128, 0.12);
+            --gradient: linear-gradient(135deg, #D2A67A 0%, #b8865a 100%);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Montserrat', sans-serif; background: var(--bg-base); color: var(--text-main); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+        /* PRELOADER */
+        #preloader { position: fixed; inset: 0; background: var(--bg-base); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.6s ease, visibility 0.6s ease; }
+        #preloader.hidden { opacity: 0; visibility: hidden; }
+        .loader-dragon { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+        .loader-spinner { width: 56px; height: 56px; border: 3px solid rgba(210,166,122,0.2); border-top: 3px solid var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .loader-text { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--accent); letter-spacing: 3px; animation: pulse 1.4s ease-in-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+        .global-blobs { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.12; animation: float 8s ease-in-out infinite alternate; }
+        .blob-1 { width: 50vw; height: 50vw; max-width: 600px; max-height: 600px; background: #3a6b52; top: -10%; left: -10%; }
+        .blob-2 { width: 40vw; height: 40vw; max-width: 500px; max-height: 500px; background: #D2A67A; bottom: 0; right: -10%; animation-delay: -3s; opacity: 0.08; }
+        @keyframes float { 0% { transform: translateY(0) scale(1); } 100% { transform: translateY(25px) scale(1.08); } }
+        .grain-overlay { position: fixed; inset: 0; z-index: 9998; pointer-events: none; background: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.35"/%3E%3C/svg%3E'); mix-blend-mode: overlay; opacity: 0.25; }
+
+        nav { position: sticky; top: 0; background: rgba(27,58,44,0.93); backdrop-filter: blur(25px); border-bottom: 1px solid var(--border); z-index: 100; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo-text { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text-main); font-family: 'Playfair Display', serif; }
+        .logo-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; }
+
+        /* STEPS */
+        .steps-bar { background: rgba(27,58,44,0.75); border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; gap: 0.5rem; justify-content: center; align-items: center; position: sticky; top: 65px; z-index: 90; backdrop-filter: blur(20px); }
+        .step { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); }
+        .step.active { color: var(--text-main); }
+        .step.done { color: var(--accent); }
+        .step-num { width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.06); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
+        .step.active .step-num { background: var(--accent); color: var(--bg-base); border-color: var(--accent); }
+        .step.done .step-num { background: rgba(210,166,122,0.15); color: var(--accent); border-color: rgba(210,166,122,0.35); }
+        .step-sep { width: 30px; height: 1px; background: var(--border); }
+
+        /* CONTENT */
+        .page-wrap { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 8rem; }
+
+        /* MENU */
+        .menu-filter-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        .mf-btn { padding: 0.4rem 0.9rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; background: rgba(210,166,122,0.06); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; transition: all 0.3s; font-family: 'Montserrat', sans-serif; }
+        .mf-btn.active, .mf-btn:hover { background: var(--gradient); color: #fff; border-color: transparent; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 0.75rem; }
+        .menu-item { background: var(--bg-surface); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 1.2rem; padding: 1rem 1.2rem; cursor: pointer; transition: all 0.3s; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+        .menu-item:hover { border-color: rgba(210,166,122,0.3); transform: translateY(-1px); }
+        .menu-item.selected { border-color: var(--accent); background: rgba(210,166,122,0.07); }
+        .item-info { flex: 1; min-width: 0; }
+        .item-name { font-size: 0.92rem; font-weight: 600; margin-bottom: 3px; }
+        .item-desc { font-size: 0.77rem; color: var(--text-muted); line-height: 1.4; }
+        .item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; flex-shrink: 0; }
+        .item-price { font-size: 0.88rem; font-weight: 700; color: var(--accent); white-space: nowrap; }
+        .qty-ctrl { display: flex; align-items: center; gap: 0.4rem; }
+        .qty-btn { width: 26px; height: 26px; border-radius: 50%; background: rgba(210,166,122,0.12); border: 1px solid rgba(210,166,122,0.28); color: var(--accent); font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+        .qty-btn:hover { background: rgba(210,166,122,0.25); }
+        .qty-count { font-size: 0.85rem; font-weight: 700; min-width: 18px; text-align: center; color: var(--text-main); }
+
+        /* CART FOOTER */
+        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(27,58,44,0.97); backdrop-filter: blur(30px); border-top: 1px solid var(--border); padding: 1rem 1.5rem; z-index: 200; }
+        .cart-bar-inner { max-width: 860px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+        .cart-summary-text { font-size: 0.88rem; }
+        .cart-count { color: var(--accent); font-weight: 700; }
+        .cart-subtotal { color: var(--text-muted); font-size: 0.82rem; }
+        .next-btn { background: var(--gradient); color: #fff; border: none; border-radius: 50px; padding: 0.75rem 2rem; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.3s; white-space: nowrap; }
+        .next-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--accent-glow); }
+        .next-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        /* STEP PANELS */
+        .step-panel { display: none; }
+        .step-panel.active { display: block; }
+
+        /* LOCATION STEP */
+        .loc-mode-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.2rem; }
+        .loc-mode-tab { flex: 1; padding: 0.7rem; border-radius: 12px; border: 1px solid var(--border); background: rgba(210,166,122,0.04); color: var(--text-muted); font-family: 'Montserrat', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s; text-align: center; }
+        .loc-mode-tab.active { background: rgba(210,166,122,0.14); color: var(--accent); border-color: rgba(210,166,122,0.4); }
+        #order-map { width: 100%; height: 340px; border-radius: 1.2rem; border: 1px solid var(--border); margin-bottom: 1rem; }
+        .map-hint { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin-bottom: 1rem; }
+        .address-display { padding: 0.8rem 1rem; background: rgba(210,166,122,0.07); border: 1px solid rgba(210,166,122,0.25); border-radius: 12px; font-size: 0.85rem; margin-bottom: 1rem; display: none; }
+        .manual-address-field { margin-bottom: 1rem; }
+
+        /* DETAILS STEP */
+        .section-card { background: var(--bg-surface); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem 2rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-soft); }
+        .section-card h3 { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1.2rem; font-family: 'Montserrat', sans-serif; }
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+        @media(max-width:520px) { .field-row { grid-template-columns: 1fr; } }
+        .field { display: flex; flex-direction: column; gap: 0.4rem; }
+        .field label { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em; font-family: 'Montserrat', sans-serif; }
+        .field input, .field textarea { background: rgba(27,58,44,0.7); border: 1px solid var(--border); border-radius: 12px; padding: 0.8rem 1rem; color: var(--text-main); font-family: 'Montserrat', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.3s; width: 100%; }
+        .field input:focus, .field textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(210,166,122,0.1); }
+        .field textarea { resize: vertical; min-height: 72px; }
+
+        /* PAYMENT */
+        .payment-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+        @media(max-width:480px) { .payment-grid { grid-template-columns: 1fr; } }
+        .pay-opt { padding: 0.9rem 1rem; border-radius: 14px; border: 1px solid var(--border); background: rgba(210,166,122,0.04); cursor: pointer; display: flex; align-items: center; gap: 0.75rem; transition: all 0.3s; }
+        .pay-opt:hover { border-color: rgba(210,166,122,0.35); }
+        .pay-opt.selected { border-color: var(--accent); background: rgba(210,166,122,0.1); }
+        .pay-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+        .pay-label { font-size: 0.88rem; font-weight: 600; }
+
+        /* ORDER SUMMARY */
+        .summary-line { display: flex; justify-content: space-between; align-items: flex-start; font-size: 0.88rem; margin-bottom: 0.5rem; }
+        .summary-line .label { color: var(--text-muted); flex: 1; padding-right: 0.5rem; }
+        .summary-line .val { font-weight: 600; text-align: right; }
+        .summary-divider { height: 1px; background: var(--border); margin: 0.8rem 0; }
+        .summary-total { display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 700; }
+        .summary-total .t-val { color: var(--accent); }
+
+        /* PROMO */
+        .promo-row { display: flex; gap: 0.5rem; margin-top: 0.8rem; }
+        .promo-input { flex: 1; background: rgba(27,58,44,0.7); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem 1rem; color: var(--text-main); font-family: 'Montserrat', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.3s; }
+        .promo-input:focus { border-color: var(--accent); }
+        .promo-btn { padding: 0.7rem 1.2rem; background: rgba(210,166,122,0.12); color: var(--accent); border: 1px solid rgba(210,166,122,0.3); border-radius: 12px; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 0.88rem; cursor: pointer; white-space: nowrap; transition: all 0.3s; }
+        .promo-btn:hover { background: rgba(210,166,122,0.22); }
+
+        /* PLACE ORDER BTN */
+        .place-order-btn { width: 100%; padding: 1rem; background: var(--gradient); color: #fff; border: none; border-radius: 50px; font-family: 'Montserrat', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .place-order-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px var(--accent-glow); }
+        .place-order-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* BACK BTN */
+        .back-btn { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 1.5rem; transition: color 0.3s; background: none; border: none; font-family: 'Montserrat', sans-serif; }
+        .back-btn:hover { color: var(--accent); }
+
+        /* TOAST */
+        .toast { position: fixed; bottom: 5rem; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(27,58,44,0.98); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 50px; padding: 0.8rem 1.5rem; font-size: 0.88rem; font-weight: 500; z-index: 10000; transition: transform 0.4s cubic-bezier(0.22,1,0.36,1); white-space: nowrap; pointer-events: none; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.error { border-color: rgba(255,100,100,0.4); color: #ff8080; }
+        .toast.success { border-color: rgba(74,222,128,0.4); color: var(--green); }
+
+        @media(max-width: 600px) {
+            nav { padding: 0.8rem 1rem; }
+            .page-wrap { padding: 1.5rem 1rem 8rem; }
+            .steps-bar { padding: 0.8rem 1rem; gap: 0.3rem; }
+            .step-sep { width: 20px; }
+            .section-card { padding: 1.2rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+<div id="preloader"><div class="loader-dragon"><div class="loader-spinner"></div><div class="loader-text">龙鼎轩</div></div></div>
+<div class="global-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+<div class="grain-overlay"></div>
+
+<nav>
+    <a href="index.html" class="logo-text"><img src="images/logo.png" style="height:36px;width:auto;object-fit:contain;" alt="Loongdingxuan"><span style="margin-left:6px;">Loongdingxuan <span style="font-size:0.85rem;color:var(--text-muted);font-weight:400;">龙鼎轩</span></span></a>
+    <div style="display:flex;gap:1rem;align-items:center;">
+        <a href="menu.html" style="color:var(--text-muted);font-size:0.85rem;display:flex;align-items:center;gap:0.4rem;text-decoration:none;"><i class="fas fa-utensils" style="color:var(--accent)"></i> Full Menu</a>
+        <a href="track.html" style="color:var(--text-muted);font-size:0.85rem;display:flex;align-items:center;gap:0.4rem;text-decoration:none;"><i class="fas fa-location-arrow" style="color:var(--accent)"></i> Track Order</a>
+    </div>
+</nav>
+
+<!-- Steps bar -->
+<div class="steps-bar" id="steps-bar">
+    <div class="step active" id="step-indicator-1"><div class="step-num">1</div><span>Menu</span></div>
+    <div class="step-sep"></div>
+    <div class="step" id="step-indicator-2"><div class="step-num">2</div><span>Location</span></div>
+    <div class="step-sep"></div>
+    <div class="step" id="step-indicator-3"><div class="step-num">3</div><span>Details</span></div>
+</div>
+
+<div class="page-wrap">
+
+    <!-- STEP 1: MENU -->
+    <div class="step-panel active" id="panel-step-1">
+        <div class="menu-filter-row" id="menu-filter-row"></div>
+        <div class="menu-grid" id="menu-grid"></div>
+    </div>
+
+    <!-- STEP 2: LOCATION -->
+    <div class="step-panel" id="panel-step-2">
+        <button class="back-btn" onclick="goStep(1)"><i class="fas fa-arrow-left"></i> Back to Menu</button>
+        <div class="loc-mode-tabs">
+            <button class="loc-mode-tab active" id="loc-tab-map" onclick="switchLocMode('map')"><i class="fas fa-map-pin"></i> Pin on Map</button>
+            <button class="loc-mode-tab" id="loc-tab-gps" onclick="useMyLocation()"><i class="fas fa-location-crosshairs"></i> Use My Location</button>
+            <button class="loc-mode-tab" id="loc-tab-manual" onclick="switchLocMode('manual')"><i class="fas fa-keyboard"></i> Type Address</button>
+        </div>
+        <div id="order-map"></div>
+        <p class="map-hint" id="map-hint">Tap on the map to drop your delivery pin</p>
+        <div class="address-display" id="address-display"><i class="fas fa-location-dot" style="color:var(--accent);margin-right:0.5rem;"></i><span id="address-text">—</span></div>
+        <div class="manual-address-field" id="manual-address-wrap" style="display:none;">
+            <div class="field"><label>Your Address</label><input type="text" id="manual-address" placeholder="Building, Street, Area, Giza..."></div>
+        </div>
+    </div>
+
+    <!-- STEP 3: DETAILS & PAYMENT -->
+    <div class="step-panel" id="panel-step-3">
+        <button class="back-btn" onclick="goStep(2)"><i class="fas fa-arrow-left"></i> Back to Location</button>
+
+        <div class="section-card">
+            <h3><i class="fas fa-user" style="margin-right:0.4rem;color:var(--accent)"></i> Contact Details</h3>
+            <div class="field-row">
+                <div class="field"><label>Full Name</label><input type="text" id="f-name" placeholder="Your name"></div>
+                <div class="field"><label>Phone Number</label><input type="tel" id="f-phone" placeholder="+20 1XX XXX XXXX"></div>
+            </div>
+            <div class="field"><label>Delivery Address</label><input type="text" id="f-address" placeholder="Building, street, area..."></div>
+            <div class="field" style="margin-top:0.8rem;"><label>Landmark (optional)</label><input type="text" id="f-landmark" placeholder="Nearest landmark or building name"></div>
+            <div class="field" style="margin-top:0.8rem;"><label>Order Notes (optional)</label><textarea id="f-notes" placeholder="Special requests, allergies, spice level..."></textarea></div>
+        </div>
+
+        <div class="section-card">
+            <h3><i class="fas fa-credit-card" style="margin-right:0.4rem;color:var(--accent)"></i> Payment Method</h3>
+            <div class="payment-grid">
+                <div class="pay-opt selected" id="pay-cash" onclick="selectPayment(this,'cash')">
+                    <div class="pay-icon" style="background:rgba(74,222,128,0.1);color:var(--green)"><i class="fas fa-money-bill-wave"></i></div>
+                    <div class="pay-label">Cash on Delivery</div>
+                </div>
+                <div class="pay-opt" id="pay-card" onclick="selectPayment(this,'card')">
+                    <div class="pay-icon" style="background:rgba(139,92,246,0.1);color:#a78bfa"><i class="fas fa-credit-card"></i></div>
+                    <div class="pay-label">Card on Delivery</div>
+                </div>
+                <div class="pay-opt" id="pay-instapay" onclick="selectPayment(this,'instapay')">
+                    <div class="pay-icon" style="background:rgba(255,183,178,0.1);color:var(--accent)"><i class="fas fa-mobile-screen"></i></div>
+                    <div class="pay-label">InstaPay</div>
+                </div>
+                <div class="pay-opt" id="pay-vodafone" onclick="selectPayment(this,'vodafone')">
+                    <div class="pay-icon" style="background:rgba(239,68,68,0.1);color:#f87171"><i class="fas fa-sim-card"></i></div>
+                    <div class="pay-label">Vodafone Cash</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h3><i class="fas fa-receipt" style="margin-right:0.4rem;color:var(--accent)"></i> Order Summary</h3>
+            <div id="cart-lines"></div>
+            <div class="summary-divider"></div>
+            <div class="summary-line"><span class="label">Subtotal</span><span class="val" id="sum-subtotal">EGP 0</span></div>
+            <div class="summary-line"><span class="label">Delivery Fee</span><span class="val" id="sum-delivery">EGP —</span></div>
+            <div class="summary-line" id="sum-discount-row" style="display:none;"><span class="label">Discount</span><span class="val" id="sum-discount" style="color:var(--green)">−EGP 0</span></div>
+            <div class="summary-divider"></div>
+            <div class="summary-total"><span>Total</span><span class="t-val" id="sum-total">EGP —</span></div>
+            <div class="promo-row">
+                <input class="promo-input" type="text" id="promo-code" placeholder="Promo code">
+                <button class="promo-btn" onclick="applyPromo()">Apply</button>
+            </div>
+            <div id="promo-msg" style="font-size:0.78rem;margin-top:0.5rem;min-height:1.2em;"></div>
+        </div>
+
+        <button class="place-order-btn" id="place-order-btn" onclick="placeOrder()">
+            <i class="fas fa-bag-shopping"></i> Place Order
+        </button>
+    </div>
+
+</div><!-- /page-wrap -->
+
+<!-- Cart bar (shown on step 1 & 2) -->
+<div class="cart-bar" id="cart-bar">
+    <div class="cart-bar-inner">
+        <div>
+            <div class="cart-summary-text"><span class="cart-count" id="cb-count">0 items</span> in cart</div>
+            <div class="cart-subtotal" id="cb-subtotal">EGP 0</div>
+        </div>
+        <button class="next-btn" id="next-btn" onclick="goNextStep()" disabled>Continue <i class="fas fa-arrow-right"></i></button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+
+// ─── MENU DATA ─────────────────────────────────────────────────────────────
+const MENU = [
+    // Dim Sum
+    { id:'har_gow',          name:'Har Gow (虾饺)',               desc:'Dim Sum',   price:120 },
+    { id:'siu_mai',          name:'Siu Mai (烧卖)',                desc:'Dim Sum',   price:130 },
+    { id:'char_siu_bao',     name:'Char Siu Bao (叉烧包)',        desc:'Dim Sum',   price:115 },
+    { id:'xiao_long_bao',    name:'Xiao Long Bao (小笼包)',       desc:'Dim Sum',   price:145 },
+    { id:'cheung_fun',       name:'Cheung Fun (肠粉)',            desc:'Dim Sum',   price:110 },
+    { id:'lo_mai_gai',       name:'Lo Mai Gai (糯米鸡)',          desc:'Dim Sum',   price:135 },
+    // Mains
+    { id:'peking_duck',      name:'Peking Duck (北京烤鸭)',       desc:'Mains',     price:650 },
+    { id:'kung_pao_chicken', name:'Kung Pao Chicken (宫保鸡丁)',  desc:'Mains',     price:280 },
+    { id:'braised_pork',     name:'Braised Pork Belly (红烧肉)', desc:'Mains',     price:320 },
+    { id:'sweet_sour_pork',  name:'Sweet & Sour Pork (咕噜肉)',  desc:'Mains',     price:295 },
+    { id:'mapo_tofu',        name:'Mapo Tofu (麻婆豆腐)',         desc:'Mains',     price:240 },
+    { id:'twice_cooked_pork',name:'Twice-Cooked Pork (回锅肉)',  desc:'Mains',     price:310 },
+    // Soups & Starters
+    { id:'hot_sour_soup',    name:'Hot & Sour Soup (酸辣汤)',    desc:'Soups & Starters', price:150 },
+    { id:'spring_rolls',     name:'Crispy Spring Rolls (春卷)',  desc:'Soups & Starters', price:110 },
+    { id:'wonton_soup',      name:'Wonton Soup (馄饨汤)',         desc:'Soups & Starters', price:145 },
+    { id:'egg_drop_soup',    name:'Egg Drop Soup (蛋花汤)',       desc:'Soups & Starters', price:90  },
+    // Noodles & Rice
+    { id:'dan_dan_noodles',  name:'Dan Dan Noodles (担担面)',    desc:'Noodles & Rice', price:195 },
+    { id:'yang_chow_rice',   name:'Yang Chow Fried Rice (扬州炒饭)', desc:'Noodles & Rice', price:175 },
+    { id:'beef_chow_mein',   name:'Beef Chow Mein (炒面)',       desc:'Noodles & Rice', price:220 },
+    { id:'seafood_rice',     name:'Seafood Fried Rice (海鲜炒饭)', desc:'Noodles & Rice', price:245 },
+    // Desserts
+    { id:'egg_tarts',        name:'Egg Tarts (蛋挞)',            desc:'Desserts',  price:95  },
+    { id:'sesame_balls',     name:'Sesame Balls (煎堆)',          desc:'Desserts',  price:85  },
+    { id:'mango_pudding',    name:'Mango Pudding (芒果布丁)',     desc:'Desserts',  price:110 },
+    // Beverages
+    { id:'jasmine_tea',      name:'Jasmine Tea (茉莉花茶)',      desc:'Beverages', price:65  },
+    { id:'oolong_tea',       name:'Oolong Tea (乌龙茶)',          desc:'Beverages', price:70  },
+    { id:'lychee_juice',     name:'Lychee Juice (荔枝汁)',        desc:'Beverages', price:80  },
+    { id:'soft_drink',       name:'Soft Drink',                  desc:'Beverages', price:40  },
+];
+
+const MENU_ITEM_DESCS = {
+    har_gow: 'Delicate steamed shrimp dumplings in translucent rice skin.',
+    siu_mai: 'Open-top steamed dumplings with pork, shrimp and fish roe.',
+    char_siu_bao: 'Fluffy buns filled with sweet and savory BBQ pork.',
+    xiao_long_bao: 'Shanghai soup dumplings with rich pork broth inside.',
+    cheung_fun: 'Silky rice noodle rolls with shrimp or pork filling.',
+    lo_mai_gai: 'Sticky rice and chicken wrapped in lotus leaf.',
+    peking_duck: 'Whole crispy-skinned roasted duck with pancakes and hoisin.',
+    kung_pao_chicken: 'Sichuan diced chicken with dried chilies and peanuts.',
+    braised_pork: 'Slow-braised pork in soy, Shaoxing wine and rock sugar.',
+    sweet_sour_pork: 'Crispy pork in tangy pineapple and bell pepper sauce.',
+    mapo_tofu: 'Soft tofu in a spicy Sichuan sauce with minced beef.',
+    twice_cooked_pork: 'Wok-tossed pork belly with leeks, chili and fermented bean paste.',
+    hot_sour_soup: 'Spicy broth with bamboo shoots, tofu and egg.',
+    spring_rolls: 'Golden fried rolls with vegetables and shrimp.',
+    wonton_soup: 'Pork and shrimp wontons in clear chicken broth.',
+    egg_drop_soup: 'Classic silky egg ribbons in seasoned broth.',
+    dan_dan_noodles: 'Sichuan noodles in sesame chili oil with minced pork.',
+    yang_chow_rice: 'Wok-fried rice with shrimp, BBQ pork and egg.',
+    beef_chow_mein: 'Stir-fried noodles with tender beef and mixed vegetables.',
+    seafood_rice: 'Wok-fried rice with mixed seafood and seasonal vegetables.',
+    egg_tarts: 'Flaky pastry shells filled with silky egg custard.',
+    sesame_balls: 'Crispy fried glutinous rice balls filled with lotus paste.',
+    mango_pudding: 'Silky smooth chilled pudding made with fresh mango.',
+    jasmine_tea: 'Fragrant green tea scented with jasmine blossoms.',
+    oolong_tea: 'Semi-oxidized tea with a rich floral and fruity profile.',
+    lychee_juice: 'Refreshing sweet juice from fresh lychee fruit.',
+    soft_drink: 'Pepsi, 7Up, Sprite, or water.',
+};
+
+const MENU_CATEGORIES = [
+    { id: 'all',            label: 'All' },
+    { id: 'Dim Sum',        label: '🥟 Dim Sum' },
+    { id: 'Mains',          label: '🍛 Mains' },
+    { id: 'Soups & Starters', label: '🍜 Soups & Starters' },
+    { id: 'Noodles & Rice', label: '🍚 Noodles & Rice' },
+    { id: 'Desserts',       label: '🍮 Desserts' },
+    { id: 'Beverages',      label: '🍵 Beverages' },
+];
+
+// ─── STATE ─────────────────────────────────────────────────────────────────
+let cart = {};
+let cartNotes = {};
+let currentStep = 1;
+let selectedLat = null, selectedLng = null, selectedAddress = '';
+let selectedPayment = 'cash';
+let discount = 0;
+let mapInstance = null, deliveryMarker = null, restaurantMarker = null;
+let locMode = 'map';
+
+// ─── FIREBASE ──────────────────────────────────────────────────────────────
+let db = null;
+try {
+    if (typeof FIREBASE_CONFIG !== 'undefined' && FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY') {
+        if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+        db = firebase.firestore();
+    }
+} catch(e) { console.warn('Firebase not configured:', e.message); }
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    // Load cart from sessionStorage (pre-filled from menu.html)
+    try {
+        const saved = sessionStorage.getItem('bs_cart');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            Object.assign(cart, parsed);
+        }
+    } catch(e) { /* ignore */ }
+
+    buildMenu();
+    updateSummary();
+    goStep(1);
+});
+
+window.addEventListener('load', () => {
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        preloader.classList.add('hidden');
+        setTimeout(() => { preloader.style.display = 'none'; }, 600);
+    }
+});
+
+// ─── MENU BUILD ────────────────────────────────────────────────────────────
+let currentCatFilter = 'all';
+
+function buildMenu() {
+    const filterRow = document.getElementById('menu-filter-row');
+    filterRow.innerHTML = MENU_CATEGORIES.map(cat =>
+        `<button class="mf-btn ${cat.id === 'all' ? 'active' : ''}" onclick="setMenuFilter('${cat.id}', this)">${cat.label}</button>`
+    ).join('');
+    renderMenuItems();
+}
+
+function renderMenuItems() {
+    const grid = document.getElementById('menu-grid');
+    const items = currentCatFilter === 'all' ? MENU : MENU.filter(i => i.desc === currentCatFilter);
+    grid.innerHTML = items.map(item => `
+        <div class="menu-item ${(cart[item.id]||0)>0?'selected':''}" id="mi-${item.id}" onclick="toggleItem('${item.id}')">
+            <div class="item-info">
+                <div class="item-name">${item.name}</div>
+                <div class="item-desc">${MENU_ITEM_DESCS[item.id] || ''}</div>
+            </div>
+            <div class="item-right">
+                <div class="item-price">EGP ${item.price}</div>
+                <div class="qty-ctrl">
+                    <button class="qty-btn" onclick="changeQty(event,'${item.id}',-1)"><i class="fas fa-minus" style="font-size:0.65rem;"></i></button>
+                    <span class="qty-count" id="qc-${item.id}">${cart[item.id]||0}</span>
+                    <button class="qty-btn" onclick="changeQty(event,'${item.id}',1)"><i class="fas fa-plus" style="font-size:0.65rem;"></i></button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function setMenuFilter(catId, btn) {
+    currentCatFilter = catId;
+    document.querySelectorAll('.mf-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderMenuItems();
+}
+
+function toggleItem(id) {
+    if ((cart[id] || 0) === 0) changeQtyRaw(id, 1);
+}
+
+function changeQty(e, id, delta) {
+    e.stopPropagation();
+    changeQtyRaw(id, delta);
+}
+
+function changeQtyRaw(id, delta) {
+    cart[id] = Math.max(0, (cart[id] || 0) + delta);
+    const countEl = document.getElementById(`qc-${id}`);
+    if (countEl) countEl.textContent = cart[id];
+    const el = document.getElementById(`mi-${id}`);
+    if (el) {
+        if (cart[id] > 0) el.classList.add('selected');
+        else el.classList.remove('selected');
+    }
+    try { sessionStorage.setItem('bs_cart', JSON.stringify(cart)); } catch(e) {}
+    updateSummary();
+}
+
+// ─── SUMMARY ──────────────────────────────────────────────────────────────
+function getSubtotal() {
+    return MENU.reduce((s, item) => s + (cart[item.id] || 0) * item.price, 0);
+}
+
+function calcDeliveryFee(distKm) {
+    if (typeof DELIVERY_BASE_FEE_EGP === 'undefined') return 25;
+    return DELIVERY_BASE_FEE_EGP + Math.ceil(distKm) * DELIVERY_PER_KM_EGP;
+}
+
+function updateSummary() {
+    const subtotal = getSubtotal();
+    const itemCount = Object.values(cart).reduce((s,v) => s + v, 0);
+
+    document.getElementById('cb-count').textContent = `${itemCount} item${itemCount !== 1 ? 's' : ''}`;
+    document.getElementById('cb-subtotal').textContent = `EGP ${subtotal}`;
+    const nextBtn = document.getElementById('next-btn');
+    if (nextBtn) nextBtn.disabled = itemCount === 0;
+
+    const cartLines = document.getElementById('cart-lines');
+    if (cartLines) {
+        cartLines.innerHTML = MENU.filter(i => (cart[i.id] || 0) > 0).map(i => {
+            const note = cartNotes[i.id] ? ` <span style="font-size:0.72rem;color:var(--text-muted);">(${cartNotes[i.id]})</span>` : '';
+            return `<div class="summary-line"><span class="label">${i.name} ×${cart[i.id]}${note}</span><span class="val">EGP ${i.price * cart[i.id]}</span></div>`;
+        }).join('');
+    }
+
+    document.getElementById('sum-subtotal').textContent = `EGP ${subtotal}`;
+
+    let deliveryFee = null;
+    if (selectedLat !== null) {
+        const dist = getDistKm(selectedLat, selectedLng);
+        deliveryFee = calcDeliveryFee(dist);
+    }
+    document.getElementById('sum-delivery').textContent = deliveryFee !== null ? `EGP ${deliveryFee}` : 'Set location';
+
+    const total = deliveryFee !== null ? subtotal + deliveryFee - discount : null;
+    document.getElementById('sum-total').textContent = total !== null ? `EGP ${total}` : '—';
+
+    if (discount > 0) {
+        document.getElementById('sum-discount-row').style.display = 'flex';
+        document.getElementById('sum-discount').textContent = `−EGP ${discount}`;
+    } else {
+        document.getElementById('sum-discount-row').style.display = 'none';
+    }
+}
+
+function getDistKm(lat, lng) {
+    if (typeof RESTAURANT_LAT === 'undefined') return 5;
+    const R = 6371;
+    const dLat = (lat - RESTAURANT_LAT) * Math.PI / 180;
+    const dLng = (lng - RESTAURANT_LNG) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(RESTAURANT_LAT * Math.PI/180) * Math.cos(lat * Math.PI/180) * Math.sin(dLng/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// ─── PAYMENT ──────────────────────────────────────────────────────────────
+function selectPayment(el, method) {
+    selectedPayment = method;
+    document.querySelectorAll('.pay-opt').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+}
+
+// ─── PROMO ────────────────────────────────────────────────────────────────
+async function applyPromo() {
+    const code = document.getElementById('promo-code').value.trim().toUpperCase();
+    const msgEl = document.getElementById('promo-msg');
+    if (!code) return;
+
+    if (!db) {
+        msgEl.style.color = '#ff8080';
+        msgEl.textContent = 'Promo codes require Firebase to be configured.';
+        return;
+    }
+
+    try {
+        const snap = await db.collection('promo_codes').doc(code).get();
+        if (snap.exists) {
+            const promo = snap.data();
+            if (promo.active) {
+                discount = promo.discount || 0;
+                msgEl.style.color = 'var(--green)';
+                msgEl.textContent = `✓ Promo applied! −EGP ${discount}`;
+                updateSummary();
+            } else {
+                msgEl.style.color = '#ff8080';
+                msgEl.textContent = 'This promo code has expired.';
+            }
+        } else {
+            msgEl.style.color = '#ff8080';
+            msgEl.textContent = 'Invalid promo code.';
+        }
+    } catch(e) {
+        msgEl.style.color = '#ff8080';
+        msgEl.textContent = 'Could not verify promo code.';
+    }
+}
+
+// ─── MAP ──────────────────────────────────────────────────────────────────
+function makeIcon(color) {
+    return L.divIcon({
+        className: '',
+        html: `<div style="width:14px;height:14px;background:${color};border-radius:50%;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.5);"></div>`,
+        iconSize: [14, 14], iconAnchor: [7, 7],
+    });
+}
+
+function initMap() {
+    if (mapInstance) return;
+    const lat = typeof RESTAURANT_LAT !== 'undefined' ? RESTAURANT_LAT : 30.0251;
+    const lng = typeof RESTAURANT_LNG !== 'undefined' ? RESTAURANT_LNG : 30.9882;
+    mapInstance = L.map('order-map', { zoomControl: true }).setView([lat, lng], 13);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        subdomains: 'abcd', maxZoom: 19,
+    }).addTo(mapInstance);
+    restaurantMarker = L.marker([lat, lng], { icon: makeIcon('#ef4444'), title: 'Loongdingxuan' }).addTo(mapInstance);
+    mapInstance.on('click', function(e) {
+        placeDeliveryPin(e.latlng.lat, e.latlng.lng);
+        reverseGeocode(e.latlng.lat, e.latlng.lng);
+    });
+}
+
+function placeDeliveryPin(lat, lng) {
+    selectedLat = lat;
+    selectedLng = lng;
+    if (deliveryMarker) deliveryMarker.remove();
+    deliveryMarker = L.marker([lat, lng], { icon: makeIcon('#3b82f6'), title: 'Delivery Location' }).addTo(mapInstance);
+    updateSummary();
+}
+
+async function reverseGeocode(lat, lng) {
+    try {
+        const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=en`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+        const addr = data.display_name || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        selectedAddress = addr;
+        showAddressDisplay(addr);
+        if (!document.getElementById('f-address').value) {
+            document.getElementById('f-address').value = addr;
+        }
+    } catch(e) {
+        selectedAddress = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        showAddressDisplay(selectedAddress);
+    }
+}
+
+function showAddressDisplay(addr) {
+    const el = document.getElementById('address-display');
+    document.getElementById('address-text').textContent = addr;
+    el.style.display = 'block';
+}
+
+function switchLocMode(mode) {
+    locMode = mode;
+    document.querySelectorAll('.loc-mode-tab').forEach(t => t.classList.remove('active'));
+    if (mode === 'map') {
+        document.getElementById('loc-tab-map').classList.add('active');
+        document.getElementById('order-map').style.display = 'block';
+        document.getElementById('map-hint').style.display = 'block';
+        document.getElementById('manual-address-wrap').style.display = 'none';
+        setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 100);
+    } else if (mode === 'manual') {
+        document.getElementById('loc-tab-manual').classList.add('active');
+        document.getElementById('order-map').style.display = 'none';
+        document.getElementById('map-hint').style.display = 'none';
+        document.getElementById('manual-address-wrap').style.display = 'block';
+    }
+}
+
+function useMyLocation() {
+    document.querySelectorAll('.loc-mode-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('loc-tab-gps').classList.add('active');
+    document.getElementById('order-map').style.display = 'block';
+    document.getElementById('map-hint').style.display = 'block';
+    document.getElementById('manual-address-wrap').style.display = 'none';
+    locMode = 'map';
+    if (!navigator.geolocation) { showToast('Geolocation not supported', 'error'); return; }
+    navigator.geolocation.getCurrentPosition(
+        pos => {
+            const { latitude: lat, longitude: lng } = pos.coords;
+            if (!mapInstance) initMap();
+            mapInstance.setView([lat, lng], 15);
+            placeDeliveryPin(lat, lng);
+            reverseGeocode(lat, lng);
+            setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 200);
+        },
+        () => { showToast('Could not get your location', 'error'); }
+    );
+}
+
+// ─── STEPS ────────────────────────────────────────────────────────────────
+function goStep(n) {
+    currentStep = n;
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(`panel-step-${n}`).classList.add('active');
+
+    for (let i = 1; i <= 3; i++) {
+        const ind = document.getElementById(`step-indicator-${i}`);
+        ind.className = 'step';
+        if (i < n) ind.classList.add('done');
+        else if (i === n) ind.classList.add('active');
+    }
+
+    document.getElementById('cart-bar').style.display = n < 3 ? 'block' : 'none';
+
+    if (n === 2) {
+        setTimeout(() => {
+            initMap();
+            if (mapInstance) mapInstance.invalidateSize();
+        }, 100);
+    }
+
+    if (n === 3) updateSummary();
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goNextStep() {
+    if (currentStep === 1) {
+        const count = Object.values(cart).reduce((s,v) => s + v, 0);
+        if (count === 0) { showToast('Please add at least one item', 'error'); return; }
+        goStep(2);
+    } else if (currentStep === 2) {
+        if (locMode === 'map' && selectedLat === null) {
+            showToast('Please pin your delivery location on the map', 'error'); return;
+        }
+        if (locMode === 'manual') {
+            const manualAddr = document.getElementById('manual-address').value.trim();
+            if (!manualAddr) { showToast('Please enter your address', 'error'); return; }
+            selectedAddress = manualAddr;
+        }
+        goStep(3);
+        if (!document.getElementById('f-address').value && selectedAddress) {
+            document.getElementById('f-address').value = selectedAddress;
+        }
+    }
+}
+
+// ─── VALIDATION ───────────────────────────────────────────────────────────
+function validate() {
+    const name = document.getElementById('f-name').value.trim();
+    const phone = document.getElementById('f-phone').value.trim();
+    const address = document.getElementById('f-address').value.trim();
+
+    if (!name) { showToast('Please enter your name', 'error'); return false; }
+    if (!phone || phone.length < 8) { showToast('Please enter a valid phone number', 'error'); return false; }
+    if (!address) { showToast('Please enter your delivery address', 'error'); return false; }
+    return true;
+}
+
+// ─── PLACE ORDER ──────────────────────────────────────────────────────────
+async function placeOrder() {
+    if (!validate()) return;
+
+    const btn = document.getElementById('place-order-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing order...';
+
+    const subtotal = getSubtotal();
+    const distKm = selectedLat !== null ? getDistKm(selectedLat, selectedLng) : 5;
+    const deliveryFee = calcDeliveryFee(distKm);
+    const total = subtotal + deliveryFee - discount;
+    const estimatedMinutes = (typeof ESTIMATED_PREP_MINUTES !== 'undefined' ? ESTIMATED_PREP_MINUTES : 30)
+        + Math.round(distKm * (typeof ESTIMATED_DRIVE_MINUTES_PER_KM !== 'undefined' ? ESTIMATED_DRIVE_MINUTES_PER_KM : 3));
+
+    const orderItems = MENU.filter(i => (cart[i.id] || 0) > 0).map(i => ({
+        id: i.id, name: i.name, qty: cart[i.id], price: i.price,
+        subtotal: cart[i.id] * i.price, note: cartNotes[i.id] || ''
+    }));
+
+    const order = {
+        customerName:    document.getElementById('f-name').value.trim(),
+        customerPhone:   document.getElementById('f-phone').value.trim(),
+        customerAddress: document.getElementById('f-address').value.trim(),
+        customerLandmark: document.getElementById('f-landmark').value.trim(),
+        orderNotes:      document.getElementById('f-notes').value.trim(),
+        lat: selectedLat,
+        lng: selectedLng,
+        items: orderItems,
+        subtotal,
+        deliveryFee,
+        discount,
+        total,
+        paymentMethod: selectedPayment,
+        status: 'pending',
+        estimatedMinutes,
+        createdAt: new Date().toISOString(),
+        shortId: null,
+    };
+
+    let orderId;
+
+    if (db) {
+        try {
+            const ref = await db.collection('orders').add(order);
+            orderId = ref.id;
+            const shortId = orderId.slice(-8).toUpperCase();
+            await ref.update({ shortId });
+            order.shortId = shortId;
+        } catch(e) {
+            console.error(e);
+            showToast('Failed to place order. Please try again.', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-bag-shopping"></i> Place Order';
+            return;
+        }
+    } else {
+        // Demo mode
+        orderId = 'DEMO-' + Date.now();
+        order.shortId = orderId.slice(-8).toUpperCase();
+    }
+
+    order.id = orderId;
+    sessionStorage.setItem('bs_order', JSON.stringify(order));
+    sessionStorage.removeItem('bs_cart');
+    window.location.href = `receipt.html?orderId=${orderId}`;
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────────────
+function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+</script>
+</body>
+</html>

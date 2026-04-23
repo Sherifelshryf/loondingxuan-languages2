@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Admin Dashboard — Loongdingxuan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="firebase-config.js"></script>
+    <style>
+        :root {
+            --bg-base: #0c0b0b;
+            --bg-surface: rgba(28, 26, 26, 0.7);
+            --bg-card: rgba(35, 32, 32, 0.6);
+            --accent: #FFB7B2;
+            --accent-glow: rgba(255, 183, 178, 0.2);
+            --text-main: #FDFCF8;
+            --text-muted: #A8A29E;
+            --border: rgba(255, 255, 255, 0.08);
+            --shadow-soft: 0 4px 30px rgba(0, 0, 0, 0.5);
+            --radius: 1.2rem;
+            --green: #4ADE80;
+            --yellow: #facc15;
+            --purple: #a78bfa;
+            --red: #f87171;
+            --sidebar-w: 240px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg-base); color: var(--text-main); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+        /* ─── LOGIN ────────────────────────────────────────────── */
+        #login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; background: radial-gradient(ellipse at 30% 20%, rgba(255,183,178,0.07) 0%, transparent 60%); }
+        .login-card { width: 100%; max-width: 380px; background: var(--bg-surface); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 2rem; padding: 2.5rem; box-shadow: var(--shadow-soft); }
+        .login-logo { text-align: center; margin-bottom: 2rem; }
+        .login-icon { width: 56px; height: 56px; border-radius: 50%; background: rgba(255,183,178,0.1); border: 2px solid rgba(255,183,178,0.25); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: var(--accent); margin: 0 auto 1rem; }
+        .login-logo h2 { font-size: 1.3rem; font-weight: 700; }
+        .login-logo p { color: var(--text-muted); font-size: 0.82rem; margin-top: 4px; }
+        .f { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+        .f label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+        .f input { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 10px; padding: 0.75rem 1rem; color: var(--text-main); font-family: 'Outfit', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.3s; }
+        .f input:focus { border-color: var(--accent); }
+        .login-btn { width: 100%; padding: 0.85rem; background: var(--accent); color: var(--bg-base); border: none; border-radius: 50px; font-family: 'Outfit', sans-serif; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.3s; margin-top: 0.5rem; }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--accent-glow); }
+        .login-error { color: var(--red); font-size: 0.8rem; text-align: center; margin-top: 0.8rem; min-height: 1em; }
+
+        /* ─── LAYOUT ────────────────────────────────────────────── */
+        #app { display: none; }
+
+        .layout { display: grid; grid-template-columns: var(--sidebar-w) 1fr; min-height: 100vh; }
+        @media(max-width: 900px) { .layout { grid-template-columns: 1fr; } .sidebar { display: none; } }
+
+        /* ─── SIDEBAR ───────────────────────────────────────────── */
+        .sidebar { background: rgba(18,16,16,0.95); backdrop-filter: blur(20px); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 1.5rem 1rem; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+        .sidebar-logo { display: flex; align-items: center; gap: 0.6rem; font-size: 1.1rem; font-weight: 700; padding: 0.5rem 0.8rem; margin-bottom: 2rem; }
+        .logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
+        .nav-group { font-size: 0.65rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; padding: 0 0.8rem; margin: 1.2rem 0 0.5rem; }
+        .nav-item { display: flex; align-items: center; gap: 0.7rem; padding: 0.7rem 0.8rem; border-radius: 10px; color: var(--text-muted); font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: all 0.2s; margin-bottom: 2px; border: none; background: none; width: 100%; text-align: left; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+        .nav-item.active { background: rgba(255,183,178,0.1); color: var(--accent); }
+        .nav-item i { width: 18px; text-align: center; }
+        .nav-badge { margin-left: auto; background: var(--accent); color: var(--bg-base); border-radius: 50px; font-size: 0.65rem; font-weight: 700; padding: 1px 7px; }
+        .sidebar-bottom { margin-top: auto; }
+
+        /* ─── MAIN ──────────────────────────────────────────────── */
+        .main { display: flex; flex-direction: column; overflow: hidden; }
+        .topbar { background: rgba(18,16,16,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+        .topbar-title { font-size: 1.1rem; font-weight: 700; }
+        .topbar-right { display: flex; align-items: center; gap: 1rem; font-size: 0.85rem; color: var(--text-muted); }
+        .topbar-time { font-variant-numeric: tabular-nums; }
+
+        /* MOBILE NAV */
+        .mobile-nav { display: none; background: rgba(18,16,16,0.95); border-bottom: 1px solid var(--border); overflow-x: auto; }
+        @media(max-width: 900px) { .mobile-nav { display: flex; } .mobile-nav .nav-item { flex-shrink: 0; border-radius: 0; border-bottom: 2px solid transparent; } .mobile-nav .nav-item.active { border-bottom-color: var(--accent); background: none; } }
+
+        .content { flex: 1; padding: 2rem; overflow-y: auto; }
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        /* ─── STAT CARDS ─────────────────────────────────────────── */
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; margin-bottom: 2rem; }
+        @media(max-width: 1100px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+        @media(max-width: 600px) { .stats-row { grid-template-columns: 1fr 1fr; gap: 0.8rem; } }
+        .stat-card { background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.4rem; box-shadow: var(--shadow-soft); }
+        .stat-label { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.6rem; }
+        .stat-val { font-size: 1.8rem; font-weight: 700; line-height: 1; }
+        .stat-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.4rem; }
+        .stat-val.accent { color: var(--accent); }
+        .stat-val.green { color: var(--green); }
+        .stat-val.yellow { color: var(--yellow); }
+        .stat-val.purple { color: var(--purple); }
+
+        /* ─── SECTION TITLE ──────────────────────────────────────── */
+        .sec-title { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; }
+
+        /* ─── ORDER CARD ─────────────────────────────────────────── */
+        .order-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem 1.5rem; margin-bottom: 0.8rem; box-shadow: var(--shadow-soft); transition: border-color 0.3s; }
+        .order-card:hover { border-color: rgba(255,255,255,0.15); }
+        .order-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem; gap: 1rem; }
+        .order-meta { flex: 1; }
+        .order-id { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; letter-spacing: 0.08em; }
+        .order-name { font-size: 1rem; font-weight: 700; margin-top: 2px; }
+        .order-phone-addr { font-size: 0.8rem; color: var(--text-muted); margin-top: 3px; }
+        .order-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem; }
+        .s-chip { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
+        .s-chip.pending   { background: rgba(255,183,178,0.12); color: var(--accent); }
+        .s-chip.confirmed { background: rgba(250,204,21,0.12); color: var(--yellow); }
+        .s-chip.picked_up { background: rgba(139,92,246,0.12); color: var(--purple); }
+        .s-chip.delivered { background: rgba(74,222,128,0.12); color: var(--green); }
+        .s-chip.cancelled { background: rgba(248,113,113,0.12); color: var(--red); }
+        .order-total-sm { font-size: 0.95rem; font-weight: 700; color: var(--accent); }
+
+        .order-items-sm { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.8rem; padding: 0.5rem 0.8rem; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid var(--border); }
+        .order-actions-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .act-btn { padding: 0.45rem 0.9rem; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text-main); font-family: 'Outfit', sans-serif; font-size: 0.78rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 0.35rem; transition: all 0.2s; }
+        .act-btn:hover { background: rgba(255,255,255,0.1); }
+        .act-btn.confirm { color: var(--yellow); border-color: rgba(250,204,21,0.3); background: rgba(250,204,21,0.08); }
+        .act-btn.dispatch { color: var(--purple); border-color: rgba(139,92,246,0.3); background: rgba(139,92,246,0.08); }
+        .act-btn.cancel { color: var(--red); border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.08); }
+        .act-btn.receipt { color: var(--accent); border-color: rgba(255,183,178,0.3); background: rgba(255,183,178,0.06); }
+
+        /* DRIVER SELECT */
+        .driver-select { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; padding: 0.45rem 0.8rem; color: var(--text-main); font-family: 'Outfit', sans-serif; font-size: 0.78rem; outline: none; }
+        .driver-select option { background: #1e1c1c; }
+
+        /* ─── MAP ────────────────────────────────────────────────── */
+        #admin-map { width: 100%; height: calc(100vh - 200px); min-height: 400px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+
+        /* ─── ANALYTICS ──────────────────────────────────────────── */
+        .chart-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-soft); margin-bottom: 1.5rem; }
+        .chart-title { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 1.5rem; }
+        .bar-chart { display: flex; align-items: flex-end; gap: 0.5rem; height: 120px; }
+        .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; height: 100%; justify-content: flex-end; }
+        .bar { width: 100%; background: linear-gradient(to top, var(--accent), rgba(255,183,178,0.4)); border-radius: 6px 6px 0 0; min-height: 4px; transition: height 0.8s cubic-bezier(0.22,1,0.36,1); }
+        .bar-label { font-size: 0.65rem; color: var(--text-muted); white-space: nowrap; }
+        .bar-val { font-size: 0.7rem; font-weight: 600; }
+        .perf-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .perf-table th { text-align: left; color: var(--text-muted); font-weight: 500; padding: 0.5rem 0.8rem; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); }
+        .perf-table td { padding: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .perf-table tr:last-child td { border-bottom: none; }
+
+        /* ─── DRIVERS ────────────────────────────────────────────── */
+        .driver-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem 1.5rem; margin-bottom: 0.8rem; box-shadow: var(--shadow-soft); display: flex; align-items: center; gap: 1rem; }
+        .drv-avatar { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,183,178,0.1); border: 1px solid rgba(255,183,178,0.25); display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 1.1rem; flex-shrink: 0; }
+        .drv-info { flex: 1; }
+        .drv-name { font-size: 0.95rem; font-weight: 700; }
+        .drv-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+        .drv-actions { display: flex; gap: 0.5rem; }
+        .online-indicator { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .dot.online { background: var(--green); }
+        .dot.offline { background: var(--border); }
+
+        /* ADD DRIVER FORM */
+        .add-form { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.5rem; }
+        .add-form h4 { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 1.2rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+        @media(max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+        .ff { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.8rem; }
+        .ff label { font-size: 0.78rem; color: var(--text-muted); }
+        .ff input { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; padding: 0.65rem 0.8rem; color: var(--text-main); font-family: 'Outfit', sans-serif; font-size: 0.88rem; outline: none; transition: border-color 0.3s; }
+        .ff input:focus { border-color: var(--accent); }
+        .submit-btn { padding: 0.7rem 1.5rem; background: var(--accent); color: var(--bg-base); border: none; border-radius: 8px; font-family: 'Outfit', sans-serif; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.3s; }
+        .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px var(--accent-glow); }
+
+        /* ─── TABS ───────────────────────────────────────────────── */
+        .sub-tabs { display: flex; gap: 0.3rem; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 50px; padding: 5px; width: fit-content; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .sub-tab { padding: 0.45rem 1.1rem; border-radius: 50px; border: none; background: none; color: var(--text-muted); font-family: 'Outfit', sans-serif; font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .sub-tab.active { background: rgba(255,183,178,0.15); color: var(--accent); font-weight: 600; }
+
+        /* EMPTY */
+        .empty { text-align: center; padding: 3rem; color: var(--text-muted); }
+        .empty i { font-size: 2rem; margin-bottom: 0.8rem; opacity: 0.3; display: block; }
+
+        /* TOAST */
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: rgba(30,28,28,0.98); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 14px; padding: 0.8rem 1.2rem; font-size: 0.88rem; font-weight: 500; z-index: 10000; transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.22,1,0.36,1); max-width: 280px; }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-color: rgba(74,222,128,0.4); }
+        .toast.error { border-color: rgba(248,113,113,0.4); color: var(--red); }
+    </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+    <div class="login-card">
+        <div class="login-logo">
+            <div class="login-icon"><i class="fas fa-shield-halved"></i></div>
+            <h2>Loongdingxuan Admin</h2>
+            <p>Operations Dashboard</p>
+        </div>
+        <div class="f"><label>Email</label><input type="email" id="admin-email" placeholder="admin@loongdingxuan.eg" autocomplete="email"></div>
+        <div class="f"><label>Password</label><input type="password" id="admin-password" placeholder="••••••••" autocomplete="current-password"></div>
+        <button class="login-btn" onclick="doLogin()"><i class="fas fa-arrow-right"></i> Sign In</button>
+        <div class="login-error" id="login-error"></div>
+    </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo"><div class="logo-dot"></div> Loongdingxuan</div>
+        <div class="nav-group">Operations</div>
+        <button class="nav-item active" onclick="showPanel('overview')"><i class="fas fa-chart-line"></i> Overview <span class="nav-badge" id="nb-pending">0</span></button>
+        <button class="nav-item" onclick="showPanel('orders')"><i class="fas fa-list-ul"></i> All Orders</button>
+        <button class="nav-item" onclick="showPanel('map')"><i class="fas fa-map"></i> Live Map</button>
+        <div class="nav-group">Management</div>
+        <button class="nav-item" onclick="showPanel('drivers')"><i class="fas fa-motorcycle"></i> Drivers</button>
+        <button class="nav-item" onclick="showPanel('analytics')"><i class="fas fa-chart-bar"></i> Analytics</button>
+        <div class="sidebar-bottom">
+            <button class="nav-item" onclick="doLogout()"><i class="fas fa-right-from-bracket"></i> Sign Out</button>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+        <div class="topbar">
+            <div class="topbar-title" id="panel-title">Overview</div>
+            <div class="topbar-right">
+                <span class="topbar-time" id="clock">—</span>
+                <a href="index.html" target="_blank" style="color:var(--text-muted);font-size:0.8rem;text-decoration:none;">View Site <i class="fas fa-arrow-up-right-from-square"></i></a>
+            </div>
+        </div>
+
+        <!-- MOBILE NAV -->
+        <div class="mobile-nav">
+            <button class="nav-item active" onclick="showPanel('overview')"><i class="fas fa-chart-line"></i> Overview</button>
+            <button class="nav-item" onclick="showPanel('orders')"><i class="fas fa-list-ul"></i> Orders</button>
+            <button class="nav-item" onclick="showPanel('map')"><i class="fas fa-map"></i> Map</button>
+            <button class="nav-item" onclick="showPanel('drivers')"><i class="fas fa-motorcycle"></i> Drivers</button>
+            <button class="nav-item" onclick="showPanel('analytics')"><i class="fas fa-chart-bar"></i> Analytics</button>
+        </div>
+
+        <div class="content">
+
+            <!-- ═══════ OVERVIEW ═══════ -->
+            <div class="panel active" id="panel-overview">
+                <div class="stats-row">
+                    <div class="stat-card"><div class="stat-label">New Orders</div><div class="stat-val accent" id="s-pending">0</div><div class="stat-sub">Awaiting confirmation</div></div>
+                    <div class="stat-card"><div class="stat-label">Active Orders</div><div class="stat-val yellow" id="s-active">0</div><div class="stat-sub">Being prepared / en route</div></div>
+                    <div class="stat-card"><div class="stat-label">Delivered Today</div><div class="stat-val green" id="s-delivered">0</div><div class="stat-sub">Successfully completed</div></div>
+                    <div class="stat-card"><div class="stat-label">Revenue Today</div><div class="stat-val purple" id="s-revenue">EGP 0</div><div class="stat-sub">Delivered orders</div></div>
+                </div>
+
+                <div class="sec-title"><span>🔴 New Orders (Needs Action)</span></div>
+                <div id="overview-pending-list"></div>
+
+                <div class="sec-title" style="margin-top:2rem;"><span>⚡ Active Orders</span></div>
+                <div id="overview-active-list"></div>
+            </div>
+
+            <!-- ═══════ ALL ORDERS ═══════ -->
+            <div class="panel" id="panel-orders">
+                <div class="sub-tabs">
+                    <button class="sub-tab active" onclick="filterOrders('all',this)">All</button>
+                    <button class="sub-tab" onclick="filterOrders('pending',this)">Pending</button>
+                    <button class="sub-tab" onclick="filterOrders('confirmed',this)">Confirmed</button>
+                    <button class="sub-tab" onclick="filterOrders('picked_up',this)">Out for Delivery</button>
+                    <button class="sub-tab" onclick="filterOrders('delivered',this)">Delivered</button>
+                    <button class="sub-tab" onclick="filterOrders('cancelled',this)">Cancelled</button>
+                </div>
+                <div id="all-orders-list"></div>
+            </div>
+
+            <!-- ═══════ LIVE MAP ═══════ -->
+            <div class="panel" id="panel-map">
+                <div id="admin-map"></div>
+            </div>
+
+            <!-- ═══════ DRIVERS ═══════ -->
+            <div class="panel" id="panel-drivers">
+                <!-- Add driver form -->
+                <div class="add-form">
+                    <h4><i class="fas fa-user-plus" style="margin-right:0.4rem;"></i> Add / Onboard Driver</h4>
+                    <div class="form-row">
+                        <div class="ff"><label>Full Name</label><input id="drv-name" type="text" placeholder="Ahmed Mohamed"></div>
+                        <div class="ff"><label>Phone</label><input id="drv-phone" type="tel" placeholder="+20 1XX XXX XXXX"></div>
+                        <div class="ff"><label>Email</label><input id="drv-email" type="email" placeholder="driver@email.com"></div>
+                        <div class="ff"><label>Vehicle</label><input id="drv-vehicle" type="text" placeholder="Motorcycle · Blue · ABC 123"></div>
+                        <div class="ff"><label>National ID</label><input id="drv-nid" type="text" placeholder="29XXXXXXXXXX"></div>
+                        <div class="ff"><label>Temp Password</label><input id="drv-pass" type="password" placeholder="Give driver this to log in" value="Loongdingxuan2024!"></div>
+                    </div>
+                    <button class="submit-btn" onclick="addDriver()"><i class="fas fa-plus"></i> Create Driver Account</button>
+                    <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.8rem;"><i class="fas fa-info-circle"></i> This creates a Firebase Auth account. The driver logs into driver.html with this email & password.</div>
+                </div>
+
+                <div class="sec-title"><span>Active Drivers</span></div>
+                <div id="drivers-list"></div>
+            </div>
+
+            <!-- ═══════ ANALYTICS ═══════ -->
+            <div class="panel" id="panel-analytics">
+                <div class="stats-row">
+                    <div class="stat-card"><div class="stat-label">Total Orders (30d)</div><div class="stat-val accent" id="an-total">0</div></div>
+                    <div class="stat-card"><div class="stat-label">Revenue (30d)</div><div class="stat-val green" id="an-revenue">EGP 0</div></div>
+                    <div class="stat-card"><div class="stat-label">Avg Order Value</div><div class="stat-val yellow" id="an-avg">EGP 0</div></div>
+                    <div class="stat-card"><div class="stat-label">Cancellation Rate</div><div class="stat-val purple" id="an-cancel">0%</div></div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">Orders per day (last 7 days)</div>
+                    <div class="bar-chart" id="bar-chart"></div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">Driver Performance</div>
+                    <table class="perf-table">
+                        <thead><tr><th>Driver</th><th>Deliveries</th><th>Avg Time</th><th>Earnings</th></tr></thead>
+                        <tbody id="perf-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+    </div><!-- /main -->
+</div><!-- /layout -->
+</div><!-- /app -->
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+const PAY = { cash:'Cash on Delivery', card:'Card on Delivery', instapay:'InstaPay', vodafone:'Vodafone Cash' };
+const STATUS_LABELS = { pending:'Pending', confirmed:'Confirmed', picked_up:'Out for Delivery', delivered:'Delivered', cancelled:'Cancelled' };
+
+let auth=null, db=null, rtdb=null;
+let allOrders = [];
+let allDrivers = [];
+let ordersFilter = 'all';
+let adminMap = null, driverMarkers = {}, orderMarkers = [];
+
+// ─── FIREBASE ───────────────────────────────────────────────────────────────
+try {
+    if (typeof FIREBASE_CONFIG !== 'undefined' && FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY') {
+        if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+        auth  = firebase.auth();
+        db    = firebase.firestore();
+        rtdb  = firebase.database();
+    }
+} catch(e) { console.warn('Firebase not configured:', e.message); }
+
+// ─── CLOCK ──────────────────────────────────────────────────────────────────
+function updateClock() {
+    document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-EG', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+}
+setInterval(updateClock, 1000); updateClock();
+
+// ─── AUTH ────────────────────────────────────────────────────────────────────
+async function doLogin() {
+    const email = document.getElementById('admin-email').value.trim();
+    const pass = document.getElementById('admin-password').value;
+    document.getElementById('login-error').textContent = '';
+    if (!auth) { showDemoApp(); return; }
+    try {
+        await auth.signInWithEmailAndPassword(email, pass);
+    } catch(e) {
+        document.getElementById('login-error').textContent = 'Invalid credentials.';
+    }
+}
+function doLogout() {
+    if (auth) auth.signOut();
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+}
+if (auth) auth.onAuthStateChanged(u => { if (u) startApp(); });
+
+// ─── START APP ────────────────────────────────────────────────────────────────
+function showDemoApp() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    subscribeToOrders();
+    subscribeToDrivers();
+    watchDriverLocations();
+}
+function startApp() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    subscribeToOrders();
+    subscribeToDrivers();
+    watchDriverLocations();
+}
+
+// ─── PANELS ──────────────────────────────────────────────────────────────────
+const PANEL_TITLES = { overview:'Overview', orders:'All Orders', map:'Live Map', drivers:'Drivers', analytics:'Analytics' };
+function showPanel(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    document.getElementById('panel-title').textContent = PANEL_TITLES[name] || name;
+    // Sidebar + mobile nav
+    document.querySelectorAll('.sidebar .nav-item, .mobile-nav .nav-item').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll(`.sidebar .nav-item, .mobile-nav .nav-item`).forEach(b => {
+        if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${name}'`)) b.classList.add('active');
+    });
+    if (name === 'map') initAdminMap();
+    if (name === 'analytics') buildAnalytics();
+}
+
+// ─── ORDERS SUBSCRIPTION ─────────────────────────────────────────────────────
+function subscribeToOrders() {
+    if (!db) { renderAllPanels([]); return; }
+    const today = new Date(); today.setHours(0,0,0,0);
+    db.collection('orders')
+        .orderBy('createdAt', 'desc')
+        .limit(200)
+        .onSnapshot(snap => {
+            allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderAllPanels(allOrders);
+        }, e => console.error(e));
+}
+
+function renderAllPanels(orders) {
+    const todayStr = new Date().toISOString().slice(0,10);
+    const todayOrders = orders.filter(o => o.createdAt && o.createdAt.slice(0,10) === todayStr);
+    const pending   = orders.filter(o => o.status === 'pending');
+    const active    = orders.filter(o => o.status === 'confirmed' || o.status === 'picked_up');
+    const delivered = todayOrders.filter(o => o.status === 'delivered');
+    const revenue   = delivered.reduce((s,o) => s + (o.total || 0), 0);
+
+    // Stats
+    document.getElementById('s-pending').textContent  = pending.length;
+    document.getElementById('s-active').textContent   = active.length;
+    document.getElementById('s-delivered').textContent= delivered.length;
+    document.getElementById('s-revenue').textContent  = 'EGP ' + revenue;
+    document.getElementById('nb-pending').textContent = pending.length;
+
+    // Overview
+    document.getElementById('overview-pending-list').innerHTML = pending.length
+        ? pending.map(o => renderOrderCard(o, true)).join('')
+        : '<div class="empty"><i class="fas fa-inbox"></i><p>No pending orders</p></div>';
+    document.getElementById('overview-active-list').innerHTML = active.length
+        ? active.map(o => renderOrderCard(o, true)).join('')
+        : '<div class="empty"><i class="fas fa-check"></i><p>No active orders</p></div>';
+
+    // All orders
+    renderFilteredOrders();
+
+    // Map markers
+    updateOrderMapMarkers(orders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled'));
+}
+
+function renderFilteredOrders() {
+    const filtered = ordersFilter === 'all' ? allOrders : allOrders.filter(o => o.status === ordersFilter);
+    document.getElementById('all-orders-list').innerHTML = filtered.length
+        ? filtered.map(o => renderOrderCard(o, false)).join('')
+        : '<div class="empty"><i class="fas fa-list-check"></i><p>No orders in this category</p></div>';
+}
+
+function filterOrders(status, btn) {
+    ordersFilter = status;
+    document.querySelectorAll('#panel-orders .sub-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderFilteredOrders();
+}
+
+function renderOrderCard(o, compact) {
+    const shortId = o.id.slice(-8).toUpperCase();
+    const items = (o.items || []).map(i => `${i.qty}× ${i.name}`).join(', ');
+    const timeStr = o.createdAt ? new Date(o.createdAt).toLocaleTimeString('en-EG', { hour:'2-digit', minute:'2-digit' }) : '';
+    const driverOpts = allDrivers.map(d => `<option value="${d.id}" ${o.assignedDriver?.id === d.id ? 'selected' : ''}>${d.name}</option>`).join('');
+
+    const canConfirm  = o.status === 'pending';
+    const canDispatch = o.status === 'confirmed' || o.status === 'pending';
+    const canCancel   = o.status === 'pending' || o.status === 'confirmed';
+
+    return `
+    <div class="order-card" id="oc-${o.id}">
+        <div class="order-top">
+            <div class="order-meta">
+                <div class="order-id">#${shortId} · ${timeStr}</div>
+                <div class="order-name">${o.customerName}</div>
+                <div class="order-phone-addr">${o.customerPhone} · ${o.customerAddress}</div>
+            </div>
+            <div class="order-right">
+                <div class="s-chip ${o.status}">${STATUS_LABELS[o.status] || o.status}</div>
+                <div style="font-size:0.9rem;font-weight:700;color:var(--accent)">EGP ${o.total}</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);">${PAY[o.paymentMethod] || o.paymentMethod || ''}</div>
+            </div>
+        </div>
+        <div class="order-items-sm">${items}</div>
+        ${o.orderNotes ? `<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.8rem;"><i class="fas fa-note-sticky" style="color:var(--accent);margin-right:0.3rem;"></i>${o.orderNotes}</div>` : ''}
+        <div class="order-actions-row">
+            ${canConfirm ? `<button class="act-btn confirm" onclick="setStatus('${o.id}','confirmed')"><i class="fas fa-check"></i> Confirm</button>` : ''}
+            ${canDispatch ? `
+            <select class="driver-select" id="drv-sel-${o.id}">
+                <option value="">— Assign Driver —</option>
+                ${driverOpts}
+            </select>
+            <button class="act-btn dispatch" onclick="dispatchOrder('${o.id}')"><i class="fas fa-motorcycle"></i> Dispatch</button>
+            ` : ''}
+            ${o.assignedDriver ? `<span style="font-size:0.75rem;color:var(--purple);display:flex;align-items:center;gap:0.3rem;"><i class="fas fa-motorcycle"></i> ${o.assignedDriver.name}</span>` : ''}
+            ${canCancel ? `<button class="act-btn cancel" onclick="setStatus('${o.id}','cancelled')"><i class="fas fa-xmark"></i> Cancel</button>` : ''}
+            <a class="act-btn receipt" href="receipt.html?orderId=${o.id}" target="_blank"><i class="fas fa-receipt"></i> Receipt</a>
+        </div>
+    </div>`;
+}
+
+async function setStatus(orderId, status) {
+    if (!db) { showToast(`Status set to ${status}`, 'success'); return; }
+    try {
+        await db.collection('orders').doc(orderId).update({ status, updatedAt: new Date().toISOString() });
+        showToast(`Order ${status}`, 'success');
+    } catch(e) { showToast('Update failed', 'error'); }
+}
+
+async function dispatchOrder(orderId) {
+    const sel = document.getElementById(`drv-sel-${orderId}`);
+    if (!sel || !sel.value) { showToast('Select a driver first', 'error'); return; }
+    const driver = allDrivers.find(d => d.id === sel.value);
+    if (!driver) return;
+    if (!db) { showToast(`Dispatched to ${driver.name}`, 'success'); return; }
+    try {
+        await db.collection('orders').doc(orderId).update({
+            status: 'confirmed',
+            assignedDriver: { id: driver.id, name: driver.name, phone: driver.phone, vehicle: driver.vehicle },
+            updatedAt: new Date().toISOString(),
+        });
+        showToast(`✅ Dispatched to ${driver.name}`, 'success');
+    } catch(e) { showToast('Dispatch failed', 'error'); }
+}
+
+// ─── DRIVERS ─────────────────────────────────────────────────────────────────
+function subscribeToDrivers() {
+    if (!db) return;
+    db.collection('drivers').onSnapshot(snap => {
+        allDrivers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderDrivers();
+    });
+}
+
+function renderDrivers() {
+    const list = document.getElementById('drivers-list');
+    if (!allDrivers.length) { list.innerHTML = '<div class="empty"><i class="fas fa-motorcycle"></i><p>No drivers added yet</p></div>'; return; }
+    list.innerHTML = allDrivers.map(d => {
+        const todayDeliveries = allOrders.filter(o => o.assignedDriver?.id === d.id && o.status === 'delivered').length;
+        return `
+        <div class="driver-card">
+            <div class="drv-avatar"><i class="fas fa-motorcycle"></i></div>
+            <div class="drv-info">
+                <div class="drv-name">${d.name}</div>
+                <div class="drv-sub">${d.phone} · ${d.vehicle || 'No vehicle info'}</div>
+                <div class="online-indicator" style="margin-top:4px;">
+                    <div class="dot ${d.isOnline ? 'online' : 'offline'}"></div>
+                    <span style="font-size:0.72rem;color:var(--text-muted);">${d.isOnline ? 'Online' : 'Offline'} · ${todayDeliveries} deliveries today</span>
+                </div>
+            </div>
+            <div class="drv-actions">
+                <a class="act-btn" href="tel:${d.phone}" style="font-size:0.75rem;"><i class="fas fa-phone"></i></a>
+                <button class="act-btn cancel" onclick="removeDriver('${d.id}')" style="font-size:0.75rem;"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+async function addDriver() {
+    const name    = document.getElementById('drv-name').value.trim();
+    const phone   = document.getElementById('drv-phone').value.trim();
+    const email   = document.getElementById('drv-email').value.trim();
+    const vehicle = document.getElementById('drv-vehicle').value.trim();
+    const nid     = document.getElementById('drv-nid').value.trim();
+    const pass    = document.getElementById('drv-pass').value.trim();
+
+    if (!name || !phone || !email) { showToast('Name, phone and email are required', 'error'); return; }
+
+    if (db) {
+        try {
+            // Create Firebase Auth account for driver
+            if (auth) {
+                try {
+                    await auth.createUserWithEmailAndPassword(email, pass);
+                    if (!pass) { showToast('Password is required to create a driver account.', 'error'); return; }
+                    await auth.currentUser.updateProfile({ displayName: name });
+                } catch(authErr) {
+                    if (authErr.code !== 'auth/email-already-in-use') throw authErr;
+                }
+            }
+            // Store driver profile in Firestore
+            await db.collection('drivers').doc(email.replace('@','_').replace('.','_')).set({
+                name, phone, email, vehicle, nid,
+                isOnline: false,
+                createdAt: new Date().toISOString(),
+            });
+            showToast(`✅ Driver ${name} added!`, 'success');
+            ['drv-name','drv-phone','drv-email','drv-vehicle','drv-nid'].forEach(id => document.getElementById(id).value = '');
+        } catch(e) {
+            showToast('Failed: ' + e.message, 'error');
+        }
+    } else {
+        showToast(`Demo: Driver ${name} would be added`, 'success');
+    }
+}
+
+async function removeDriver(driverId) {
+    if (!confirm('Remove this driver?')) return;
+    if (!db) return;
+    await db.collection('drivers').doc(driverId).delete();
+    showToast('Driver removed', 'success');
+}
+
+// ─── LIVE DRIVER LOCATIONS ────────────────────────────────────────────────────
+function watchDriverLocations() {
+    if (!rtdb) return;
+    rtdb.ref('driver_locations').on('value', snap => {
+        const locations = snap.val() || {};
+        Object.entries(locations).forEach(([uid, loc]) => {
+            updateDriverMapMarker(uid, loc);
+        });
+    });
+}
+
+function updateDriverMapMarker(uid, loc) {
+    if (!adminMap) return;
+    if (driverMarkers[uid]) {
+        driverMarkers[uid].setLatLng([loc.lat, loc.lng]);
+    } else {
+        driverMarkers[uid] = L.marker([loc.lat, loc.lng], {
+            icon: makeLeafletIcon('#facc15'),
+            title: loc.driverName || 'Driver',
+        }).addTo(adminMap);
+    }
+}
+
+// ─── ADMIN MAP ────────────────────────────────────────────────────────────────
+function makeLeafletIcon(color) {
+    return L.divIcon({
+        className: '',
+        html: `<div style="width:14px;height:14px;background:${color};border-radius:50%;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.5);"></div>`,
+        iconSize: [14, 14],
+        iconAnchor: [7, 7],
+    });
+}
+
+function initAdminMap() {
+    if (adminMap) return;
+    createMap();
+}
+
+function createMap() {
+    adminMap = L.map('admin-map').setView([RESTAURANT_LAT, RESTAURANT_LNG], 12);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19,
+    }).addTo(adminMap);
+
+    L.marker([RESTAURANT_LAT, RESTAURANT_LNG], {
+        icon: makeLeafletIcon('#ef4444'),
+        title: RESTAURANT_NAME,
+    }).addTo(adminMap);
+
+    if (rtdb) watchDriverLocations();
+    updateOrderMapMarkers(allOrders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled'));
+}
+
+function updateOrderMapMarkers(orders) {
+    if (!adminMap) return;
+    orderMarkers.forEach(m => m.remove());
+    orderMarkers = [];
+    orders.forEach(o => {
+        if (!o.lat || !o.lng) return;
+        const m = L.marker([o.lat, o.lng], {
+            icon: makeLeafletIcon('#3b82f6'),
+            title: `${o.customerName} — EGP ${o.total}`,
+        }).addTo(adminMap);
+        m.bindPopup(`<div style="font-family:sans-serif;font-size:13px;"><b>${o.customerName}</b><br>${o.customerPhone}<br>EGP ${o.total} · ${STATUS_LABELS[o.status]}</div>`);
+        orderMarkers.push(m);
+    });
+}
+
+function loadAdminMaps() {
+    createMap();
+}
+
+// ─── ANALYTICS ────────────────────────────────────────────────────────────────
+function buildAnalytics() {
+    const last30 = new Date(); last30.setDate(last30.getDate() - 30);
+    const recent = allOrders.filter(o => o.createdAt && new Date(o.createdAt) >= last30);
+    const delivered = recent.filter(o => o.status === 'delivered');
+    const cancelled = recent.filter(o => o.status === 'cancelled');
+    const revenue = delivered.reduce((s,o) => s + (o.total || 0), 0);
+    const avg = delivered.length ? Math.round(revenue / delivered.length) : 0;
+    const cancelRate = recent.length ? Math.round(cancelled.length / recent.length * 100) : 0;
+
+    document.getElementById('an-total').textContent   = recent.length;
+    document.getElementById('an-revenue').textContent  = 'EGP ' + revenue;
+    document.getElementById('an-avg').textContent     = 'EGP ' + avg;
+    document.getElementById('an-cancel').textContent  = cancelRate + '%';
+
+    // Bar chart (last 7 days)
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        const key = d.toISOString().slice(0, 10);
+        const count = allOrders.filter(o => o.createdAt && o.createdAt.slice(0, 10) === key).length;
+        days.push({ label: d.toLocaleDateString('en', { weekday: 'short' }), count });
+    }
+    const maxCount = Math.max(...days.map(d => d.count), 1);
+    document.getElementById('bar-chart').innerHTML = days.map(d => `
+        <div class="bar-wrap">
+            <div class="bar-val">${d.count}</div>
+            <div class="bar" style="height:${Math.round(d.count / maxCount * 100)}%;"></div>
+            <div class="bar-label">${d.label}</div>
+        </div>
+    `).join('');
+
+    // Driver performance
+    const perf = {};
+    allOrders.filter(o => o.assignedDriver && o.status === 'delivered').forEach(o => {
+        const id = o.assignedDriver.id;
+        if (!perf[id]) perf[id] = { name: o.assignedDriver.name, count: 0, earnings: 0 };
+        perf[id].count++;
+        // Driver pay = 20% of delivery fee + EGP 10 base per delivery
+        perf[id].earnings += Math.round((o.deliveryFee || 0) * 0.2 + 10);
+    });
+    const rows = Object.values(perf).sort((a,b) => b.count - a.count);
+    document.getElementById('perf-table-body').innerHTML = rows.length
+        ? rows.map(r => `<tr><td>${r.name}</td><td>${r.count}</td><td>—</td><td>EGP ${r.earnings}</td></tr>`).join('')
+        : '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:1.5rem;">No data yet</td></tr>';
+}
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>

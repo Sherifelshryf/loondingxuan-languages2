@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Track Order — Loongdingxuan (龙鼎轩)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="firebase-config.js"></script>
+    <style>
+        :root {
+            --bg-base: #121010;
+            --bg-surface: rgba(35, 32, 32, 0.55);
+            --accent: #FFB7B2;
+            --accent-glow: rgba(255, 183, 178, 0.2);
+            --text-main: #FDFCF8;
+            --text-muted: #A8A29E;
+            --border: rgba(255, 255, 255, 0.08);
+            --shadow-soft: 0 4px 30px rgba(0, 0, 0, 0.5);
+            --radius-lg: 2rem;
+            --green: #4ADE80;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg-base); color: var(--text-main); min-height: 100vh; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; }
+        .global-blobs { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.2; animation: float 8s ease-in-out infinite alternate; }
+        .blob-1 { width: 50vw; height: 50vw; max-width: 600px; max-height: 600px; background: #FF7EB3; top: -10%; left: -10%; }
+        .blob-2 { width: 40vw; height: 40vw; max-width: 500px; max-height: 500px; background: #8E84FA; bottom: 0; right: -10%; animation-delay: -3s; }
+        @keyframes float { 0% { transform: translateY(0) scale(1); } 100% { transform: translateY(25px) scale(1.08); } }
+        .grain-overlay { position: fixed; inset: 0; z-index: 9999; pointer-events: none; background: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.35"/%3E%3C/svg%3E'); mix-blend-mode: overlay; opacity: 0.4; }
+
+        nav { position: sticky; top: 0; background: rgba(20,18,18,0.85); backdrop-filter: blur(25px); border-bottom: 1px solid var(--border); z-index: 100; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo-text { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text-main); }
+        .logo-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; }
+
+        #track-map { flex: 1; min-height: 50vh; width: 100%; }
+
+        .bottom-panel {
+            background: rgba(20,18,18,0.95); backdrop-filter: blur(30px);
+            border-top: 1px solid var(--border);
+            padding: 1.5rem 2rem 2.5rem; position: relative; z-index: 50;
+            overflow-y: auto; max-height: 45vh;
+        }
+        .panel-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 1.5rem; }
+
+        .search-wrap { display: flex; gap: 0.6rem; margin-bottom: 1.5rem; }
+        .search-wrap input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px; padding: 0.75rem 1rem; color: var(--text-main); font-family: 'Outfit', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.3s; }
+        .search-wrap input:focus { border-color: var(--accent); }
+        .search-btn { padding: 0.75rem 1.2rem; background: var(--accent); color: var(--bg-base); border: none; border-radius: 12px; font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; white-space: nowrap; transition: all 0.3s; }
+        .search-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px var(--accent-glow); }
+
+        .status-pill { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.9rem; border-radius: 50px; font-size: 0.8rem; font-weight: 600; }
+        .status-pill.pending   { background: rgba(255,183,178,0.12); color: var(--accent); }
+        .status-pill.confirmed { background: rgba(250,204,21,0.12); color: #facc15; }
+        .status-pill.picked_up { background: rgba(139,92,246,0.12); color: #a78bfa; }
+        .status-pill.delivered { background: rgba(74,222,128,0.12); color: var(--green); }
+        .status-pill.cancelled { background: rgba(255,80,80,0.1); color: #ff6060; }
+
+        .order-summary-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+        .order-name { font-size: 1.1rem; font-weight: 700; }
+        .order-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 3px; }
+        .eta-chip { display: flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 50px; padding: 0.4rem 0.9rem; font-size: 0.82rem; font-weight: 500; white-space: nowrap; }
+        .eta-chip i { color: var(--accent); }
+
+        .progress-track { margin: 1.2rem 0; }
+        .progress-steps { display: flex; justify-content: space-between; position: relative; margin-bottom: 0.5rem; }
+        .progress-steps::before { content:''; position:absolute; top: 14px; left: 0; right: 0; height: 2px; background: var(--border); z-index: 0; }
+        .progress-fill { position: absolute; top: 14px; left: 0; height: 2px; background: var(--accent); z-index: 1; transition: width 0.8s cubic-bezier(0.22,1,0.36,1); }
+        .prog-step { display: flex; flex-direction: column; align-items: center; z-index: 2; position: relative; }
+        .prog-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; border: 2px solid var(--border); background: var(--bg-base); transition: all 0.4s; }
+        .prog-dot.done { background: var(--accent); border-color: var(--accent); color: var(--bg-base); }
+        .prog-dot.active { background: var(--bg-base); border-color: var(--accent); color: var(--accent); animation: stepPulse 1.5s infinite; }
+        @keyframes stepPulse { 0%,100%{box-shadow:0 0 0 0 var(--accent-glow);} 50%{box-shadow:0 0 0 6px transparent;} }
+        .prog-label { font-size: 0.68rem; color: var(--text-muted); margin-top: 6px; text-align: center; max-width: 60px; }
+
+        .driver-card { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 14px; margin-top: 1rem; }
+        .driver-avatar { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,183,178,0.15); display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 1.2rem; flex-shrink: 0; }
+        .driver-info .name { font-size: 0.9rem; font-weight: 600; }
+        .driver-info .vehicle { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+        .driver-call { margin-left: auto; display: flex; align-items: center; gap: 0.6rem; }
+        .call-btn { width: 38px; height: 38px; border-radius: 50%; background: rgba(74,222,128,0.12); border: 1px solid rgba(74,222,128,0.3); color: var(--green); display: flex; align-items: center; justify-content: center; text-decoration: none; transition: all 0.3s; font-size: 0.9rem; }
+        .call-btn:hover { background: rgba(74,222,128,0.25); }
+
+        .not-found { text-align: center; padding: 2rem; color: var(--text-muted); }
+        .not-found i { font-size: 2.5rem; color: var(--border); margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+<div class="global-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+<div class="grain-overlay"></div>
+
+<nav>
+    <a href="index.html" class="logo-text"><div class="logo-dot"></div> Loongdingxuan <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400;">龙鼎轩</span></a>
+    <span style="color:var(--text-muted);font-size:0.9rem;display:flex;align-items:center;gap:0.5rem;"><i class="fas fa-location-arrow" style="color:var(--accent)"></i> Live Tracking</span>
+</nav>
+
+<div id="track-map"></div>
+
+<div class="bottom-panel">
+    <div class="panel-handle"></div>
+
+    <div class="search-wrap">
+        <input type="text" id="order-search" placeholder="Enter Order ID (e.g. ABC12345)" style="text-transform:uppercase;">
+        <button class="search-btn" onclick="searchOrder()">Track</button>
+    </div>
+
+    <div id="order-info" style="display:none;">
+        <div class="order-summary-row">
+            <div>
+                <div class="order-name" id="t-name">—</div>
+                <div class="order-sub" id="t-address">—</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.5rem;">
+                <div class="status-pill pending" id="t-status-pill">Pending</div>
+                <div class="eta-chip"><i class="fas fa-clock"></i> <span id="t-eta">—</span></div>
+            </div>
+        </div>
+
+        <div class="progress-track">
+            <div class="progress-steps">
+                <div class="prog-step"><div class="prog-dot active" id="ps-0"><i class="fas fa-inbox"></i></div><div class="prog-label">Received</div></div>
+                <div class="prog-step"><div class="prog-dot pending" id="ps-1"><i class="fas fa-kitchen-set"></i></div><div class="prog-label">Preparing</div></div>
+                <div class="prog-step"><div class="prog-dot pending" id="ps-2"><i class="fas fa-motorcycle"></i></div><div class="prog-label">On the way</div></div>
+                <div class="prog-step"><div class="prog-dot pending" id="ps-3"><i class="fas fa-house-chimney"></i></div><div class="prog-label">Delivered</div></div>
+            </div>
+            <div style="position:relative;height:0;"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+        </div>
+
+        <div class="driver-card" id="driver-card" style="display:none;">
+            <div class="driver-avatar"><i class="fas fa-motorcycle"></i></div>
+            <div class="driver-info">
+                <div class="name" id="t-driver-name">Your Driver</div>
+                <div class="vehicle" id="t-driver-vehicle">On the way to you</div>
+            </div>
+            <div class="driver-call">
+                <a class="call-btn" id="t-driver-call" href="#"><i class="fas fa-phone"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="not-found" id="not-found" style="display:none;">
+        <i class="fas fa-magnifying-glass"></i>
+        <p>Order not found.<br>Please check your Order ID.</p>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+const STATUS_ORDER = ['pending', 'confirmed', 'picked_up', 'delivered'];
+const STATUS_LABELS = { pending:'Pending', confirmed:'Confirmed', picked_up:'Out for Delivery', delivered:'Delivered', cancelled:'Cancelled' };
+
+let db = null, rtdb = null, map = null, customerMarker = null, driverMarker = null, restaurantMarker = null;
+let driverLocationRef = null;
+
+try {
+    if (typeof FIREBASE_CONFIG !== 'undefined' && FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY') {
+        if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+        db = firebase.firestore();
+        rtdb = firebase.database();
+    }
+} catch(e) { console.warn('Firebase not configured:', e.message); }
+
+function makeLeafletIcon(color) {
+    return L.divIcon({
+        className: '',
+        html: `<div style="width:14px;height:14px;background:${color};border-radius:50%;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.5);"></div>`,
+        iconSize: [14, 14], iconAnchor: [7, 7],
+    });
+}
+
+function initMap() {
+    const lat = typeof RESTAURANT_LAT !== 'undefined' ? RESTAURANT_LAT : 30.0251;
+    const lng = typeof RESTAURANT_LNG !== 'undefined' ? RESTAURANT_LNG : 30.9882;
+    map = L.map('track-map', { zoomControl: true }).setView([lat, lng], 13);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd', maxZoom: 19,
+    }).addTo(map);
+    restaurantMarker = L.marker([lat, lng], { icon: makeLeafletIcon('#ef4444'), title: 'Loongdingxuan' }).addTo(map);
+
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('orderId');
+    if (orderId) {
+        document.getElementById('order-search').value = orderId.slice(-8).toUpperCase();
+        loadOrder(orderId);
+    }
+}
+
+async function searchOrder() {
+    const input = document.getElementById('order-search').value.trim();
+    if (!input) return;
+    document.getElementById('order-info').style.display = 'none';
+    document.getElementById('not-found').style.display = 'none';
+    if (!db) { showDemo(); return; }
+    try {
+        let snap = await db.collection('orders').doc(input).get();
+        if (!snap.exists) {
+            const q = await db.collection('orders').where('shortId', '==', input.toUpperCase()).limit(1).get();
+            if (!q.empty) snap = q.docs[0];
+        }
+        if (snap && snap.exists) {
+            const data = { id: snap.id, ...snap.data() };
+            renderTracking(data);
+            subscribeToOrder(snap.id);
+        } else {
+            document.getElementById('not-found').style.display = 'block';
+        }
+    } catch(e) {
+        console.error(e);
+        document.getElementById('not-found').style.display = 'block';
+    }
+}
+
+async function loadOrder(orderId) {
+    const stored = sessionStorage.getItem('bs_order');
+    if (stored) {
+        const o = JSON.parse(stored);
+        if (o.id === orderId || orderId.includes(o.id)) {
+            renderTracking(o);
+            if (db && !orderId.startsWith('DEMO-')) subscribeToOrder(orderId);
+            return;
+        }
+    }
+    if (db && !orderId.startsWith('DEMO-')) {
+        try {
+            const snap = await db.collection('orders').doc(orderId).get();
+            if (snap.exists) { renderTracking({ id: orderId, ...snap.data() }); subscribeToOrder(orderId); }
+            else document.getElementById('not-found').style.display = 'block';
+        } catch(e) { document.getElementById('not-found').style.display = 'block'; }
+    }
+}
+
+function subscribeToOrder(orderId) {
+    db.collection('orders').doc(orderId).onSnapshot(snap => {
+        if (snap.exists) renderTracking({ id: snap.id, ...snap.data() });
+    });
+}
+
+function renderTracking(o) {
+    document.getElementById('order-info').style.display = 'block';
+    document.getElementById('not-found').style.display = 'none';
+    document.getElementById('t-name').textContent = `${o.customerName}'s Order`;
+    document.getElementById('t-address').textContent = o.customerAddress || '';
+    document.getElementById('t-eta').textContent = `~${o.estimatedMinutes || 45} min`;
+
+    const status = o.status || 'pending';
+    const idx = STATUS_ORDER.indexOf(status);
+    const pill = document.getElementById('t-status-pill');
+    pill.textContent = STATUS_LABELS[status] || status;
+    pill.className = `status-pill ${status}`;
+
+    STATUS_ORDER.forEach((_, i) => {
+        const dot = document.getElementById(`ps-${i}`);
+        if (!dot) return;
+        dot.className = 'prog-dot ' + (i < idx ? 'done' : i === idx ? 'active' : 'pending');
+    });
+
+    const pct = idx === 0 ? 0 : idx === 1 ? 33 : idx === 2 ? 66 : 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+
+    const lat = typeof RESTAURANT_LAT !== 'undefined' ? RESTAURANT_LAT : 30.0251;
+    const lng = typeof RESTAURANT_LNG !== 'undefined' ? RESTAURANT_LNG : 30.9882;
+
+    if (o.lat && o.lng && map) {
+        if (customerMarker) customerMarker.remove();
+        customerMarker = L.marker([o.lat, o.lng], { icon: makeLeafletIcon('#3b82f6'), title: o.customerAddress }).addTo(map);
+        map.fitBounds([
+            [Math.min(lat, o.lat), Math.min(lng, o.lng)],
+            [Math.max(lat, o.lat), Math.max(lng, o.lng)],
+        ]);
+    }
+
+    if (o.assignedDriver && (status === 'picked_up' || status === 'confirmed')) {
+        document.getElementById('driver-card').style.display = 'flex';
+        document.getElementById('t-driver-name').textContent = o.assignedDriver.name || 'Your Driver';
+        document.getElementById('t-driver-vehicle').textContent = o.assignedDriver.vehicle || 'On the way';
+        if (o.assignedDriver.phone) document.getElementById('t-driver-call').href = `tel:${o.assignedDriver.phone}`;
+        if (rtdb && o.assignedDriver.id) watchDriverLocation(o.assignedDriver.id);
+    } else {
+        document.getElementById('driver-card').style.display = 'none';
+    }
+}
+
+function watchDriverLocation(driverId) {
+    if (driverLocationRef) driverLocationRef.off();
+    driverLocationRef = rtdb.ref(`driver_locations/${driverId}`);
+    driverLocationRef.on('value', snap => {
+        const loc = snap.val();
+        if (!loc || !map) return;
+        if (driverMarker) driverMarker.setLatLng([loc.lat, loc.lng]);
+        else driverMarker = L.marker([loc.lat, loc.lng], { icon: makeLeafletIcon('#f59e0b'), title: 'Your Driver' }).addTo(map);
+    });
+}
+
+function showDemo() {
+    const lat = typeof RESTAURANT_LAT !== 'undefined' ? RESTAURANT_LAT : 30.0251;
+    const lng = typeof RESTAURANT_LNG !== 'undefined' ? RESTAURANT_LNG : 30.9882;
+    document.getElementById('order-info').style.display = 'block';
+    document.getElementById('not-found').style.display = 'none';
+    renderTracking({
+        id: 'DEMO', customerName: 'Demo User', customerAddress: 'Sheikh Zayed City',
+        status: 'confirmed', estimatedMinutes: 35,
+        lat: lat + 0.01, lng: lng + 0.01
+    });
+}
+
+initMap();
+</script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Order Confirmed — Loongdingxuan (龙鼎轩)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Reenie+Beanie&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="firebase-config.js"></script>
+    <style>
+        :root {
+            --bg-base: #121010;
+            --bg-surface: rgba(35, 32, 32, 0.55);
+            --accent: #FFB7B2;
+            --accent-glow: rgba(255, 183, 178, 0.2);
+            --text-main: #FDFCF8;
+            --text-muted: #A8A29E;
+            --border: rgba(255, 255, 255, 0.08);
+            --shadow-soft: 0 4px 30px rgba(0, 0, 0, 0.5);
+            --radius-lg: 2rem;
+            --green: #4ADE80;
+            --green-dim: rgba(74, 222, 128, 0.12);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg-base); color: var(--text-main); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+        .global-blobs { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.2; animation: float 8s ease-in-out infinite alternate; }
+        .blob-1 { width: 50vw; height: 50vw; max-width: 600px; max-height: 600px; background: #FF7EB3; top: -10%; left: -10%; }
+        .blob-2 { width: 40vw; height: 40vw; max-width: 500px; max-height: 500px; background: #4ADE80; bottom: 0; right: -10%; animation-delay: -3s; }
+        @keyframes float { 0% { transform: translateY(0) scale(1); } 100% { transform: translateY(25px) scale(1.08); } }
+        .grain-overlay { position: fixed; inset: 0; z-index: 9999; pointer-events: none; background: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.35"/%3E%3C/svg%3E'); mix-blend-mode: overlay; opacity: 0.4; }
+        nav { position: sticky; top: 0; background: rgba(20,18,18,0.85); backdrop-filter: blur(25px); border-bottom: 1px solid var(--border); z-index: 100; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo-text { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text-main); }
+        .logo-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; }
+        .page-wrap { max-width: 680px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
+        .confirm-banner { text-align: center; padding: 3rem 2rem; margin-bottom: 2rem; background: var(--bg-surface); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); }
+        .confirm-icon { width: 72px; height: 72px; border-radius: 50%; background: var(--green-dim); border: 2px solid var(--green); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--green); margin: 0 auto 1.5rem; animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .confirm-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .confirm-sub { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+        .order-id-pill { display: inline-block; margin-top: 1.2rem; padding: 0.4rem 1.2rem; background: rgba(255,183,178,0.1); border: 1px solid rgba(255,183,178,0.25); border-radius: 50px; font-size: 0.85rem; font-weight: 600; color: var(--accent); letter-spacing: 0.05em; }
+        .eta-bar { display: flex; align-items: center; gap: 1rem; padding: 1.2rem 1.5rem; background: var(--bg-surface); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 1.2rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-soft); }
+        .eta-icon { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,183,178,0.1); display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 1.3rem; flex-shrink: 0; }
+        .eta-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+        .eta-val { font-size: 1.3rem; font-weight: 700; }
+        .receipt-card { background: var(--bg-surface); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); overflow: hidden; margin-bottom: 1.5rem; }
+        .receipt-header { padding: 1.5rem 2rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .receipt-header h3 { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+        .receipt-body { padding: 1.5rem 2rem; }
+        .receipt-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem; font-size: 0.9rem; }
+        .receipt-row .lbl { color: var(--text-muted); }
+        .receipt-row .val { font-weight: 500; text-align: right; max-width: 60%; }
+        .receipt-divider { height: 1px; background: var(--border); margin: 1rem 0; }
+        .receipt-total { display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 700; }
+        .receipt-total .t-val { color: var(--accent); }
+        .items-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        .items-table th { text-align: left; color: var(--text-muted); font-weight: 500; padding: 0 0 0.8rem; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; }
+        .items-table th:last-child { text-align: right; }
+        .items-table td { padding: 0.5rem 0; border-top: 1px solid var(--border); }
+        .items-table td:last-child { text-align: right; font-weight: 600; }
+        .items-table .item-qty-badge { display: inline-block; background: rgba(255,183,178,0.12); color: var(--accent); border-radius: 6px; padding: 2px 7px; font-size: 0.75rem; font-weight: 600; margin-right: 6px; }
+        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.5rem; }
+        @media(max-width: 480px) { .actions { grid-template-columns: 1fr; } }
+        .action-btn { padding: 0.85rem 1rem; border-radius: 14px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text-main); font-family: 'Outfit', sans-serif; font-size: 0.88rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.3s; text-decoration: none; }
+        .action-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+        .action-btn.primary { background: var(--accent); color: var(--bg-base); border-color: var(--accent); font-weight: 700; }
+        .action-btn.primary:hover { box-shadow: 0 6px 20px var(--accent-glow); }
+        .action-btn.whatsapp { background: rgba(37,211,102,0.12); color: #25D366; border-color: rgba(37,211,102,0.3); }
+        @media print {
+            .global-blobs, .grain-overlay, nav, .actions, .confirm-banner, .eta-bar, .no-print { display: none !important; }
+            body { background: white !important; color: black !important; }
+            .receipt-card { border: 1px solid #ddd !important; box-shadow: none !important; background: white !important; color: black !important; }
+            .receipt-card * { color: black !important; }
+            .receipt-header h3, .receipt-row .lbl { color: #555 !important; }
+            .page-wrap { padding: 0 !important; max-width: 100% !important; }
+        }
+    </style>
+</head>
+<body>
+<div class="global-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+<div class="grain-overlay"></div>
+<nav>
+    <a href="index.html" class="logo-text"><div class="logo-dot"></div> Loongdingxuan <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400;">龙鼎轩</span></a>
+    <span style="color:var(--text-muted);font-size:0.85rem;" id="nav-order-id"></span>
+</nav>
+<div class="page-wrap">
+    <div class="confirm-banner">
+        <div class="confirm-icon"><i class="fas fa-check"></i></div>
+        <h1 class="confirm-title">Order Confirmed! 🎉</h1>
+        <p class="confirm-sub">Your order has been received and our kitchen is preparing it right now. You'll receive updates as your delivery progresses.</p>
+        <div class="order-id-pill" id="order-id-display">Order #—</div>
+    </div>
+    <div class="eta-bar">
+        <div class="eta-icon"><i class="fas fa-clock"></i></div>
+        <div>
+            <div class="eta-label">Estimated Delivery</div>
+            <div class="eta-val" id="eta-display">~45 min</div>
+            <div class="eta-label" style="margin-top:2px;" id="eta-note">Based on your delivery distance</div>
+        </div>
+        <div style="margin-left:auto;text-align:right;">
+            <div class="eta-label">Payment</div>
+            <div style="font-weight:600;font-size:0.95rem;" id="payment-display">—</div>
+        </div>
+    </div>
+    <div class="receipt-card" id="printable-receipt">
+        <div class="receipt-header">
+            <h3><i class="fas fa-receipt" style="margin-right:0.4rem;color:var(--accent)"></i> Receipt</h3>
+            <span style="font-size:0.78rem;color:var(--text-muted);" id="receipt-date">—</span>
+        </div>
+        <div class="receipt-body">
+            <div class="receipt-row"><span class="lbl">Name</span><span class="val" id="r-name">—</span></div>
+            <div class="receipt-row"><span class="lbl">Phone</span><span class="val" id="r-phone">—</span></div>
+            <div class="receipt-row"><span class="lbl">Address</span><span class="val" id="r-address">—</span></div>
+            <div class="receipt-row" id="r-landmark-row" style="display:none;"><span class="lbl">Landmark</span><span class="val" id="r-landmark">—</span></div>
+            <div class="receipt-row" id="r-notes-row" style="display:none;"><span class="lbl">Notes</span><span class="val" id="r-notes">—</span></div>
+            <div class="receipt-divider"></div>
+            <table class="items-table">
+                <thead><tr><th>Item</th><th>Qty</th><th>Price</th></tr></thead>
+                <tbody id="r-items"></tbody>
+            </table>
+            <div class="receipt-divider"></div>
+            <div class="receipt-row"><span class="lbl">Subtotal</span><span class="val" id="r-subtotal">—</span></div>
+            <div class="receipt-row"><span class="lbl">Delivery Fee</span><span class="val" id="r-delivery">—</span></div>
+            <div class="receipt-row" id="r-discount-row" style="display:none;"><span class="lbl">Discount</span><span class="val" id="r-discount" style="color:var(--green)">—</span></div>
+            <div class="receipt-divider"></div>
+            <div class="receipt-total"><span>Total</span><span class="t-val" id="r-total">—</span></div>
+            <div style="margin-top:1.5rem;padding:1rem;background:rgba(255,255,255,0.03);border-radius:12px;font-size:0.78rem;color:var(--text-muted);text-align:center;line-height:1.6;">
+                Loongdingxuan (龙鼎轩) · Sheikh Zayed City, Giza · <span id="r-restaurant-phone">Egypt</span><br>
+                Thank you for your order! We hope you enjoy every bite. 🥟
+            </div>
+        </div>
+    </div>
+    <div class="actions no-print">
+        <button class="action-btn" onclick="window.print()"><i class="fas fa-print"></i> Print Receipt</button>
+        <button class="action-btn" id="share-btn" onclick="shareReceipt()"><i class="fas fa-share-nodes"></i> Share</button>
+        <a class="action-btn whatsapp" id="whatsapp-btn" href="#" target="_blank"><i class="fab fa-whatsapp"></i> Contact Us</a>
+        <a class="action-btn primary" href="order.html"><i class="fas fa-plus"></i> New Order</a>
+    </div>
+    <div style="text-align:center;margin-top:1rem;" class="no-print">
+        <a href="track.html" style="color:var(--text-muted);font-size:0.88rem;text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;"><i class="fas fa-location-arrow" style="color:var(--accent)"></i> Track your order</a>
+    </div>
+</div>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+const PAYMENT_LABELS = { cash: 'Cash on Delivery', card: 'Card on Delivery', instapay: 'InstaPay', vodafone: 'Vodafone Cash' };
+let orderData = null;
+let db = null;
+try {
+    if (typeof FIREBASE_CONFIG !== 'undefined' && FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY') {
+        if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+        db = firebase.firestore();
+    }
+} catch(e) { console.warn('Firebase not configured:', e.message); }
+
+async function loadOrder() {
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('orderId');
+    const stored = sessionStorage.getItem('bs_order');
+    if (stored) {
+        orderData = JSON.parse(stored);
+        if (orderId && orderData.id === orderId) { renderOrder(orderData); return; }
+    }
+    if (db && orderId && !orderId.startsWith('DEMO-')) {
+        try {
+            const snap = await db.collection('orders').doc(orderId).get();
+            if (snap.exists) { orderData = { id: orderId, ...snap.data() }; renderOrder(orderData); return; }
+        } catch(e) { console.error(e); }
+    }
+    document.querySelector('.confirm-banner').innerHTML = '<p style="color:var(--text-muted)">Order not found. Please check your link or contact us.</p>';
+}
+
+function renderOrder(o) {
+    const shortId = o.id ? o.id.slice(-8).toUpperCase() : '—';
+    document.getElementById('nav-order-id').textContent = '#' + shortId;
+    document.getElementById('order-id-display').textContent = 'Order #' + shortId;
+    const eta = o.estimatedMinutes || 45;
+    document.getElementById('eta-display').textContent = `~${eta} min`;
+    if (o.lat && o.lng) document.getElementById('eta-note').textContent = 'Based on your delivery distance from Sheikh Zayed';
+    document.getElementById('payment-display').textContent = PAYMENT_LABELS[o.paymentMethod] || o.paymentMethod || '—';
+    const d = o.createdAt ? new Date(o.createdAt) : new Date();
+    document.getElementById('receipt-date').textContent = d.toLocaleDateString('en-EG', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    document.getElementById('r-name').textContent = o.customerName || '—';
+    document.getElementById('r-phone').textContent = o.customerPhone || '—';
+    document.getElementById('r-address').textContent = o.customerAddress || '—';
+    if (o.customerLandmark) { document.getElementById('r-landmark').textContent = o.customerLandmark; document.getElementById('r-landmark-row').style.display = 'flex'; }
+    if (o.orderNotes) { document.getElementById('r-notes').textContent = o.orderNotes; document.getElementById('r-notes-row').style.display = 'flex'; }
+    const tbody = document.getElementById('r-items');
+    tbody.innerHTML = '';
+    (o.items || []).forEach(item => {
+        const tr = document.createElement('tr');
+        const tdName = document.createElement('td');
+        tdName.textContent = item.name + (item.note ? ' (' + item.note + ')' : '');
+        const tdQty = document.createElement('td');
+        const badge = document.createElement('span');
+        badge.className = 'item-qty-badge';
+        badge.textContent = item.qty;
+        tdQty.appendChild(badge);
+        const tdPrice = document.createElement('td');
+        tdPrice.textContent = 'EGP ' + item.subtotal;
+        tr.appendChild(tdName); tr.appendChild(tdQty); tr.appendChild(tdPrice);
+        tbody.appendChild(tr);
+    });
+    document.getElementById('r-subtotal').textContent = `EGP ${o.subtotal || 0}`;
+    document.getElementById('r-delivery').textContent = `EGP ${o.deliveryFee || 0}`;
+    if (o.discount > 0) { document.getElementById('r-discount').textContent = `-EGP ${o.discount}`; document.getElementById('r-discount-row').style.display = 'flex'; }
+    document.getElementById('r-total').textContent = `EGP ${o.total || 0}`;
+    if (typeof RESTAURANT_PHONE !== 'undefined') document.getElementById('r-restaurant-phone').textContent = RESTAURANT_PHONE;
+    if (typeof RESTAURANT_PHONE !== 'undefined') {
+        const msg = encodeURIComponent(`Hi Loongdingxuan! My order #${shortId} — ${o.customerName} — ${o.customerPhone}`);
+        document.getElementById('whatsapp-btn').href = `https://wa.me/${RESTAURANT_PHONE.replace(/\D/g,'')}?text=${msg}`;
+    }
+}
+
+async function shareReceipt() {
+    const url = window.location.href;
+    if (navigator.share) {
+        try { await navigator.share({ title: 'Loongdingxuan Order', text: 'My Loongdingxuan delivery order!', url }); } catch(e) {}
+    } else {
+        await navigator.clipboard.writeText(url);
+        alert('Link copied to clipboard!');
+    }
+}
+
+loadOrder();
+</script>
+</body>
+</html>

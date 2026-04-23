@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Driver App — Loongdingxuan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="firebase-config.js"></script>
+    <style>
+        :root {
+            --bg-base: #0f0e0e;
+            --bg-surface: rgba(30, 28, 28, 0.7);
+            --accent: #FFB7B2;
+            --accent-glow: rgba(255, 183, 178, 0.2);
+            --text-main: #FDFCF8;
+            --text-muted: #A8A29E;
+            --border: rgba(255, 255, 255, 0.09);
+            --shadow-soft: 0 4px 30px rgba(0, 0, 0, 0.5);
+            --green: #4ADE80;
+            --yellow: #facc15;
+            --purple: #a78bfa;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg-base); color: var(--text-main); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+        /* ─── LOGIN ─────────────────────────────────────────────────── */
+        #login-screen {
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            flex-direction: column; padding: 2rem;
+            background: radial-gradient(ellipse at 30% 20%, rgba(255,183,178,0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 70% 80%, rgba(167,139,250,0.06) 0%, transparent 60%);
+        }
+        .login-card { width: 100%; max-width: 400px; background: var(--bg-surface); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 2rem; padding: 2.5rem; box-shadow: var(--shadow-soft); }
+        .login-logo { text-align: center; margin-bottom: 2rem; }
+        .login-logo .icon { width: 64px; height: 64px; border-radius: 50%; background: rgba(255,183,178,0.1); border: 2px solid rgba(255,183,178,0.25); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: var(--accent); margin: 0 auto 1rem; }
+        .login-logo h2 { font-size: 1.4rem; font-weight: 700; }
+        .login-logo p { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
+        .login-field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+        .login-field label { font-size: 0.82rem; color: var(--text-muted); font-weight: 500; }
+        .login-field input { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px; padding: 0.8rem 1rem; color: var(--text-main); font-family: 'Outfit', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.3s; width: 100%; }
+        .login-field input:focus { border-color: var(--accent); }
+        .login-btn { width: 100%; padding: 0.9rem; background: var(--accent); color: var(--bg-base); border: none; border-radius: 50px; font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.3s; margin-top: 0.5rem; }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--accent-glow); }
+        .login-error { color: #ff8080; font-size: 0.82rem; text-align: center; margin-top: 0.8rem; min-height: 1.2em; }
+
+        /* ─── MAIN APP ───────────────────────────────────────────────── */
+        #app-screen { display: none; flex-direction: column; min-height: 100vh; }
+
+        /* TOP BAR */
+        .top-bar { background: rgba(20,18,18,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .driver-info-bar { display: flex; align-items: center; gap: 0.8rem; }
+        .driver-avatar-sm { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,183,178,0.12); display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 1rem; border: 1px solid rgba(255,183,178,0.25); }
+        .driver-name-sm { font-size: 0.9rem; font-weight: 600; }
+        .driver-status-badge { font-size: 0.7rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.3rem; margin-top: 2px; }
+        .online-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: blink 2s infinite; }
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+        .top-bar-actions { display: flex; gap: 0.6rem; }
+        .icon-btn { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem; transition: all 0.3s; }
+        .icon-btn:hover { background: rgba(255,255,255,0.12); color: var(--text-main); }
+        .icon-btn.active { background: rgba(74,222,128,0.12); border-color: rgba(74,222,128,0.3); color: var(--green); }
+
+        /* TABS */
+        .tabs { display: flex; background: rgba(20,18,18,0.6); border-bottom: 1px solid var(--border); }
+        .tab-btn { flex: 1; padding: 0.9rem; background: none; border: none; color: var(--text-muted); font-family: 'Outfit', sans-serif; font-size: 0.85rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.4rem; border-bottom: 2px solid transparent; transition: all 0.3s; }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .badge { background: var(--accent); color: var(--bg-base); border-radius: 50px; font-size: 0.65rem; font-weight: 700; padding: 1px 6px; min-width: 18px; text-align: center; }
+
+        /* CONTENT */
+        .tab-content { display: none; padding: 1.5rem; flex: 1; }
+        .tab-content.active { display: block; }
+
+        /* ORDER CARD */
+        .order-card { background: var(--bg-surface); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 1.4rem; padding: 1.2rem 1.5rem; margin-bottom: 1rem; box-shadow: var(--shadow-soft); }
+        .order-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+        .order-id-sm { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; letter-spacing: 0.06em; }
+        .order-customer { font-size: 1rem; font-weight: 700; margin-top: 2px; }
+        .order-phone { font-size: 0.82rem; color: var(--text-muted); margin-top: 2px; }
+        .order-address-row { display: flex; align-items: flex-start; gap: 0.6rem; margin-bottom: 1rem; font-size: 0.85rem; }
+        .order-address-row i { color: var(--accent); margin-top: 2px; flex-shrink: 0; }
+        .order-items-summary { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; padding: 0.6rem 0.8rem; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid var(--border); }
+        .order-total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .order-total-val { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+        .order-pay-method { font-size: 0.78rem; color: var(--text-muted); }
+
+        /* ACTION BUTTONS */
+        .order-actions { display: flex; gap: 0.6rem; }
+        .o-btn { flex: 1; padding: 0.7rem 0.5rem; border-radius: 12px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text-main); font-family: 'Outfit', sans-serif; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.4rem; transition: all 0.3s; text-decoration: none; }
+        .o-btn:hover { background: rgba(255,255,255,0.1); }
+        .o-btn.nav { background: rgba(139,92,246,0.12); color: var(--purple); border-color: rgba(139,92,246,0.3); }
+        .o-btn.pickup { background: rgba(250,204,21,0.1); color: var(--yellow); border-color: rgba(250,204,21,0.3); }
+        .o-btn.deliver { background: rgba(74,222,128,0.1); color: var(--green); border-color: rgba(74,222,128,0.3); }
+        .o-btn.call { background: rgba(74,222,128,0.08); color: var(--green); border-color: rgba(74,222,128,0.2); }
+
+        /* STATUS CHIP */
+        .s-chip { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.75rem; font-weight: 600; }
+        .s-chip.pending   { background: rgba(255,183,178,0.12); color: var(--accent); }
+        .s-chip.confirmed { background: rgba(250,204,21,0.12); color: var(--yellow); }
+        .s-chip.picked_up { background: rgba(139,92,246,0.12); color: var(--purple); }
+        .s-chip.delivered { background: rgba(74,222,128,0.12); color: var(--green); }
+
+        /* MAP TAB */
+        #driver-map { width: 100%; height: calc(100vh - 180px); border-radius: 1.4rem; overflow: hidden; border: 1px solid var(--border); }
+
+        /* EARNINGS TAB */
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 1.2rem; padding: 1.2rem; box-shadow: var(--shadow-soft); }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.06em; }
+        .stat-val { font-size: 1.5rem; font-weight: 700; }
+        .stat-val.accent { color: var(--accent); }
+        .stat-val.green { color: var(--green); }
+
+        /* EMPTY STATE */
+        .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); }
+        .empty-state i { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.4; display: block; }
+        .empty-state p { font-size: 0.9rem; }
+
+        /* TOAST */
+        .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(30,28,28,0.98); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 50px; padding: 0.8rem 1.5rem; font-size: 0.88rem; font-weight: 500; z-index: 10000; transition: transform 0.4s cubic-bezier(0.22,1,0.36,1); white-space: nowrap; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.success { border-color: rgba(74,222,128,0.4); color: var(--green); }
+        .toast.error { border-color: rgba(255,100,100,0.4); color: #ff8080; }
+
+        .section-label { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+
+<!-- ─── LOGIN SCREEN ─────────────────────────────────────────────────── -->
+<div id="login-screen">
+    <div class="login-card">
+        <div class="login-logo">
+            <div class="icon"><i class="fas fa-motorcycle"></i></div>
+            <h2>Loongdingxuan Driver</h2>
+            <p>Sign in to start your delivery shift</p>
+        </div>
+        <div class="login-field">
+            <label>Email</label>
+            <input type="email" id="login-email" placeholder="driver@loongdingxuan.eg" autocomplete="email">
+        </div>
+        <div class="login-field">
+            <label>Password</label>
+            <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button class="login-btn" onclick="doLogin()"><i class="fas fa-arrow-right"></i> Sign In</button>
+        <div class="login-error" id="login-error"></div>
+    </div>
+</div>
+
+<!-- ─── APP SCREEN ───────────────────────────────────────────────────── -->
+<div id="app-screen">
+    <div class="top-bar">
+        <div class="driver-info-bar">
+            <div class="driver-avatar-sm"><i class="fas fa-user"></i></div>
+            <div>
+                <div class="driver-name-sm" id="driver-display-name">Driver</div>
+                <div class="driver-status-badge"><div class="online-dot"></div> Online</div>
+            </div>
+        </div>
+        <div class="top-bar-actions">
+            <div class="icon-btn active" id="location-btn" title="Location sharing" onclick="toggleLocationSharing()"><i class="fas fa-location-arrow"></i></div>
+            <div class="icon-btn" onclick="doLogout()" title="Sign out"><i class="fas fa-right-from-bracket"></i></div>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('orders')"><i class="fas fa-list-check"></i> Orders <span class="badge" id="orders-badge">0</span></button>
+        <button class="tab-btn" onclick="switchTab('map')"><i class="fas fa-map"></i> Map</button>
+        <button class="tab-btn" onclick="switchTab('earnings')"><i class="fas fa-wallet"></i> Earnings</button>
+    </div>
+
+    <!-- ORDERS TAB -->
+    <div class="tab-content active" id="tab-orders">
+        <div class="section-label">Assigned to You</div>
+        <div id="orders-list"></div>
+    </div>
+
+    <!-- MAP TAB -->
+    <div class="tab-content" id="tab-map">
+        <div id="driver-map"></div>
+    </div>
+
+    <!-- EARNINGS TAB -->
+    <div class="tab-content" id="tab-earnings">
+        <div class="stat-grid">
+            <div class="stat-card"><div class="stat-label">Today's Deliveries</div><div class="stat-val accent" id="stat-deliveries">0</div></div>
+            <div class="stat-card"><div class="stat-label">Today's Earnings</div><div class="stat-val green" id="stat-earnings">EGP 0</div></div>
+            <div class="stat-card"><div class="stat-label">This Week</div><div class="stat-val" id="stat-week">0 orders</div></div>
+            <div class="stat-card"><div class="stat-label">Rating</div><div class="stat-val" id="stat-rating">⭐ —</div></div>
+        </div>
+        <div class="section-label">Completed Deliveries</div>
+        <div id="completed-list"></div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+const PAYMENT_LABELS = { cash: 'Cash on Delivery', card: 'Card on Delivery', instapay: 'InstaPay', vodafone: 'Vodafone Cash' };
+let auth = null, db = null, rtdb = null;
+let currentDriver = null;
+let locationWatchId = null;
+let locationActive = false;
+let assignedOrders = [];
+let driverMap = null;
+let driverSelfMarker = null;
+
+// ─── FIREBASE INIT ────────────────────────────────────────────────────────────
+try {
+    if (typeof FIREBASE_CONFIG !== 'undefined' && FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY') {
+        if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+        auth = firebase.auth();
+        db = firebase.firestore();
+        rtdb = firebase.database();
+    }
+} catch(e) { console.warn('Firebase not configured:', e.message); }
+
+// ─── AUTH ────────────────────────────────────────────────────────────────────
+async function doLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const errEl = document.getElementById('login-error');
+    errEl.textContent = '';
+
+    if (!auth) {
+        // Demo mode without Firebase
+        showApp({ uid: 'demo', email, displayName: email.split('@')[0] });
+        return;
+    }
+    try {
+        const cred = await auth.signInWithEmailAndPassword(email, password);
+        showApp(cred.user);
+    } catch(e) {
+        errEl.textContent = 'Invalid email or password.';
+    }
+}
+
+function doLogout() {
+    stopLocationSharing();
+    if (auth) auth.signOut();
+    document.getElementById('app-screen').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+}
+
+function showApp(user) {
+    currentDriver = user;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'flex';
+    document.getElementById('driver-display-name').textContent = user.displayName || user.email?.split('@')[0] || 'Driver';
+    startLocationSharing();
+    subscribeToOrders(user.uid);
+    loadEarnings(user.uid);
+}
+
+if (auth) {
+    auth.onAuthStateChanged(user => { if (user) showApp(user); });
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+function switchTab(name) {
+    document.querySelectorAll('.tab-btn').forEach((b, i) => {
+        const names = ['orders', 'map', 'earnings'];
+        b.classList.toggle('active', names[i] === name);
+    });
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    if (name === 'map') initDriverMap();
+}
+
+// ─── ORDERS ───────────────────────────────────────────────────────────────────
+function subscribeToOrders(driverId) {
+    if (!db) { renderOrders([]); return; }
+    db.collection('orders')
+        .where('assignedDriver.id', '==', driverId)
+        .where('status', 'in', ['confirmed', 'picked_up'])
+        .onSnapshot(snap => {
+            assignedOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderOrders(assignedOrders);
+        }, e => console.error(e));
+}
+
+function renderOrders(orders) {
+    document.getElementById('orders-badge').textContent = orders.length;
+    const list = document.getElementById('orders-list');
+    if (!orders.length) {
+        list.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No active orders assigned to you</p></div>';
+        return;
+    }
+    list.innerHTML = orders.map(o => {
+        const shortId = o.id.slice(-8).toUpperCase();
+        const items = (o.items || []).map(i => `${i.qty}× ${i.name}`).join(', ');
+        const canPickup = o.status === 'confirmed';
+        const canDeliver = o.status === 'picked_up';
+        return `
+        <div class="order-card">
+            <div class="order-card-header">
+                <div>
+                    <div class="order-id-sm">ORDER #${shortId}</div>
+                    <div class="order-customer">${o.customerName}</div>
+                    <div class="order-phone">${o.customerPhone}</div>
+                </div>
+                <div class="s-chip ${o.status}">${formatStatus(o.status)}</div>
+            </div>
+            <div class="order-address-row"><i class="fas fa-map-pin"></i> <span>${o.customerAddress}${o.customerLandmark ? ' · ' + o.customerLandmark : ''}</span></div>
+            <div class="order-items-summary">${items}</div>
+            <div class="order-total-row">
+                <div><div class="order-total-val">EGP ${o.total}</div><div class="order-pay-method">${PAYMENT_LABELS[o.paymentMethod] || o.paymentMethod}</div></div>
+            </div>
+            <div class="order-actions">
+                <a class="o-btn call" href="tel:${o.customerPhone}"><i class="fas fa-phone"></i> Call</a>
+                ${o.lat && o.lng ? `<a class="o-btn nav" href="https://www.google.com/maps/dir/?api=1&destination=${o.lat},${o.lng}" target="_blank"><i class="fas fa-diamond-turn-right"></i> Navigate</a>` : ''}
+                ${canPickup ? `<button class="o-btn pickup" onclick="updateOrderStatus('${o.id}','picked_up')"><i class="fas fa-box-open"></i> Picked Up</button>` : ''}
+                ${canDeliver ? `<button class="o-btn deliver" onclick="updateOrderStatus('${o.id}','delivered')"><i class="fas fa-circle-check"></i> Delivered</button>` : ''}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+async function updateOrderStatus(orderId, newStatus) {
+    if (!db) { showToast('Demo mode: status updated', 'success'); return; }
+    try {
+        await db.collection('orders').doc(orderId).update({
+            status: newStatus,
+            updatedAt: new Date().toISOString()
+        });
+        showToast(newStatus === 'picked_up' ? '📦 Order picked up!' : '✅ Order delivered!', 'success');
+        if (newStatus === 'delivered' && currentDriver) loadEarnings(currentDriver.uid);
+    } catch(e) {
+        showToast('Failed to update status', 'error');
+    }
+}
+
+function formatStatus(s) {
+    return { pending:'Pending', confirmed:'Ready', picked_up:'On the Way', delivered:'Delivered' }[s] || s;
+}
+
+// ─── LOCATION ─────────────────────────────────────────────────────────────────
+function startLocationSharing() {
+    if (!navigator.geolocation) { showToast('Location not supported on this device', 'error'); return; }
+    locationActive = true;
+    document.getElementById('location-btn').classList.add('active');
+
+    const opts = { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 };
+    locationWatchId = navigator.geolocation.watchPosition(pos => {
+        const { latitude: lat, longitude: lng, accuracy } = pos.coords;
+        pushLocation(lat, lng, accuracy);
+        updateSelfMarker(lat, lng);
+    }, err => console.warn('Location error:', err.message), opts);
+}
+
+function stopLocationSharing() {
+    if (locationWatchId !== null) navigator.geolocation.clearWatch(locationWatchId);
+    locationWatchId = null;
+    locationActive = false;
+    document.getElementById('location-btn').classList.remove('active');
+    if (currentDriver && rtdb) rtdb.ref(`driver_locations/${currentDriver.uid}`).remove();
+}
+
+function toggleLocationSharing() {
+    if (locationActive) stopLocationSharing();
+    else startLocationSharing();
+}
+
+async function pushLocation(lat, lng, accuracy) {
+    if (!rtdb || !currentDriver) return;
+    await rtdb.ref(`driver_locations/${currentDriver.uid}`).set({
+        lat, lng, accuracy,
+        updatedAt: new Date().toISOString(),
+        driverName: currentDriver.displayName || currentDriver.email,
+    });
+}
+
+// ─── DRIVER MAP ───────────────────────────────────────────────────────────────
+function makeLeafletIcon(color) {
+    return L.divIcon({
+        className: '',
+        html: `<div style="width:14px;height:14px;background:${color};border-radius:50%;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.5);"></div>`,
+        iconSize: [14, 14],
+        iconAnchor: [7, 7],
+    });
+}
+
+function initDriverMap() {
+    if (driverMap) return;
+    driverMap = L.map('driver-map').setView([RESTAURANT_LAT, RESTAURANT_LNG], 13);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19,
+    }).addTo(driverMap);
+
+    L.marker([RESTAURANT_LAT, RESTAURANT_LNG], {
+        icon: makeLeafletIcon('#ef4444'),
+        title: RESTAURANT_NAME,
+    }).addTo(driverMap);
+
+    // Show customer order pins
+    assignedOrders.forEach(o => {
+        if (o.lat && o.lng) {
+            L.marker([o.lat, o.lng], {
+                icon: makeLeafletIcon('#3b82f6'),
+                title: o.customerName,
+            }).addTo(driverMap);
+        }
+    });
+}
+
+function updateSelfMarker(lat, lng) {
+    if (!driverMap) return;
+    if (driverSelfMarker) {
+        driverSelfMarker.setLatLng([lat, lng]);
+    } else {
+        driverSelfMarker = L.marker([lat, lng], {
+            icon: makeLeafletIcon('#facc15'),
+            title: 'You',
+        }).addTo(driverMap);
+    }
+}
+
+// ─── EARNINGS ─────────────────────────────────────────────────────────────────
+async function loadEarnings(driverId) {
+    if (!db) return;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const weekAgo = new Date(today); weekAgo.setDate(weekAgo.getDate() - 7);
+
+    try {
+        const snap = await db.collection('orders')
+            .where('assignedDriver.id', '==', driverId)
+            .where('status', '==', 'delivered')
+            .get();
+
+        const all = snap.docs.map(d => d.data());
+        const todayOrders = all.filter(o => new Date(o.updatedAt) >= today);
+        const weekOrders  = all.filter(o => new Date(o.updatedAt) >= weekAgo);
+
+        document.getElementById('stat-deliveries').textContent = todayOrders.length;
+        // Drivers earn 20% of delivery fee
+        // Driver pay = 20% of delivery fee + EGP 10 base per delivery
+        const todayEarnings = todayOrders.reduce((s, o) => s + Math.round((o.deliveryFee || 0) * 0.2 + 10), 0);
+        document.getElementById('stat-earnings').textContent = 'EGP ' + todayEarnings;
+        document.getElementById('stat-week').textContent = weekOrders.length + ' orders';
+
+        // Render completed
+        const completed = document.getElementById('completed-list');
+        if (!todayOrders.length) { completed.innerHTML = '<div class="empty-state"><i class="fas fa-box"></i><p>No completed deliveries today</p></div>'; return; }
+        completed.innerHTML = todayOrders.map(o => `
+            <div class="order-card">
+                <div class="order-card-header">
+                    <div><div class="order-id-sm">ORDER #${o.id ? o.id.slice(-8).toUpperCase() : '—'}</div><div class="order-customer">${o.customerName}</div></div>
+                    <div class="s-chip delivered">Delivered</div>
+                </div>
+                <div style="font-size:0.82rem;color:var(--text-muted);">${o.customerAddress}</div>
+                <div style="font-size:0.88rem;font-weight:600;color:var(--green);margin-top:0.5rem;">EGP ${Math.round((o.deliveryFee || 0) * 0.2 + 10)} earned</div>
+            </div>
+        `).join('');
+    } catch(e) { console.error(e); }
+}
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─── MAPS LOAD ────────────────────────────────────────────────────────────────
+// Leaflet is loaded synchronously; map is initialized when the tab is opened.
+</script>
+</body>
+</html>
