@@ -319,7 +319,7 @@ function applyGradualBlur(containerSelector, preset = 'subtle', customOptions = 
 
 if (!window._blurInitDone) {
     window._blurInitDone = true;
-    document.addEventListener('DOMContentLoaded', () => {
+    const initAll = () => {
         initClickSpark();
         applyGradualBlur('body', 'page-footer', {
             divCount: 16,
@@ -352,5 +352,11 @@ if (!window._blurInitDone) {
 
         window.addEventListener('scroll', updateBlurOpacity, { passive: true });
         updateBlurOpacity();
-    });
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAll);
+    } else {
+        initAll();
+    }
 }

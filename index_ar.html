@@ -42,8 +42,9 @@
         .back-to-top.visible{opacity:1;visibility:visible;transform:translateY(0)}
         .back-to-top:hover{transform:translateY(-5px) scale(1.1)}
         #preloader{position:fixed;inset:0;background:var(--bg-main);z-index:9999;display:flex;justify-content:center;align-items:center;transition:opacity 0.6s ease,visibility 0.6s ease}
-        .loader-spinner{width:60px;height:60px;border:3px solid rgba(201,148,58,0.2);border-top:3px solid var(--accent);border-radius:50%;animation:spin 0.8s linear infinite}
-        @keyframes spin{to{transform:rotate(360deg)}}
+        .loader-dragon { display: flex; flex-direction: column; align-items: center; }
+        .loader-logo { width: 120px; height: auto; animation: pulseLogo 1.5s ease-in-out infinite; }
+        @keyframes pulseLogo { 0% { transform: scale(0.95); opacity: 0.6; } 50% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(0.95); opacity: 0.6; } }
         nav{position:fixed;top:36px;width:100%;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;z-index:1000;transition:var(--trans)}
         nav.scrolled{background:rgba(13,11,8,0.93);backdrop-filter:blur(15px);padding:10px 5%;border-bottom:1px solid var(--border-thin);box-shadow:0 5px 20px rgba(0,0,0,0.5)}
         .logo-img{height:44px;width:auto;object-fit:contain}
@@ -195,7 +196,7 @@
     </style>
 </head>
 <body class="rtl">
-    <div id="preloader"><div class="loader-spinner"></div></div>
+    <div id="preloader"><div class="loader-dragon"><img src="images/logo.png" alt="Logo" class="loader-logo"></div></div>
     <button class="back-to-top" id="topBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-arrow-up"></i></button>
     <div class="lang-bar"><button class="lang-btn" onclick="location.href='index.html'">EN</button><button class="lang-btn active" onclick="location.href='index_ar.html'">عربي</button><button class="lang-btn" onclick="location.href='index_zh.html'">中文</button></div>
     <nav id="nav">
@@ -209,7 +210,7 @@
             <a href="#gallery">معرض الصور</a>
             <a href="#contact">الموقع</a>
             <a href="#res" class="btn-reserve">احجز طاولة</a>
-            <a href="https://www.talabat.com/egypt/restaurant/799867/loongdingxuan-el-rehab-city-1?aid=7600" target="_blank" class="btn-talabat"><img src="images/talabat.png" style="height:20px;width:20px;border-radius:5px;object-fit:contain;" alt="Talabat"> اطلب على طلبات</a>
+            <a href="https://www.talabat.com/egypt/restaurant/799867/loongdingxuan-el-rehab-city-1?aid=7600" target="_blank" class="btn-talabat"><img src="images/t_logo.svg" style="height:20px;width:20px;border-radius:5px;object-fit:contain;" alt="Talabat"> اطلب على طلبات</a>
         </div>
         <div class="hamburger" id="ham"><i class="fas fa-bars"></i></div>
     </nav>
@@ -223,7 +224,7 @@
                 <div class="hero-btns reveal">
                     <a href="#menu" class="btn-solid">استكشف القائمة</a>
                     <a href="#res" class="btn-outline">احجز طاولة</a>
-                    <a href="https://www.talabat.com/egypt/restaurant/799867/loongdingxuan-el-rehab-city-1?aid=7600" target="_blank" class="btn-talabat"><img src="images/talabat.png" style="height:22px;width:22px;border-radius:5px;object-fit:contain;" alt="Talabat"> اطلب على طلبات</a>
+                    <a href="https://www.talabat.com/egypt/restaurant/799867/loongdingxuan-el-rehab-city-1?aid=7600" target="_blank" class="btn-talabat"><img src="images/t_logo.svg" style="height:22px;width:22px;border-radius:5px;object-fit:contain;" alt="Talabat"> اطلب على طلبات</a>
                     <a href="order.html" class="btn-solid" style="background:var(--gradient);"><i class="fas fa-bag-shopping" style="margin-left:8px;"></i>اطلب توصيل</a>
                 </div>
             </div>

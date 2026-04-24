@@ -6,33 +6,36 @@
     <title>Order Confirmed — Loongdingxuan (龙鼎轩)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Reenie+Beanie&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Montserrat:wght@400;500;600;700&family=Reenie+Beanie&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="firebase-config.js"></script>
     <style>
         :root {
-            --bg-base: #121010;
-            --bg-surface: rgba(35, 32, 32, 0.55);
-            --accent: #FFB7B2;
-            --accent-glow: rgba(255, 183, 178, 0.2);
-            --text-main: #FDFCF8;
-            --text-muted: #A8A29E;
-            --border: rgba(255, 255, 255, 0.08);
+            --bg-base: #2B4B3E;
+            --bg-surface: rgba(27, 58, 44, 0.88);
+            --accent: #D2A67A;
+            --accent-light: #e8c8a0;
+            --accent-glow: rgba(210, 166, 122, 0.25);
+            --text-main: #F5EDD8;
+            --text-muted: #b8a890;
+            --border: rgba(210, 166, 122, 0.22);
             --shadow-soft: 0 4px 30px rgba(0, 0, 0, 0.5);
             --radius-lg: 2rem;
             --green: #4ADE80;
             --green-dim: rgba(74, 222, 128, 0.12);
+            --gradient: linear-gradient(135deg, #D2A67A 0%, #b8865a 100%);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg-base); color: var(--text-main); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Montserrat', sans-serif; background: var(--bg-base); color: var(--text-main); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+        h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 700; letter-spacing: 1px; }
         .global-blobs { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
         .blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.2; animation: float 8s ease-in-out infinite alternate; }
-        .blob-1 { width: 50vw; height: 50vw; max-width: 600px; max-height: 600px; background: #FF7EB3; top: -10%; left: -10%; }
-        .blob-2 { width: 40vw; height: 40vw; max-width: 500px; max-height: 500px; background: #4ADE80; bottom: 0; right: -10%; animation-delay: -3s; }
+        .blob-1 { width: 50vw; height: 50vw; max-width: 600px; max-height: 600px; background: #3a6b52; top: -10%; left: -10%; }
+        .blob-2 { width: 40vw; height: 40vw; max-width: 500px; max-height: 500px; background: #D2A67A; bottom: 0; right: -10%; animation-delay: -3s; opacity: 0.15; }
         @keyframes float { 0% { transform: translateY(0) scale(1); } 100% { transform: translateY(25px) scale(1.08); } }
         .grain-overlay { position: fixed; inset: 0; z-index: 9999; pointer-events: none; background: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.35"/%3E%3C/svg%3E'); mix-blend-mode: overlay; opacity: 0.4; }
-        nav { position: sticky; top: 0; background: rgba(20,18,18,0.85); backdrop-filter: blur(25px); border-bottom: 1px solid var(--border); z-index: 100; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .logo-text { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text-main); }
+        nav { position: sticky; top: 0; background: rgba(27,58,44,0.93); backdrop-filter: blur(25px); border-bottom: 1px solid var(--border); z-index: 100; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo-text { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text-main); font-family: 'Playfair Display', serif; }
         .logo-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; }
         .page-wrap { max-width: 680px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
         .confirm-banner { text-align: center; padding: 3rem 2rem; margin-bottom: 2rem; background: var(--bg-surface); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); }
@@ -40,9 +43,9 @@
         @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .confirm-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; }
         .confirm-sub { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
-        .order-id-pill { display: inline-block; margin-top: 1.2rem; padding: 0.4rem 1.2rem; background: rgba(255,183,178,0.1); border: 1px solid rgba(255,183,178,0.25); border-radius: 50px; font-size: 0.85rem; font-weight: 600; color: var(--accent); letter-spacing: 0.05em; }
+        .order-id-pill { display: inline-block; margin-top: 1.2rem; padding: 0.4rem 1.2rem; background: rgba(210,166,122,0.1); border: 1px solid rgba(210,166,122,0.25); border-radius: 50px; font-size: 0.85rem; font-weight: 600; color: var(--accent); letter-spacing: 0.05em; }
         .eta-bar { display: flex; align-items: center; gap: 1rem; padding: 1.2rem 1.5rem; background: var(--bg-surface); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 1.2rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-soft); }
-        .eta-icon { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,183,178,0.1); display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 1.3rem; flex-shrink: 0; }
+        .eta-icon { width: 48px; height: 48px; border-radius: 50%; background: rgba(210,166,122,0.1); display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 1.3rem; flex-shrink: 0; }
         .eta-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
         .eta-val { font-size: 1.3rem; font-weight: 700; }
         .receipt-card { background: var(--bg-surface); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); overflow: hidden; margin-bottom: 1.5rem; }
@@ -60,14 +63,15 @@
         .items-table th:last-child { text-align: right; }
         .items-table td { padding: 0.5rem 0; border-top: 1px solid var(--border); }
         .items-table td:last-child { text-align: right; font-weight: 600; }
-        .items-table .item-qty-badge { display: inline-block; background: rgba(255,183,178,0.12); color: var(--accent); border-radius: 6px; padding: 2px 7px; font-size: 0.75rem; font-weight: 600; margin-right: 6px; }
+        .items-table .item-qty-badge { display: inline-block; background: rgba(210,166,122,0.12); color: var(--accent); border-radius: 6px; padding: 2px 7px; font-size: 0.75rem; font-weight: 600; margin-right: 6px; }
         .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.5rem; }
         @media(max-width: 480px) { .actions { grid-template-columns: 1fr; } }
-        .action-btn { padding: 0.85rem 1rem; border-radius: 14px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text-main); font-family: 'Outfit', sans-serif; font-size: 0.88rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.3s; text-decoration: none; }
-        .action-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
-        .action-btn.primary { background: var(--accent); color: var(--bg-base); border-color: var(--accent); font-weight: 700; }
-        .action-btn.primary:hover { box-shadow: 0 6px 20px var(--accent-glow); }
-        .action-btn.whatsapp { background: rgba(37,211,102,0.12); color: #25D366; border-color: rgba(37,211,102,0.3); }
+        .action-btn { padding: 0.85rem 1rem; border-radius: 50px; border: 2px solid var(--accent); background: transparent; color: var(--accent); font-family: 'Montserrat', sans-serif; font-size: 0.85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.3s; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; }
+        .action-btn:hover { background: var(--accent); color: #fff; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(210,166,122,0.3); }
+        .action-btn.primary { background: var(--gradient); color: #fff; border: none; }
+        .action-btn.primary:hover { box-shadow: 0 6px 20px var(--accent-glow); transform: translateY(-2px); }
+        .action-btn.whatsapp { border-color: #25D366; color: #25D366; }
+        .action-btn.whatsapp:hover { background: #25D366; color: #fff; box-shadow: 0 6px 15px rgba(37,211,102,0.3); }
         @media print {
             .global-blobs, .grain-overlay, nav, .actions, .confirm-banner, .eta-bar, .no-print { display: none !important; }
             body { background: white !important; color: black !important; }
@@ -127,7 +131,7 @@
             <div class="receipt-divider"></div>
             <div class="receipt-total"><span>Total</span><span class="t-val" id="r-total">—</span></div>
             <div style="margin-top:1.5rem;padding:1rem;background:rgba(255,255,255,0.03);border-radius:12px;font-size:0.78rem;color:var(--text-muted);text-align:center;line-height:1.6;">
-                Loongdingxuan (龙鼎轩) · Sheikh Zayed City, Giza · <span id="r-restaurant-phone">Egypt</span><br>
+                Loongdingxuan (龙鼎轩) · Rehab – New Cairo, Cairo · <span id="r-restaurant-phone">Egypt</span><br>
                 Thank you for your order! We hope you enjoy every bite. 🥟
             </div>
         </div>
@@ -178,7 +182,7 @@ function renderOrder(o) {
     document.getElementById('order-id-display').textContent = 'Order #' + shortId;
     const eta = o.estimatedMinutes || 45;
     document.getElementById('eta-display').textContent = `~${eta} min`;
-    if (o.lat && o.lng) document.getElementById('eta-note').textContent = 'Based on your delivery distance from Sheikh Zayed';
+    if (o.lat && o.lng) document.getElementById('eta-note').textContent = 'Based on your delivery distance from Rehab';
     document.getElementById('payment-display').textContent = PAYMENT_LABELS[o.paymentMethod] || o.paymentMethod || '—';
     const d = o.createdAt ? new Date(o.createdAt) : new Date();
     document.getElementById('receipt-date').textContent = d.toLocaleDateString('en-EG', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
