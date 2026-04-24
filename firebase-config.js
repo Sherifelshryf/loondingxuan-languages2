@@ -45,7 +45,7 @@ const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY";
 const RESTAURANT_LAT = 30.0549375;
 const RESTAURANT_LNG = 31.4924375;
 const RESTAURANT_NAME = "Loongdingxuan";
-const RESTAURANT_PHONE = "+201229873306";
+const RESTAURANT_PHONE = "+20226076395";
 const RESTAURANT_ADDRESS = "Loongdingxuan (龙鼎轩), Second New Cairo, Cairo Governorate, Egypt";
 
 // Delivery settings
