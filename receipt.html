@@ -167,7 +167,7 @@ async function loadOrder() {
         orderData = JSON.parse(stored);
         if (orderId && orderData.id === orderId) { renderOrder(orderData); return; }
     }
-    if (db && orderId && !orderId.startsWith('DEMO-')) {
+    if (db && orderId) {
         try {
             const snap = await db.collection('orders').doc(orderId).get();
             if (snap.exists) { orderData = { id: orderId, ...snap.data() }; renderOrder(orderData); return; }

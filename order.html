@@ -277,84 +277,11 @@
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="menu-data.js"></script>
 <script>
 
-// ─── MENU DATA ─────────────────────────────────────────────────────────────
-const MENU = [
-    // Dim Sum
-    { id:'har_gow',          name:'Har Gow (虾饺)',               desc:'Dim Sum',   price:120 },
-    { id:'siu_mai',          name:'Siu Mai (烧卖)',                desc:'Dim Sum',   price:130 },
-    { id:'char_siu_bao',     name:'Char Siu Bao (叉烧包)',        desc:'Dim Sum',   price:115 },
-    { id:'xiao_long_bao',    name:'Xiao Long Bao (小笼包)',       desc:'Dim Sum',   price:145 },
-    { id:'cheung_fun',       name:'Cheung Fun (肠粉)',            desc:'Dim Sum',   price:110 },
-    { id:'lo_mai_gai',       name:'Lo Mai Gai (糯米鸡)',          desc:'Dim Sum',   price:135 },
-    // Mains
-    { id:'peking_duck',      name:'Peking Duck (北京烤鸭)',       desc:'Mains',     price:650 },
-    { id:'kung_pao_chicken', name:'Kung Pao Chicken (宫保鸡丁)',  desc:'Mains',     price:280 },
-    { id:'braised_pork',     name:'Braised Pork Belly (红烧肉)', desc:'Mains',     price:320 },
-    { id:'sweet_sour_pork',  name:'Sweet & Sour Pork (咕噜肉)',  desc:'Mains',     price:295 },
-    { id:'mapo_tofu',        name:'Mapo Tofu (麻婆豆腐)',         desc:'Mains',     price:240 },
-    { id:'twice_cooked_pork',name:'Twice-Cooked Pork (回锅肉)',  desc:'Mains',     price:310 },
-    // Soups & Starters
-    { id:'hot_sour_soup',    name:'Hot & Sour Soup (酸辣汤)',    desc:'Soups & Starters', price:150 },
-    { id:'spring_rolls',     name:'Crispy Spring Rolls (春卷)',  desc:'Soups & Starters', price:110 },
-    { id:'wonton_soup',      name:'Wonton Soup (馄饨汤)',         desc:'Soups & Starters', price:145 },
-    { id:'egg_drop_soup',    name:'Egg Drop Soup (蛋花汤)',       desc:'Soups & Starters', price:90  },
-    // Noodles & Rice
-    { id:'dan_dan_noodles',  name:'Dan Dan Noodles (担担面)',    desc:'Noodles & Rice', price:195 },
-    { id:'yang_chow_rice',   name:'Yang Chow Fried Rice (扬州炒饭)', desc:'Noodles & Rice', price:175 },
-    { id:'beef_chow_mein',   name:'Beef Chow Mein (炒面)',       desc:'Noodles & Rice', price:220 },
-    { id:'seafood_rice',     name:'Seafood Fried Rice (海鲜炒饭)', desc:'Noodles & Rice', price:245 },
-    // Desserts
-    { id:'egg_tarts',        name:'Egg Tarts (蛋挞)',            desc:'Desserts',  price:95  },
-    { id:'sesame_balls',     name:'Sesame Balls (煎堆)',          desc:'Desserts',  price:85  },
-    { id:'mango_pudding',    name:'Mango Pudding (芒果布丁)',     desc:'Desserts',  price:110 },
-    // Beverages
-    { id:'jasmine_tea',      name:'Jasmine Tea (茉莉花茶)',      desc:'Beverages', price:65  },
-    { id:'oolong_tea',       name:'Oolong Tea (乌龙茶)',          desc:'Beverages', price:70  },
-    { id:'lychee_juice',     name:'Lychee Juice (荔枝汁)',        desc:'Beverages', price:80  },
-    { id:'soft_drink',       name:'Soft Drink',                  desc:'Beverages', price:40  },
-];
-
-const MENU_ITEM_DESCS = {
-    har_gow: 'Delicate steamed shrimp dumplings in translucent rice skin.',
-    siu_mai: 'Open-top steamed dumplings with pork, shrimp and fish roe.',
-    char_siu_bao: 'Fluffy buns filled with sweet and savory BBQ pork.',
-    xiao_long_bao: 'Shanghai soup dumplings with rich pork broth inside.',
-    cheung_fun: 'Silky rice noodle rolls with shrimp or pork filling.',
-    lo_mai_gai: 'Sticky rice and chicken wrapped in lotus leaf.',
-    peking_duck: 'Whole crispy-skinned roasted duck with pancakes and hoisin.',
-    kung_pao_chicken: 'Sichuan diced chicken with dried chilies and peanuts.',
-    braised_pork: 'Slow-braised pork in soy, Shaoxing wine and rock sugar.',
-    sweet_sour_pork: 'Crispy pork in tangy pineapple and bell pepper sauce.',
-    mapo_tofu: 'Soft tofu in a spicy Sichuan sauce with minced beef.',
-    twice_cooked_pork: 'Wok-tossed pork belly with leeks, chili and fermented bean paste.',
-    hot_sour_soup: 'Spicy broth with bamboo shoots, tofu and egg.',
-    spring_rolls: 'Golden fried rolls with vegetables and shrimp.',
-    wonton_soup: 'Pork and shrimp wontons in clear chicken broth.',
-    egg_drop_soup: 'Classic silky egg ribbons in seasoned broth.',
-    dan_dan_noodles: 'Sichuan noodles in sesame chili oil with minced pork.',
-    yang_chow_rice: 'Wok-fried rice with shrimp, BBQ pork and egg.',
-    beef_chow_mein: 'Stir-fried noodles with tender beef and mixed vegetables.',
-    seafood_rice: 'Wok-fried rice with mixed seafood and seasonal vegetables.',
-    egg_tarts: 'Flaky pastry shells filled with silky egg custard.',
-    sesame_balls: 'Crispy fried glutinous rice balls filled with lotus paste.',
-    mango_pudding: 'Silky smooth chilled pudding made with fresh mango.',
-    jasmine_tea: 'Fragrant green tea scented with jasmine blossoms.',
-    oolong_tea: 'Semi-oxidized tea with a rich floral and fruity profile.',
-    lychee_juice: 'Refreshing sweet juice from fresh lychee fruit.',
-    soft_drink: 'Pepsi, 7Up, Sprite, or water.',
-};
-
-const MENU_CATEGORIES = [
-    { id: 'all',            label: 'All' },
-    { id: 'Dim Sum',        label: '🥟 Dim Sum' },
-    { id: 'Mains',          label: '🍛 Mains' },
-    { id: 'Soups & Starters', label: '🍜 Soups & Starters' },
-    { id: 'Noodles & Rice', label: '🍚 Noodles & Rice' },
-    { id: 'Desserts',       label: '🍮 Desserts' },
-    { id: 'Beverages',      label: '🍵 Beverages' },
-];
+// Menu data (MENU, MENU_CATEGORIES and helpers) comes from menu-data.js.
+const LANG = 'en';
 
 // ─── STATE ─────────────────────────────────────────────────────────────────
 let cart = {};
@@ -424,7 +351,7 @@ function updateSummary() {
     if (cartLines) {
         cartLines.innerHTML = MENU.filter(i => (cart[i.id] || 0) > 0).map(i => {
             const note = cartNotes[i.id] ? ` <span style="font-size:0.72rem;color:var(--text-muted);">(${cartNotes[i.id]})</span>` : '';
-            return `<div class="summary-line"><span class="label">${i.name} ×${cart[i.id]}${note}</span><span class="val">EGP ${i.price * cart[i.id]}</span></div>`;
+            return `<div class="summary-line"><span class="label">${menuItemLabel(i, LANG)} ×${cart[i.id]}${note}</span><span class="val">EGP ${i.price * cart[i.id]}</span></div>`;
         }).join('');
     }
 
@@ -669,7 +596,7 @@ async function placeOrder() {
         + Math.round(distKm * (typeof ESTIMATED_DRIVE_MINUTES_PER_KM !== 'undefined' ? ESTIMATED_DRIVE_MINUTES_PER_KM : 3));
 
     const orderItems = MENU.filter(i => (cart[i.id] || 0) > 0).map(i => ({
-        id: i.id, name: i.name, qty: cart[i.id], price: i.price,
+        id: i.id, name: menuItemLabel(i, LANG), qty: cart[i.id], price: i.price,
         subtotal: cart[i.id] * i.price, note: cartNotes[i.id] || ''
     }));
 
@@ -693,26 +620,26 @@ async function placeOrder() {
         shortId: null,
     };
 
-    let orderId;
+    if (!db) {
+        showToast('Online ordering is temporarily unavailable. Please call us to order.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-bag-shopping"></i> Place Order';
+        return;
+    }
 
-    if (db) {
-        try {
-            const ref = await db.collection('orders').add(order);
-            orderId = ref.id;
-            const shortId = orderId.slice(-8).toUpperCase();
-            await ref.update({ shortId });
-            order.shortId = shortId;
-        } catch(e) {
-            console.error(e);
-            showToast('Failed to place order. Please try again.', 'error');
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-bag-shopping"></i> Place Order';
-            return;
-        }
-    } else {
-        // Demo mode
-        orderId = 'DEMO-' + Date.now();
-        order.shortId = orderId.slice(-8).toUpperCase();
+    let orderId;
+    try {
+        const ref = await db.collection('orders').add(order);
+        orderId = ref.id;
+        const shortId = orderId.slice(-8).toUpperCase();
+        await ref.update({ shortId });
+        order.shortId = shortId;
+    } catch(e) {
+        console.error(e);
+        showToast('Failed to place order. Please try again.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-bag-shopping"></i> Place Order';
+        return;
     }
 
     order.id = orderId;

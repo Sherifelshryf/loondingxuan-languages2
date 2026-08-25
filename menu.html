@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="Loongdingxuan Menu — Authentic Chinese Restaurant in Egypt. Browse our full menu and add items directly to your cart.">
+    <meta name="description" content="Loongdingxuan (龙鼎轩) full halal Chinese menu — 90 dishes across cold dishes, chicken, beef, lamb, seafood, hot pot, noodles, rice and drinks. Order for delivery.">
     <title>Menu — Loongdingxuan (龙鼎轩)</title>
     <link rel="icon" type="image/png" href="images/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -93,9 +93,15 @@
         .menu-card:hover .menu-img-wrap img { transform: scale(1.1); }
         .menu-img-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: linear-gradient(135deg, var(--bg-sec), var(--bg-main)); }
         .card-info { flex: 1; min-width: 0; }
-        .card-name { font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
-        .card-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 6px; }
-        .card-price { font-size: 0.95rem; font-weight: 700; color: var(--accent); }
+        .card-code { font-size: 0.66rem; font-weight: 700; letter-spacing: 1.5px; color: var(--accent); opacity: 0.75; margin-bottom: 2px; }
+        .card-name { font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
+        .card-native { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+        .card-desc { font-size: 0.75rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 6px; }
+        .card-price { font-size: 0.95rem; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .tag { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; padding: 2px 7px; border-radius: 50px; }
+        .tag.veg { background: rgba(74,222,128,0.14); color: var(--green); border: 1px solid rgba(74,222,128,0.3); }
+        .tag.spicy { background: rgba(239,68,68,0.14); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+        .halal-badge { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; padding: 7px 18px; border-radius: 50px; border: 1px solid var(--border); background: rgba(210,166,122,0.08); color: var(--accent-light); font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
         .card-actions { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .add-btn { width: 34px; height: 34px; border-radius: 50%; background: var(--gradient); color: #fff; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: var(--trans); box-shadow: 0 4px 12px rgba(210,166,122,0.3); }
         .add-btn:hover { transform: scale(1.15); box-shadow: 0 6px 18px rgba(210,166,122,0.5); }
@@ -174,6 +180,7 @@
     <span>Browse &amp; Order</span>
     <h1>Our <em>Full Menu</em></h1>
     <p>Add your favourites directly to the cart and proceed to checkout for delivery.</p>
+    <div class="halal-badge"><i class="fas fa-certificate"></i> 清真 · Halal Certified</div>
     <div class="divider"></div>
 </section>
 
@@ -198,92 +205,10 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="menu-data.js"></script>
 <script>
-// ─── HELPERS ─────────────────────────────────────────────────────────────
-function handleImgError(img) {
-    const emoji = img.getAttribute('data-fallback-emoji') || '🍽️';
-    const placeholder = document.createElement('div');
-    placeholder.className = 'menu-img-placeholder';
-    placeholder.textContent = emoji;
-    img.parentElement.replaceChild(placeholder, img);
-}
-
-// ─── MENU DATA (same as order.html) ──────────────────────────────────────
-const MENU = [
-    // Dim Sum
-    { id:'har_gow',          name:'Har Gow (虾饺)',               desc:'Dim Sum',          price:120,  emoji:'🥟' },
-    { id:'siu_mai',          name:'Siu Mai (烧卖)',                desc:'Dim Sum',          price:130,  emoji:'🥟' },
-    { id:'char_siu_bao',     name:'Char Siu Bao (叉烧包)',        desc:'Dim Sum',          price:115,  emoji:'🥮' },
-    { id:'xiao_long_bao',    name:'Xiao Long Bao (小笼包)',       desc:'Dim Sum',          price:145,  emoji:'🥟' },
-    { id:'cheung_fun',       name:'Cheung Fun (肠粉)',            desc:'Dim Sum',          price:110,  emoji:'🍜' },
-    { id:'lo_mai_gai',       name:'Lo Mai Gai (糯米鸡)',          desc:'Dim Sum',          price:135,  emoji:'🍱' },
-    // Mains
-    { id:'peking_duck',      name:'Peking Duck (北京烤鸭)',       desc:'Mains',            price:650,  emoji:'🦆', img:'images/dish1.jpg' },
-    { id:'kung_pao_chicken', name:'Kung Pao Chicken (宫保鸡丁)',  desc:'Mains',            price:280,  emoji:'🍗' },
-    { id:'braised_pork',     name:'Braised Pork Belly (红烧肉)',  desc:'Mains',            price:320,  emoji:'🍖', img:'images/pork_belly.jpg' },
-    { id:'sweet_sour_pork',  name:'Sweet & Sour Pork (咕噜肉)',   desc:'Mains',            price:295,  emoji:'🍖' },
-    { id:'mapo_tofu',        name:'Mapo Tofu (麻婆豆腐)',         desc:'Mains',            price:240,  emoji:'🥘' },
-    { id:'twice_cooked_pork',name:'Twice-Cooked Pork (回锅肉)',   desc:'Mains',            price:310,  emoji:'🥩' },
-    // Soups & Starters
-    { id:'hot_sour_soup',    name:'Hot & Sour Soup (酸辣汤)',     desc:'Soups & Starters', price:150,  emoji:'🍲', img:'images/hot_sour_soup.jpg' },
-    { id:'spring_rolls',     name:'Crispy Spring Rolls (春卷)',   desc:'Soups & Starters', price:110,  emoji:'🥚' },
-    { id:'wonton_soup',      name:'Wonton Soup (馄饨汤)',         desc:'Soups & Starters', price:145,  emoji:'🍜' },
-    { id:'egg_drop_soup',    name:'Egg Drop Soup (蛋花汤)',        desc:'Soups & Starters', price:90,   emoji:'🥣' },
-    // Noodles & Rice
-    { id:'dan_dan_noodles',  name:'Dan Dan Noodles (担担面)',     desc:'Noodles & Rice',   price:195,  emoji:'🍜' },
-    { id:'yang_chow_rice',   name:'Yang Chow Fried Rice (扬州炒饭)', desc:'Noodles & Rice', price:175, emoji:'🍚', img:'images/dish2.jpg' },
-    { id:'beef_chow_mein',   name:'Beef Chow Mein (炒面)',        desc:'Noodles & Rice',   price:220,  emoji:'🍜' },
-    { id:'seafood_rice',     name:'Seafood Fried Rice (海鲜炒饭)', desc:'Noodles & Rice',   price:245,  emoji:'🍚' },
-    // Desserts
-    { id:'egg_tarts',        name:'Egg Tarts (蛋挞)',             desc:'Desserts',         price:95,   emoji:'🥧', img:'images/dish3.jpg' },
-    { id:'sesame_balls',     name:'Sesame Balls (煎堆)',           desc:'Desserts',         price:85,   emoji:'🟡' },
-    { id:'mango_pudding',    name:'Mango Pudding (芒果布丁)',      desc:'Desserts',         price:110,  emoji:'🥭', img:'images/dish4.jpg' },
-    // Beverages
-    { id:'jasmine_tea',      name:'Jasmine Tea (茉莉花茶)',       desc:'Beverages',        price:65,   emoji:'🍵' },
-    { id:'oolong_tea',       name:'Oolong Tea (乌龙茶)',           desc:'Beverages',        price:70,   emoji:'🫖' },
-    { id:'lychee_juice',     name:'Lychee Juice (荔枝汁)',        desc:'Beverages',        price:80,   emoji:'🧃' },
-    { id:'soft_drink',       name:'Soft Drink',                   desc:'Beverages',        price:40,   emoji:'🥤' },
-];
-
-const MENU_ITEM_DESCS = {
-    har_gow: 'Delicate steamed shrimp dumplings in translucent rice skin.',
-    siu_mai: 'Open-top steamed dumplings with pork, shrimp and fish roe.',
-    char_siu_bao: 'Fluffy buns filled with sweet and savory BBQ pork.',
-    xiao_long_bao: 'Shanghai soup dumplings with rich pork broth inside.',
-    cheung_fun: 'Silky rice noodle rolls with shrimp or pork filling.',
-    lo_mai_gai: 'Sticky rice and chicken wrapped in lotus leaf.',
-    peking_duck: 'Whole crispy-skinned roasted duck with pancakes and hoisin.',
-    kung_pao_chicken: 'Sichuan diced chicken with dried chilies and peanuts.',
-    braised_pork: 'Slow-braised pork in soy, Shaoxing wine and rock sugar.',
-    sweet_sour_pork: 'Crispy pork in tangy pineapple and bell pepper sauce.',
-    mapo_tofu: 'Soft tofu in a spicy Sichuan sauce with minced beef.',
-    twice_cooked_pork: 'Wok-tossed pork belly with leeks, chili and fermented bean paste.',
-    hot_sour_soup: 'Spicy broth with bamboo shoots, tofu and egg.',
-    spring_rolls: 'Golden fried rolls with vegetables and shrimp.',
-    wonton_soup: 'Pork and shrimp wontons in clear chicken broth.',
-    egg_drop_soup: 'Classic silky egg ribbons in seasoned broth.',
-    dan_dan_noodles: 'Sichuan noodles in sesame chili oil with minced pork.',
-    yang_chow_rice: 'Wok-fried rice with shrimp, BBQ pork and egg.',
-    beef_chow_mein: 'Stir-fried noodles with tender beef and mixed vegetables.',
-    seafood_rice: 'Wok-fried rice with mixed seafood and seasonal vegetables.',
-    egg_tarts: 'Flaky pastry shells filled with silky egg custard.',
-    sesame_balls: 'Crispy fried glutinous rice balls filled with lotus paste.',
-    mango_pudding: 'Silky smooth chilled pudding made with fresh mango.',
-    jasmine_tea: 'Fragrant green tea scented with jasmine blossoms.',
-    oolong_tea: 'Semi-oxidized tea with a rich floral and fruity profile.',
-    lychee_juice: 'Refreshing sweet juice from fresh lychee fruit.',
-    soft_drink: 'Pepsi, 7Up, Sprite, or water.',
-};
-
-const MENU_CATEGORIES = [
-    { id: 'all',             label: 'All', icon: '🍽️' },
-    { id: 'Dim Sum',         label: 'Dim Sum', icon: '🥟' },
-    { id: 'Mains',           label: 'Mains', icon: '🍛' },
-    { id: 'Soups & Starters', label: 'Soups', icon: '🍜' },
-    { id: 'Noodles & Rice',  label: 'Noodles & Rice', icon: '🍚' },
-    { id: 'Desserts',        label: 'Desserts', icon: '🍮' },
-    { id: 'Beverages',       label: 'Beverages', icon: '🍵' },
-];
+// Menu data (MENU, MENU_CATEGORIES and helpers) comes from menu-data.js.
+const LANG = 'en';
 
 // ─── STATE ───────────────────────────────────────────────────────────────
 let cart = {};
@@ -300,41 +225,38 @@ function buildMenu() {
     const tabsEl = document.getElementById('menu-tabs');
     const catsEl = document.getElementById('menu-cats');
 
-    tabsEl.innerHTML = MENU_CATEGORIES.map(c =>
-        `<button class="menu-tab ${c.id === 'all' ? 'active' : ''}" onclick="switchTab('${c.id}', this)">${c.icon} ${c.label}</button>`
-    ).join('');
+    tabsEl.innerHTML = '<button class="menu-tab active" onclick="switchTab(\'all\', this)">🍽️ All</button>'
+        + MENU_CATEGORIES.map(c =>
+            `<button class="menu-tab" onclick="switchTab('${c.id}', this)">${c.emoji} ${menuCategoryName(c, LANG)}</button>`
+        ).join('');
 
-    // Create one container per category (plus 'all' is a special combined view)
-    const cats = MENU_CATEGORIES.filter(c => c.id !== 'all').map(c => c.id);
-    cats.forEach(catId => {
-        const grid = document.createElement('div');
-        grid.className = 'menu-cat';
-        grid.id = `cat-${catId.replace(/[^a-z]/gi, '_')}`;
-        catsEl.appendChild(grid);
-    });
-
-    // 'all' is just a combined view – we handle via filter
     const allGrid = document.createElement('div');
     allGrid.className = 'menu-cat active';
     allGrid.id = 'cat-all';
-    catsEl.insertBefore(allGrid, catsEl.firstChild);
+    catsEl.appendChild(allGrid);
+
+    MENU_CATEGORIES.forEach(c => {
+        const grid = document.createElement('div');
+        grid.className = 'menu-cat';
+        grid.id = `cat-${c.id}`;
+        catsEl.appendChild(grid);
+    });
 
     renderCat('all');
-    cats.forEach(c => renderCat(c));
+    MENU_CATEGORIES.forEach(c => renderCat(c.id));
 }
 
 function renderCat(catId) {
-    const items = catId === 'all' ? MENU : MENU.filter(i => i.desc === catId);
-    const el = document.getElementById(`cat-${catId.replace(/[^a-z]/gi, '_')}`);
+    const el = document.getElementById(`cat-${catId}`);
     if (!el) return;
-    el.innerHTML = items.map(item => buildCardHTML(item)).join('');
+    el.innerHTML = menuItemsIn(catId).map(item => buildCardHTML(item)).join('');
 }
 
 function buildCardHTML(item) {
     const qty = cart[item.id] || 0;
-    const imgHTML = item.img
-        ? `<img src="${item.img}" alt="${item.name}" data-fallback-emoji="${item.emoji}" onload="this.style.display='block'" onerror="handleImgError(this)">`
-        : `<div class="menu-img-placeholder">${item.emoji}</div>`;
+    const note = menuItemNote(item, LANG);
+    const tags = (item.veg ? '<span class="tag veg">Vegetarian</span>' : '')
+               + (item.spicy ? '<span class="tag spicy">Spicy</span>' : '');
     const actionsHTML = qty > 0
         ? `<div class="qty-ctrl">
              <button class="qty-btn" onclick="changeQty('${item.id}', -1)"><i class="fas fa-minus" style="font-size:0.6rem;"></i></button>
@@ -342,13 +264,20 @@ function buildCardHTML(item) {
              <button class="qty-btn" onclick="changeQty('${item.id}', 1)"><i class="fas fa-plus" style="font-size:0.6rem;"></i></button>
            </div>`
         : `<button class="add-btn" onclick="addItem('${item.id}')" title="Add to cart"><i class="fas fa-plus"></i></button>`;
+    const img = menuItemImage(item);
+    const imgHTML = img
+        ? `<img src="${img}" alt="${menuItemName(item, LANG)}" loading="lazy" decoding="async"
+                onerror="this.parentElement.innerHTML='<div class=&quot;menu-img-placeholder&quot;>${item.emoji}</div>'">`
+        : `<div class="menu-img-placeholder">${item.emoji}</div>`;
     return `
         <div class="menu-card ${qty > 0 ? 'in-cart' : ''}" id="mc-${item.id}">
             <div class="menu-img-wrap">${imgHTML}</div>
             <div class="card-info">
-                <div class="card-name">${item.name}</div>
-                <div class="card-desc">${MENU_ITEM_DESCS[item.id] || ''}</div>
-                <div class="card-price">EGP ${item.price}</div>
+                <div class="card-code">${item.id}</div>
+                <div class="card-name">${menuItemName(item, LANG)}</div>
+                <div class="card-native">${item.zh}</div>
+                ${note ? `<div class="card-desc">${note}</div>` : ''}
+                <div class="card-price">EGP ${item.price}${tags}</div>
             </div>
             <div class="card-actions" id="ca-${item.id}">${actionsHTML}</div>
         </div>`;
@@ -359,8 +288,7 @@ function switchTab(catId, btn) {
     document.querySelectorAll('.menu-tab').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     document.querySelectorAll('.menu-cat').forEach(c => c.classList.remove('active'));
-    const targetId = `cat-${catId.replace(/[^a-z]/gi, '_')}`;
-    const target = document.getElementById(targetId);
+    const target = document.getElementById(`cat-${catId}`);
     if (target) target.classList.add('active');
 }
 
@@ -370,8 +298,8 @@ function addItem(id) {
     refreshCard(id);
     saveCart();
     updateCartBar();
-    const item = MENU.find(i => i.id === id);
-    showToast(`${item ? item.name.split(' ')[0] : 'Item'} added to cart`);
+    const item = findMenuItem(id);
+    showToast(`${item ? menuItemName(item, LANG) : 'Item'} added to cart`);
 }
 
 function changeQty(id, delta) {
@@ -382,7 +310,7 @@ function changeQty(id, delta) {
 }
 
 function refreshCard(id) {
-    const item = MENU.find(i => i.id === id);
+    const item = findMenuItem(id);
     if (!item) return;
     const qty = cart[id] || 0;
 

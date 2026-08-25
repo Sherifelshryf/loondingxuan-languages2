@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="龙鼎轩 - 埃及正宗中国餐厅，品味中华饮食文化精髓。">
+    <meta name="description" content="龙鼎轩 - 埃及新开罗正宗清真中国餐厅。堂食、订座、外送。">
     <title>龙鼎轩 | 正宗中国餐厅</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="icon" type="image/png" href="images/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -189,6 +188,9 @@
         .brand-ornament::before,.brand-ornament::after{content:'';flex:1;max-width:80px;height:1px;background:var(--accent)}
         .brand-ornament-icon{color:var(--accent);font-size:1rem}
         /* Tagline styling */
+        .hero-halal{display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;padding:6px 16px;border-radius:50px;border:1px solid var(--border-thin);background:rgba(210,166,122,0.1);color:var(--accent-light);font-size:0.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+        .menu-emoji{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2.2rem;background:linear-gradient(135deg,var(--bg-main),var(--bg-sec))}
+        .menu-code{font-size:0.62rem;font-weight:700;letter-spacing:1.5px;color:var(--accent);opacity:0.75;display:block;margin-bottom:2px}
         .brand-tagline{font-size:0.72rem;letter-spacing:4px;color:var(--accent-light);text-transform:uppercase;opacity:0.85}
         /* Input select option */
         .input-grp select option{background:#2B4B3E}
@@ -206,7 +208,6 @@
             <a href="#home">首页</a>
             <a href="#menu">菜单</a>
             <a href="order.html"><i class="fas fa-bag-shopping" style="margin-right:4px;"></i>在线点餐</a>
-            <a href="#testimonials">评价</a>
             <a href="#gallery">相册</a>
             <a href="#contact">位置</a>
             <a href="#res" class="btn-reserve">预订</a>
@@ -219,6 +220,7 @@
             <div class="hero-content">
                 <span class="hero-chinese reveal">龙鼎轩</span>
                 <span class="hero-subtitle reveal">正宗中国美食</span>
+                <span class="hero-halal reveal"><i class="fas fa-certificate"></i> 清真 · 清真认证</span>
                 <h1 class="reveal">品味<br><span>皇朝风味</span></h1>
                 <p class="reveal">传承千年饮食文化精髓--从手工制作的点心到慢火炖制的经典佳肴，以真诚的中国式热情款待每一位宾客。</p>
                 <div class="hero-btns reveal">
@@ -240,21 +242,14 @@
         <section class="section bg-sec" id="menu">
             <div class="sec-header reveal"><span>传统精制</span><h2>招牌菜单</h2><div class="divider"></div></div>
             <div class="menu-container">
-                <div class="menu-tabs reveal"><button class="menu-tab active" data-target="dimsum">点心</button><button class="menu-tab" data-target="mains">主菜</button><button class="menu-tab" data-target="soups">汤品与前菜</button><button class="menu-tab" data-target="noodles">面食与米饭</button></div>
-                <div class="menu-cat active" id="dimsum"><div class="menu-item reveal"><div class="menu-img-wrapper"><img src="https://images.unsplash.com/photo-1563245372-f21724e3856d?w=200&q=80" alt="虾饺" class="menu-img" loading="lazy"></div><div class="menu-content"><div class="menu-head"><span class="menu-name">虾饺<span class="menu-badge">经典</span></span><span class="menu-price">120埃镑</span></div><p class="menu-desc">透明米皮包裹鲜嫩虾肉，入口即化。</p></div></div><div class="menu-item reveal"><div class="menu-img-wrapper"><img src="https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=200&q=80" alt="烧卖" class="menu-img" loading="lazy"></div><div class="menu-content"><div class="menu-head"><span class="menu-name">烧卖<span class="menu-badge">热门</span></span><span class="menu-price">130埃镑</span></div><p class="menu-desc">开口蒸饺，内馅为猪肉、虾仁和鱼子。</p></div></div><div class="menu-item reveal"><div class="menu-img-wrapper"><img src="https://images.unsplash.com/photo-1607330289024-1535c6b4e1c1?w=200&q=80" alt="叉烧包" class="menu-img" loading="lazy"></div><div class="menu-content"><div class="menu-head"><span class="menu-name">叉烧包</span><span class="menu-price">115埃镑</span></div><p class="menu-desc">松软包子，内馅为甜咸叉烧肉。</p></div></div><div class="menu-item reveal"><div class="menu-img-wrapper"><img src="https://images.unsplash.com/photo-1585032226651-759b368d7246?w=200&q=80" alt="小笼包" class="menu-img" loading="lazy"></div><div class="menu-content"><div class="menu-head"><span class="menu-name">小笼包<span class="menu-badge">主厨推荐</span></span><span class="menu-price">145埃镑</span></div><p class="menu-desc">上海汤包，薄皮内包裹浓郁猪肉汤汁。</p></div></div></div>
-<div class="menu-cat" id="mains"><div class="menu-item reveal"><div class="menu-img-wrapper"><img src="https://images.unsplash.com/photo-1548943487-a2e4e43b4853?w=200&q=80" alt="北京烤鸭" class="menu-img" loading="lazy"></div><div class="menu-content"><div class="menu-head"><span class="menu-name">北京烤鸭<span class="menu-badge">招牌</span></span><span class="menu-price">650埃镑</span></div><p class="menu-desc">整只酥脆烤鸭，配薄饼、葱段和海鲜酱。</p></div></div><div class="menu-item reveal"><div class="menu-img-wrapper"><img src="https://images.unsplash.com/photo-1547592180-85f173990554?w=200&q=80" alt="宫保鸡丁" class="menu-img" loading="lazy"></div><div class="menu-content"><div class="menu-head"><span class="menu-name">宫保鸡丁</span><span class="menu-price">280埃镑</span></div><p class="menu-desc">四川风味鸡丁，配干辣椒和花生。</p></div></div><div class="menu-item reveal"><div class="menu-img-wrapper"><img src="images/pork_belly.jpg" alt="红烧肉" class="menu-img" loading="lazy"></div><div class="menu-content"><div class="menu-head"><span class="menu-name">红烧肉</span><span class="menu-price">320埃镑</span></div><p class="menu-desc">酱油、绍兴酒和冰糖慢炖五花肉。</p></div></div></div>
-<div class="menu-cat" id="soups"><div class="menu-item reveal"><div class="menu-img-wrapper"><img src="images/hot_sour_soup.jpg" alt="酸辣汤" class="menu-img" loading="lazy"></div><div class="menu-content"><div class="menu-head"><span class="menu-name">酸辣汤<span class="menu-badge">热门</span></span><span class="menu-price">150埃镑</span></div><p class="menu-desc">竹笋、豆腐和鸡蛋的经典酸辣浓汤。</p></div></div><div class="menu-item reveal"><div class="menu-img-wrapper"><img src="https://images.unsplash.com/photo-1603073163308-9654c3fb70b5?w=200&q=80" alt="炸春卷" class="menu-img" loading="lazy"></div><div class="menu-content"><div class="menu-head"><span class="menu-name">炸春卷</span><span class="menu-price">110埃镑</span></div><p class="menu-desc">金黄酥脆，内馅为蔬菜和虾仁。</p></div></div></div>
-<div class="menu-cat" id="noodles"><div class="menu-item reveal"><div class="menu-img-wrapper"><img src="https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=200&q=80" alt="担担面" class="menu-img" loading="lazy"></div><div class="menu-content"><div class="menu-head"><span class="menu-name">担担面</span><span class="menu-price">195埃镑</span></div><p class="menu-desc">四川风味，芝麻辣油拌面，配猪肉末。</p></div></div><div class="menu-item reveal"><div class="menu-img-wrapper"><img src="https://images.unsplash.com/photo-1512058564366-18510be2db19?w=200&q=80" alt="扬州炒饭" class="menu-img" loading="lazy"></div><div class="menu-content"><div class="menu-head"><span class="menu-name">扬州炒饭<span class="menu-badge">最受欢迎</span></span><span class="menu-price">175埃镑</span></div><p class="menu-desc">大火翻炒，虾仁、叉烧和鸡蛋完美融合。</p></div></div></div>
-
+                <div class="menu-tabs reveal" id="menu-tabs"></div>
+                <div id="menu-cats"></div>
+                <div style="text-align:center;margin-top:40px" class="reveal"><a href="menu.html" class="btn-outline">查看完整菜单</a></div>
             </div>
         </section>
-        <section class="section" id="testimonials">
-            <div class="sec-header reveal"><span>宾客体验</span><h2>宾客评价</h2><div class="divider"></div></div>
-            <div class="grid-auto"><div class="card reveal"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p>"小笼包和北京烤鸭绝无仅有，是埃及最正宗的中国美食！"</p><strong>Sara Mohamed</strong></div><div class="card reveal"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p>"氛围绝佳，每道菜都精心烹制，点心水准无与伦比。"</p><strong>Ahmed Karim</strong></div><div class="card reveal"><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div><p>"优雅环境，热情服务，每一口都仿佛置身中国。"</p><strong>Nour Hassan</strong></div></div>
-        </section>
-        <section class="section bg-sec">
+                <section class="section bg-sec">
             <div class="sec-header reveal"><span>常见问题</span><h2>常见问题解答</h2><div class="divider"></div></div>
-            <div class="faq-container"><div class="faq-item reveal"><div class="faq-question">是否提供素食或清真餐选项？ <i class="fas fa-chevron-down"></i></div><div class="faq-answer">是的！我们提供多种素食菜肴，所有肉类均经清真认证。</div></div><div class="faq-item reveal"><div class="faq-question">北京烤鸭是否需要提前预订？ <i class="fas fa-chevron-down"></i></div><div class="faq-answer">是的，建议至少提前24小时预订，请通过Facebook或电话联系我们。</div></div><div class="faq-item reveal"><div class="faq-question">是否接受大型团体预订？ <i class="fas fa-chevron-down"></i></div><div class="faq-answer">当然！我们欢迎家庭聚会和企业宴请，请提前联系我们安排。</div></div><div class="faq-item reveal"><div class="faq-question">周末是否需要提前预订？ <i class="fas fa-chevron-down"></i></div><div class="faq-answer">周末客流较多，建议提前预订以确保您的座位。</div></div></div>
+            <div class="faq-container"><div class="faq-item reveal"><div class="faq-question">是否提供素食或清真餐选项？ <i class="fas fa-chevron-down"></i></div><div class="faq-answer">提供。菜单中有超过 15 道全素菜品，所有肉类均为清真认证。</div></div><div class="faq-item reveal"><div class="faq-question">餐厅提供猪肉或酒类吗？ <i class="fas fa-chevron-down"></i></div><div class="faq-answer">不提供。本店为清真餐厅，不供应猪肉与酒类，所有肉类均为清真认证。</div></div><div class="faq-item reveal"><div class="faq-question">是否接受大型团体预订？ <i class="fas fa-chevron-down"></i></div><div class="faq-answer">当然！我们欢迎家庭聚会和企业宴请，请提前联系我们安排。</div></div><div class="faq-item reveal"><div class="faq-question">周末是否需要提前预订？ <i class="fas fa-chevron-down"></i></div><div class="faq-answer">周末客流较多，建议提前预订以确保您的座位。</div></div></div>
         </section>
         <section class="section" id="gallery">
             <div class="sec-header reveal"><span>我们的世界</span><h2>餐厅相册</h2><div class="divider"></div></div>
@@ -318,7 +313,38 @@
         </div>
         <p>&copy; <span id="yr"></span> Loongdingxuan. 版权所有。</p>
     </footer>
+    <script src="menu-data.js"></script>
     <script>
+        // Marketing menu, rendered from the shared menu data (menu-data.js).
+        var HOME_LANG = 'zh';
+        var HOME_CATS = ['chicken','beef','seafood','noodles'];
+        (function renderHomeMenu(){
+            var tabs = document.getElementById('menu-tabs');
+            var cats = document.getElementById('menu-cats');
+            if(!tabs || !cats) return;
+            HOME_CATS.forEach(function(id, idx){
+                var cat = MENU_CATEGORIES.filter(function(c){return c.id===id;})[0];
+                if(!cat) return;
+                tabs.insertAdjacentHTML('beforeend',
+                    '<button class="menu-tab' + (idx===0?' active':'') + '" data-target="cat-' + id + '">' + cat.emoji + ' ' + menuCategoryName(cat, HOME_LANG) + '</button>');
+                var items = menuItemsIn(id).slice(0, 6).map(function(item){
+                    var note = menuItemNote(item, HOME_LANG);
+                    return '<div class="menu-item reveal">'
+                        + '<div class="menu-img-wrapper">' + (menuItemImage(item)
+                              ? '<img src="' + menuItemImage(item) + '" alt="" class="menu-img" loading="lazy" decoding="async">'
+                              : '<div class="menu-emoji">' + item.emoji + '</div>') + '</div>'
+                        + '<div class="menu-content"><div class="menu-head">'
+                        + '<span class="menu-name"><span class="menu-code">' + item.id + '</span>' + menuItemName(item, HOME_LANG)
+                        + (item.spicy ? '<span class="menu-badge">' + (HOME_LANG==='ar'?'حار':HOME_LANG==='zh'?'辣':'Spicy') + '</span>' : '')
+                        + '</span><span class="menu-price">EGP ' + item.price + '</span></div>'
+                        + '<p class="menu-desc">' + (HOME_LANG==='zh' ? item.en : item.zh) + (note ? ' · ' + note : '') + '</p>'
+                        + '</div></div>';
+                }).join('');
+                cats.insertAdjacentHTML('beforeend',
+                    '<div class="menu-cat' + (idx===0?' active':'') + '" id="cat-' + id + '">' + items + '</div>');
+            });
+        })();
+
         window.RESERVATION_MSG = "感谢您的预订！我们将尽快与您确认。";
 
         var sel = function(s){ return document.querySelector(s); };
