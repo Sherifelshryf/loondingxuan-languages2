@@ -284,7 +284,7 @@
                         <div class="ff"><label>Email</label><input id="drv-email" type="email" placeholder="driver@email.com"></div>
                         <div class="ff"><label>Vehicle</label><input id="drv-vehicle" type="text" placeholder="Motorcycle · Blue · ABC 123"></div>
                         <div class="ff"><label>National ID</label><input id="drv-nid" type="text" placeholder="29XXXXXXXXXX"></div>
-                        <div class="ff"><label>Temp Password</label><input id="drv-pass" type="password" placeholder="Give driver this to log in" value="Loongdingxuan2024!"></div>
+                        <div class="ff"><label>Temp Password</label><input id="drv-pass" type="password" placeholder="Give driver this to log in" autocomplete="new-password"></div>
                     </div>
                     <button class="submit-btn" onclick="addDriver()"><i class="fas fa-plus"></i> Create Driver Account</button>
                     <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.8rem;"><i class="fas fa-info-circle"></i> This creates a Firebase Auth account. The driver logs into driver.html with this email & password.</div>
@@ -360,7 +360,10 @@ async function doLogin() {
     const email = document.getElementById('admin-email').value.trim();
     const pass = document.getElementById('admin-password').value;
     document.getElementById('login-error').textContent = '';
-    if (!auth) { showDemoApp(); return; }
+    if (!auth) {
+        document.getElementById('login-error').textContent = 'Sign-in is unavailable — the dashboard is not connected.';
+        return;
+    }
     try {
         await auth.signInWithEmailAndPassword(email, pass);
     } catch(e) {
@@ -375,13 +378,6 @@ function doLogout() {
 if (auth) auth.onAuthStateChanged(u => { if (u) startApp(); });
 
 // ─── START APP ────────────────────────────────────────────────────────────────
-function showDemoApp() {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    subscribeToOrders();
-    subscribeToDrivers();
-    watchDriverLocations();
-}
 function startApp() {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
@@ -505,7 +501,7 @@ function renderOrderCard(o, compact) {
 }
 
 async function setStatus(orderId, status) {
-    if (!db) { showToast(`Status set to ${status}`, 'success'); return; }
+    if (!db) { showToast('Not connected — cannot update order.', 'error'); return; }
     try {
         await db.collection('orders').doc(orderId).update({ status, updatedAt: new Date().toISOString() });
         showToast(`Order ${status}`, 'success');
@@ -517,7 +513,7 @@ async function dispatchOrder(orderId) {
     if (!sel || !sel.value) { showToast('Select a driver first', 'error'); return; }
     const driver = allDrivers.find(d => d.id === sel.value);
     if (!driver) return;
-    if (!db) { showToast(`Dispatched to ${driver.name}`, 'success'); return; }
+    if (!db) { showToast('Not connected — cannot dispatch.', 'error'); return; }
     try {
         await db.collection('orders').doc(orderId).update({
             status: 'confirmed',
@@ -595,7 +591,7 @@ async function addDriver() {
             showToast('Failed: ' + e.message, 'error');
         }
     } else {
-        showToast(`Demo: Driver ${name} would be added`, 'success');
+        showToast('Not connected — cannot add a driver.', 'error');
     }
 }
 

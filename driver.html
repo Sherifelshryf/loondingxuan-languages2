@@ -232,8 +232,7 @@ async function doLogin() {
     errEl.textContent = '';
 
     if (!auth) {
-        // Demo mode without Firebase
-        showApp({ uid: 'demo', email, displayName: email.split('@')[0] });
+        errEl.textContent = 'Sign-in is unavailable — the driver app is not connected.';
         return;
     }
     try {
@@ -326,7 +325,7 @@ function renderOrders(orders) {
 }
 
 async function updateOrderStatus(orderId, newStatus) {
-    if (!db) { showToast('Demo mode: status updated', 'success'); return; }
+    if (!db) { showToast('Not connected — cannot update status.', 'error'); return; }
     try {
         await db.collection('orders').doc(orderId).update({
             status: newStatus,

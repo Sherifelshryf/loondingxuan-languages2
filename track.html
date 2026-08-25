@@ -197,7 +197,10 @@ async function searchOrder() {
     if (!input) return;
     document.getElementById('order-info').style.display = 'none';
     document.getElementById('not-found').style.display = 'none';
-    if (!db) { showDemo(); return; }
+    if (!db) {
+        showUnavailable('Order tracking is temporarily unavailable.<br>Please call us for an update on your order.');
+        return;
+    }
     try {
         let snap = await db.collection('orders').doc(input).get();
         if (!snap.exists) {
@@ -223,11 +226,11 @@ async function loadOrder(orderId) {
         const o = JSON.parse(stored);
         if (o.id === orderId || orderId.includes(o.id)) {
             renderTracking(o);
-            if (db && !orderId.startsWith('DEMO-')) subscribeToOrder(orderId);
+            if (db) subscribeToOrder(orderId);
             return;
         }
     }
-    if (db && !orderId.startsWith('DEMO-')) {
+    if (db) {
         try {
             const snap = await db.collection('orders').doc(orderId).get();
             if (snap.exists) { renderTracking({ id: orderId, ...snap.data() }); subscribeToOrder(orderId); }
@@ -298,16 +301,11 @@ function watchDriverLocation(driverId) {
     });
 }
 
-function showDemo() {
-    const lat = typeof RESTAURANT_LAT !== 'undefined' ? RESTAURANT_LAT : 30.0251;
-    const lng = typeof RESTAURANT_LNG !== 'undefined' ? RESTAURANT_LNG : 30.9882;
-    document.getElementById('order-info').style.display = 'block';
-    document.getElementById('not-found').style.display = 'none';
-    renderTracking({
-        id: 'DEMO', customerName: 'Demo User', customerAddress: 'Sheikh Zayed City',
-        status: 'confirmed', estimatedMinutes: 35,
-        lat: lat + 0.01, lng: lng + 0.01
-    });
+function showUnavailable(msg) {
+    const el = document.getElementById('not-found');
+    el.querySelector('p').innerHTML = msg;
+    el.style.display = 'block';
+    document.getElementById('order-info').style.display = 'none';
 }
 
 initMap();

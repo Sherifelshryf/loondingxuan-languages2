@@ -3,6 +3,7 @@
 **Repository analyzed:** `loondingxuan-languages2`
 **Analysis date:** 2026-07-28
 **Analysis method:** Full static inspection of every file in the repository (9 HTML pages, 2 JS files, 9 image assets, git history). No code was executed or modified.
+**Last updated:** 2026-08-25 — the fabricated placeholder menu was replaced with the restaurant's real printed menu (90 dishes, trilingual, halal), and all fake/demo data was removed. See *Change Log* at the end.
 **Purpose of this document:** Give another AI or designer enough accurate information to build a WebLite portfolio entry for this project without needing repository access.
 
 > **Accuracy note.** Everything in this dossier is derived from the source code and assets in this repository. No business outcomes, traffic figures, conversion data, client briefs, or testimonials are claimed, because none are evidenced in the repository. See **Section 13 — Evidence & Confidence** for a per-claim breakdown and **Questions for WebLite** for the gaps that only the owner can fill.
@@ -15,7 +16,7 @@
 |---|---|---|
 | **Project type** | Restaurant website **plus** a custom-built, database-backed food-delivery platform (customer ordering, live order tracking, driver app, and admin operations dashboard) | Verified |
 | **Industry** | Food & Beverage — full-service Chinese restaurant / hospitality | Verified |
-| **Sub-vertical** | Authentic Chinese fine-casual dining with in-house delivery operations | Verified |
+| **Sub-vertical** | Authentic **halal** (清真) Chinese fine-casual dining with in-house delivery operations. The printed menu is branded "CHINA HALAL FOOD" and carries the halal seal; there is no pork and no alcohol anywhere on it | Verified |
 | **Market / region** | Egypt (Cairo). Prices are in EGP; local payment methods include InstaPay and Vodafone Cash; Arabic is a first-class language | Verified |
 | **Business model surfaced** | Dine-in (reservations), in-house delivery (own drivers), and third-party aggregator delivery (Talabat) | Verified |
 | **Delivery scale (configured)** | 20 km max delivery radius, EGP 25 base fee + EGP 5/km, 30 min prep + ~3 min/km drive estimate | Verified |
@@ -25,7 +26,7 @@
 The site is built to do four distinct jobs, and the code shows real investment in all four:
 
 1. **Build brand credibility and appetite** — a cinematic, gold-on-deep-green marketing site presenting the restaurant as an authentic, premium Chinese dining destination.
-2. **Serve a multilingual local audience** — fully translated English, Arabic (RTL), and Chinese versions of the marketing site, reflecting a Chinese restaurant operating in an Arabic-speaking market with an expatriate Chinese clientele.
+2. **Serve a multilingual local audience** — fully translated English, Arabic (RTL), and Chinese versions of the marketing site, and a menu where every one of the 90 dishes carries all three languages. This reflects a halal Chinese restaurant operating in an Arabic-speaking market with an expatriate Chinese clientele — the halal positioning is what makes Chinese cuisine accessible to the local Muslim majority.
 3. **Take orders directly, bypassing aggregator commission** — a complete first-party ordering funnel (catalog → cart → map-pinned address → checkout → receipt → live tracking) that competes with the Talabat listing also linked from the site.
 4. **Run the delivery operation** — an internal admin dashboard and a driver-facing mobile app that together handle order dispatch, driver onboarding, real-time GPS fleet tracking, status progression, and revenue/performance analytics.
 
@@ -76,7 +77,9 @@ Staff get their own tools: an authenticated operations dashboard with live order
 
 | Feature | What it does | Why it matters |
 |---|---|---|
-| **Full ordering catalog** | 27 dishes across six categories with descriptions, prices, photography-or-emoji fallback thumbnails, and category filtering including an "All" view. | The complete menu becomes a transactional surface, not a PDF. |
+| **Full ordering catalog** | The restaurant's complete printed menu — **90 dishes across 13 categories** — each carrying its official menu code (L1, J4, M12…), its name in English, Chinese and Arabic, its price, and vegetarian/spicy tags. Category filtering includes an "All" view. | The entire menu becomes a transactional surface, not a PDF. Menu codes mean customer, waiter and kitchen all speak the same language about an order. |
+| **Trilingual dish data** | Every dish stores its English, Simplified Chinese and Arabic name in one shared dataset, so the same catalogue drives all three editions of the site. | A Chinese diner, an Arabic-speaking local and an English-speaking expat each read the menu in their own language — rare in this market. |
+| **Halal signalling** | Halal certification (清真) is surfaced as a badge on the hero and menu hero, and answered directly in the FAQ. 16 dishes are flagged vegetarian and 13 spicy. | Halal status is the single most important trust signal for this restaurant's local audience, and dietary tags cut pre-order phone calls. |
 | **Persistent cart with live quantity controls** | Add/increment/decrement per item, cards visually flag their in-cart state, cart persists to `sessionStorage` and survives the page change into checkout. | Removes friction at the exact point where food orders are most often abandoned. |
 | **Floating cart bar** | Slide-up bar pinned to the viewport showing live item count, running subtotal, and a checkout button with a count badge. | The order total is always visible — a proven conversion pattern. |
 | **Three-way address capture** | Pin on an interactive map, one-tap GPS ("Use My Location"), or type the address manually. | Egyptian addresses are notoriously hard to express as text; map pinning solves a genuine local delivery problem. |
@@ -117,6 +120,7 @@ Staff get their own tools: an authenticated operations dashboard with live order
 | UI / component library | **None.** Every component — tabs, accordion, drawer, toast, stepper, cart bar, modal-free panels — is bespoke | Verified |
 | Icons | Font Awesome 6.5.2 via cdnjs | Verified |
 | Typography | Google Fonts — Playfair Display + Montserrat (English), Noto Kufi Arabic (Arabic), Noto Serif SC (Chinese), Outfit (admin/driver) | Verified |
+| Shared data | `menu-data.js` — a single trilingual menu dataset (90 dishes, 13 categories) imported by the catalogue, the checkout and all three marketing pages. One price edit propagates everywhere | Verified |
 | Browser APIs used | IntersectionObserver, Canvas 2D, Geolocation (`getCurrentPosition` and `watchPosition`), Web Share API, Clipboard API, `sessionStorage`, `window.print()`, `URLSearchParams`, `requestAnimationFrame` | Verified |
 
 ### Backend
@@ -605,6 +609,8 @@ The strongest single asset for the case study header is the three-panel dispatch
 - Arabic RTL implementation with a dedicated rule block covering navigation, menu rows, accordions, underline origins, hover translations, the language bar, and drawer slide direction
 - Firebase 9.23.0 compat SDK: Firestore, Realtime Database, and Authentication
 - Firestore collections in use: `orders`, `drivers`, `promo_codes`
+- Halal certification (清真) stated on the printed menu cover ("CHINA HALAL FOOD" / الطعام الصيني الحلال) and consistent with the dish list: no pork, no alcohol
+- Menu price range EGP 70–1390; 16 vegetarian dishes and 13 dishes marked spicy
 - Realtime Database path in use: `driver_locations/{uid}`
 - Email/password authentication gating both `admin.html` and `driver.html`
 - Driver account creation from the admin UI, writing both an Auth account and a Firestore profile
@@ -616,7 +622,7 @@ The strongest single asset for the case study header is the three-panel dispatch
 - Four payment methods: Cash on Delivery, Card on Delivery, InstaPay, Vodafone Cash
 - Promo code lookup against Firestore with an `active` flag check
 - Cart persistence via `sessionStorage` across the catalog → checkout transition
-- 27 menu items across six categories, hardcoded identically in `menu.html` and `order.html`
+- 90 menu items across 13 categories in a single shared `menu-data.js`, each with menu code, English/Chinese/Arabic names, price, and vegetarian/spicy flags, transcribed from the restaurant's official printed menu
 - Four-stage order status model shared across all consuming pages
 - Driver GPS broadcasting via `watchPosition`, with a toggle that deletes the location record
 - Admin analytics: 30-day metrics, seven-day bar chart, per-driver performance and earnings
@@ -647,16 +653,13 @@ These must **not** be described as working features in any published portfolio c
 - **The table reservation form does not submit anywhere.** It shows a confirmation message after a simulated delay and resets. No data is transmitted, stored, or emailed.
 - **The newsletter signup does not submit anywhere.** It shows an alert and resets.
 - **No online payment capture.** All four payment methods are recorded as a selection on the order; nothing is charged through the site.
-- **The ordering flow is English-only.** The catalog, checkout, receipt, and tracking pages exist in English only; the Arabic and Chinese editions link directly into the English ordering pages. Multilingual coverage is marketing-site-only.
+- **The ordering flow's interface is still English-only.** Dish *data* is now trilingual and the catalogue renders from a `LANG` constant, so translating the ordering UI is now a small change — but the catalogue, checkout, receipt and tracking chrome still ship in English, and the Arabic and Chinese editions link into them.
 - **SEO is minimal.** Titles and meta descriptions are present, but there are no Open Graph or Twitter Card tags, no canonical URLs, no `hreflang` annotations between the three language editions, no structured data (`Restaurant`, `Menu`, or `LocalBusiness` schema), no sitemap, and no `robots.txt`. Do not claim SEO as a capability on this project.
 - **Accessibility is not implemented.** There are zero ARIA attributes and zero explicit roles across all nine pages. Interactive elements are built from `div` elements with click handlers in several places. The viewport meta tag sets `maximum-scale=1.0, user-scalable=no`, which blocks pinch-zoom. Alt text is present on images (65 instances), which is the one positive. Do not claim accessibility on this project.
-- **Some marketing menu thumbnails are hotlinked to Unsplash**, not served locally — four external stock images per language edition. These are generic stock dishes, not the restaurant's own food.
-- **`favicon.ico` is referenced but does not exist** in the repository; the PNG fallback covers it.
+- **No per-dish photography.** The catalogue uses category emoji rather than photographs. The previous stock-photo hotlinks were removed with the placeholder menu. The official menu PDF contains a professional photograph of most dishes, so this is a solvable gap — see *Questions for WebLite*.
 - **The logo is a 553KB PNG** embedded twice as inline base64 in each marketing page, inflating each of the three files to roughly 300KB. An SVG or optimised raster would be substantially smaller.
 - **`GOOGLE_MAPS_API_KEY` is declared but never used** — vestigial from an approach later replaced by Leaflet.
 - **The tracking page retains an older colour palette** (blush accent on near-black) rather than the green-and-gold brand applied to the ordering and receipt pages — a visual inconsistency to note before capturing screenshots side by side.
-- **The admin driver-onboarding form ships with a hardcoded default temporary password** containing the client's name. Not a live credential, but it should be removed from source and must never appear in a screenshot.
-- **When Firebase is unconfigured, the admin login grants access to the dashboard shell without authenticating.** This is an intentional demo affordance and is harmless in a configured deployment, but should be confirmed as removed or gated in production.
 
 ### ❓ Needs owner confirmation
 
@@ -749,12 +752,12 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
 ```json
 {
   "anonymousTitle": "Authentic Chinese Restaurant - Trilingual Website & In-House Delivery Platform",
-  "projectType": "Restaurant website with custom food delivery platform, admin operations dashboard and driver application",
+  "projectType": "Halal Chinese restaurant website with custom food delivery platform, admin operations dashboard and driver application",
   "industry": "Food & Beverage - Restaurant / Hospitality",
-  "subIndustry": "Authentic Chinese fine-casual dining with in-house delivery operations",
+  "subIndustry": "Authentic halal (Qing Zhen) Chinese fine-casual dining with in-house delivery operations",
   "market": "Middle East & North Africa (Egypt)",
-  "shortDescription": "A trilingual restaurant website paired with a complete in-house delivery platform - customers browse, order, and watch their driver move across a live map, while staff dispatch orders and track the fleet from a custom operations dashboard.",
-  "longDescription": "A premium Chinese restaurant needed more than a brochure site: it needed to take delivery orders directly and run the deliveries itself. This project delivers both halves. The public site is presented in three complete language editions - English, Arabic with a true right-to-left layout and Arabic typography, and Chinese with Simplified Chinese serif type - each a fully translated standalone page rather than a runtime string swap. Deep jade green and antique gold set an upscale tone, with a tabbed signature menu, a social-linked photo gallery, an FAQ accordion, an embedded location map, and a table-booking form, all animated by scroll-triggered reveals, canvas click-sparks, and a hand-built progressive blur at the page edge. The ordering platform behind it lets diners build a cart from a categorised catalog, pin their delivery address on an interactive map or use GPS or type it, watch the delivery fee and ETA recalculate live from the real distance to the restaurant, choose from four regionally relevant payment methods, apply a database-validated promo code, and receive a printable, shareable receipt. A live tracking page then follows the order through a four-stage timeline with the assigned driver's real-time GPS position moving on the map. Staff get two purpose-built tools: an authenticated operations dashboard with live order queues, a fleet map, one-click driver dispatch, self-service driver onboarding, and 30-day analytics - plus a separate mobile-first driver app that broadcasts location, advances order status, and calculates shift earnings. The entire system is hand-built in vanilla JavaScript on a serverless real-time database, with no framework and no build step.",
+  "shortDescription": "A trilingual halal Chinese restaurant website paired with a complete in-house delivery platform - customers browse a 90-dish menu in three languages, order, and watch their driver move across a live map, while staff dispatch orders and track the fleet from a custom operations dashboard.",
+  "longDescription": "A premium Chinese restaurant needed more than a brochure site: it needed to take delivery orders directly and run the deliveries itself. This project delivers both halves. The restaurant is fully halal certified, and that positioning runs through the product: a halal badge on the hero and menu, a dedicated FAQ answer, and a 90-dish menu containing no pork and no alcohol. The public site is presented in three complete language editions - English, Arabic with a true right-to-left layout and Arabic typography, and Chinese with Simplified Chinese serif type - each a fully translated standalone page rather than a runtime string swap. Deep jade green and antique gold set an upscale tone, with a tabbed signature menu, a social-linked photo gallery, an FAQ accordion, an embedded location map, and a table-booking form, all animated by scroll-triggered reveals, canvas click-sparks, and a hand-built progressive blur at the page edge. The ordering platform behind it lets diners build a cart from the restaurant's complete 90-dish printed menu across 13 categories - every dish carrying its official menu code and its name in English, Chinese and Arabic, pin their delivery address on an interactive map or use GPS or type it, watch the delivery fee and ETA recalculate live from the real distance to the restaurant, choose from four regionally relevant payment methods, apply a database-validated promo code, and receive a printable, shareable receipt. A live tracking page then follows the order through a four-stage timeline with the assigned driver's real-time GPS position moving on the map. Staff get two purpose-built tools: an authenticated operations dashboard with live order queues, a fleet map, one-click driver dispatch, self-service driver onboarding, and 30-day analytics - plus a separate mobile-first driver app that broadcasts location, advances order status, and calculates shift earnings. The entire system is hand-built in vanilla JavaScript on a serverless real-time database, with no framework and no build step.",
   "primaryPurpose": [
     "Build brand credibility for a premium dining experience",
     "Serve a multilingual customer base in English, Arabic and Chinese",
@@ -769,8 +772,18 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     },
     {
       "name": "Interactive digital catalog with persistent cart",
-      "description": "27 dishes across six categories with descriptions, prices, photo-or-emoji thumbnails, category filtering, per-item quantity controls, in-cart visual state and a floating cart bar showing live count and subtotal. The cart persists across the page transition into checkout.",
-      "value": "Turns the menu into a transactional surface and removes friction where food orders are most often abandoned."
+      "description": "The restaurant's complete printed menu - 90 dishes across 13 categories - each with its official menu code (L1, J4, M12), its name in English, Chinese and Arabic, its price, and vegetarian or spicy tags. Category filtering, per-item quantity controls, in-cart visual state and a floating cart bar showing live count and subtotal. The cart persists across the page transition into checkout.",
+      "value": "The entire menu becomes transactional rather than a PDF, and menu codes mean the customer, the waiter and the kitchen all refer to a dish the same way."
+    },
+    {
+      "name": "Trilingual dish data",
+      "description": "Every dish stores its English, Simplified Chinese and Arabic name in one shared dataset that drives the catalogue, the checkout and all three editions of the marketing site.",
+      "value": "A Chinese diner, an Arabic-speaking local and an English-speaking expatriate each read the same menu in their own language."
+    },
+    {
+      "name": "Halal certification signalling and dietary tags",
+      "description": "Halal certification is surfaced as a badge on the hero and menu hero and answered directly in the FAQ. 16 dishes are flagged vegetarian and 13 are flagged spicy.",
+      "value": "Halal status is the decisive trust signal for this restaurant's local audience, and dietary tags remove a common reason to phone before ordering."
     },
     {
       "name": "Map-based delivery address selection",
@@ -957,7 +970,8 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     "Online Ordering",
     "Mobile-First Application Design",
     "Business Intelligence & Reporting",
-    "Third-Party Platform Integration"
+    "Third-Party Platform Integration",
+    "Halal / Dietary Compliance Signalling"
   ],
   "capabilitiesExplicitlyNotApplicable": [
     "3D Web Experiences",
@@ -1211,11 +1225,11 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
       "action": "Crop out or blur in gallery, hero, footer and nav screenshots"
     },
     {
-      "severity": "medium",
+      "severity": "resolved",
       "asset": "Testimonial cards on the marketing site",
       "usedOn": "index.html and translated editions",
-      "issue": "Three named individuals with quoted reviews",
-      "action": "Do not reproduce the names. Confirm with the owner whether these are genuine reviews or placeholder copy before showing them at all."
+      "issue": "Three invented named individuals with quoted reviews. REMOVED from all three editions - the section no longer exists.",
+      "action": "No action needed. If the client has genuine attributable reviews, they can be reinstated."
     },
     {
       "severity": "medium",
@@ -1226,13 +1240,6 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     },
     {
       "severity": "medium",
-      "asset": "Admin driver-onboarding form default password field",
-      "usedOn": "admin.html Drivers panel",
-      "issue": "The temporary-password field ships with a hardcoded default password containing the client's name as its value, visible in any screenshot of that panel",
-      "action": "Never screenshot the Drivers panel without clearing this field. Recommend to the client that the default be removed from source."
-    },
-    {
-      "severity": "medium",
       "asset": "Admin and driver login screens",
       "usedOn": "admin.html, driver.html",
       "issue": "Placeholder email addresses use the client's domain",
@@ -1240,9 +1247,9 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     },
     {
       "severity": "none",
-      "asset": "images/dish1.jpg, dish2.jpg, dish3.jpg, dish4.jpg, pork_belly.jpg, hot_sour_soup.jpg",
+      "asset": "images/dish1.jpg, dish2.jpg, dish3.jpg, dish4.jpg",
       "usedOn": "Gallery and menu thumbnails",
-      "issue": "Plated food photography with no signage, branding or people",
+      "issue": "Plated food photography with no signage, branding or people. The former pork_belly.jpg and hot_sour_soup.jpg were deleted along with the placeholder menu.",
       "action": "Safe to publish - the best anonymised visual assets available in the repository"
     },
     {
@@ -1257,19 +1264,16 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     "The table reservation form does not submit anywhere - it shows a confirmation message after a simulated delay and resets. No data is transmitted, stored or emailed.",
     "The newsletter signup does not submit anywhere - it shows an alert and resets.",
     "No online payment capture - all four payment methods are recorded as a selection on the order; nothing is charged through the site.",
-    "The ordering flow is English-only - catalog, checkout, receipt and tracking exist in English only, and the Arabic and Chinese editions link directly into the English ordering pages. Multilingual coverage is marketing-site-only.",
+    "The ordering flow's interface is still English-only. Dish data is now trilingual and the catalogue renders from a single LANG constant, so translating the ordering UI is a small change, but the catalogue, checkout, receipt and tracking chrome still ship in English.",
     "SEO is minimal - titles and meta descriptions are present, but there are no Open Graph or Twitter Card tags, no canonical URLs, no hreflang annotations between language editions, no structured data, no sitemap and no robots.txt.",
     "Accessibility is not implemented - zero ARIA attributes and zero explicit roles across all nine pages, several interactive elements built from div elements with click handlers, and a viewport meta tag that blocks pinch-zoom. Alt text is present on images.",
-    "Some marketing menu thumbnails are hotlinked to Unsplash rather than served locally - four external stock images per language edition, not the restaurant's own food.",
-    "favicon.ico is referenced but does not exist in the repository; the PNG fallback covers it.",
     "The logo is a 553KB PNG embedded twice as inline base64 in each marketing page, inflating each of the three files to roughly 300KB.",
     "GOOGLE_MAPS_API_KEY is declared in configuration but never referenced anywhere in the codebase - vestigial from an approach later replaced by Leaflet.",
     "The tracking page retains an older blush-on-near-black palette rather than the green-and-gold brand applied to the ordering and receipt pages - a visual inconsistency to note before capturing screenshots side by side.",
-    "The admin driver-onboarding form ships with a hardcoded default temporary password containing the client's name.",
-    "When Firebase configuration is absent the admin login grants access to the dashboard shell without authenticating - an intentional demo affordance, harmless in a configured deployment, but worth confirming as removed or gated in production.",
-    "Menu data is hardcoded and duplicated across menu.html and order.html, so every price change requires editing two files.",
     "All business logic including pricing, distance, ETA, earnings and analytics is computed client-side; no server-side validation exists.",
-    "Firestore security rules are not present in this repository and cannot be verified."
+    "Firestore security rules are not present in this repository and cannot be verified.",
+    "No per-dish photography. The catalogue uses category emoji. The official menu PDF contains a professional photograph of most dishes, so this is solvable if the client supplies the source images.",
+    "Menu data is transcribed from the printed menu and is not admin-editable; a price change is a one-line edit in menu-data.js rather than a dashboard action."
   ],
   "portfolioCard": {
     "title": "Authentic Chinese Restaurant - Trilingual Website & Delivery Platform",
@@ -1302,7 +1306,7 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     "overall": 8.2
   },
   "recommendedTier": "Featured Project",
-  "recommendedTierReasoning": "Featured for three reasons. It resolves the objection agencies most often face - can you build more than a website - in a single screenshot, because the admin dashboard and driver app prove WebLite ships operational software. It carries a rare, specifically marketable specialism in genuine right-to-left Arabic implementation, which is decisive in the MENA market. And it tells a complete end-to-end story a visitor can follow from hero to catalog to map pin to checkout to receipt to live tracking to dispatcher console to driver phone. Conditional on completing the privacy work: the hero background contains identifiable third parties and brand signage, and every operational screen renders live customer data, so the project cannot be published from production screenshots.",
+  "recommendedTierReasoning": "Featured for three reasons. It resolves the objection agencies most often face - can you build more than a website - in a single screenshot, because the admin dashboard and driver app prove WebLite ships operational software. It carries a rare, specifically marketable specialism in genuine right-to-left Arabic implementation, which is decisive in the MENA market. And it tells a complete end-to-end story a visitor can follow from hero to catalog to map pin to checkout to receipt to live tracking to dispatcher console to driver phone. The menu is now the restaurant's real trilingual halal menu and all fabricated demo content has been removed, so screenshots of the catalogue are safe and accurate. Still conditional on completing the remaining privacy work: the hero background contains identifiable third parties and brand signage, and every operational screen renders live customer data, so the project cannot be published from production screenshots.",
   "ownerQuestions": [
     "What problem did the client originally come to you with - losing margin to aggregator commissions, inability to serve Arabic or Chinese speakers, or something else?",
     "Was this a redesign of an existing website or a new build from nothing?",
@@ -1312,6 +1316,8 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     "Is the client's identity permitted to be public, or must this stay anonymised?",
     "Are screenshots allowed publicly, and specifically may the storefront hero photograph be published - do the staff and customers visible in it have any consent on record?",
     "Were the branding, logo mark and photography supplied by the client or created by WebLite? If WebLite created the brand identity, that is a significant additional capability this dossier cannot currently claim.",
+    "The menu PDF contains a professional photograph of most dishes. Can you supply those images as separate files so each dish can carry its own photo instead of a category emoji?",
+    "Are the printed menu prices current? They were transcribed exactly as printed, and EGP pricing moves quickly.",
     "Are the dish photographs the restaurant's own or licensed stock? Several marketing thumbnails are hotlinked to Unsplash - was that a deliberate placeholder pending the client's own photography?",
     "Is the website currently live, and at what URL?",
     "Is the delivery platform operating in production with real orders and real drivers, or built and awaiting launch?",
@@ -1325,7 +1331,8 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     "Was online payment capture considered and deferred, or is cash-and-transfer-on-delivery the intended permanent model for this market?",
     "Is the menu intended to become admin-editable? It is currently hardcoded in two page files, so every price change requires a code edit.",
     "Should this be positioned primarily as a restaurant website or as a custom delivery application? The repository supports either framing and they attract very different prospects.",
-    "Are there other WebLite projects sharing this stack that should be presented as a coherent capability cluster?"
+    "Are there other WebLite projects sharing this stack that should be presented as a coherent capability cluster?",
+    "Should the ordering flow (catalogue, checkout, receipt, tracking) be translated into Arabic and Chinese now that the dish data already carries all three languages?"
   ],
   "repositoryFacts": {
     "pages": [
@@ -1340,12 +1347,13 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
       "driver.html - mobile driver application"
     ],
     "sharedModules": [
+      "menu-data.js - trilingual menu dataset (90 dishes, 13 categories), single source of truth for catalogue, checkout and marketing pages",
       "animations.js - click-spark canvas system and progressive-blur engine",
       "firebase-config.js - backend credentials placeholders and business constants"
     ],
     "imageAssets": 9,
-    "menuItems": 27,
-    "menuCategories": 6,
+    "menuItems": 90,
+    "menuCategories": 13,
     "languages": 3,
     "userRoles": 3,
     "buildSystem": "none",
@@ -1364,11 +1372,52 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
       "delivered",
       "cancelled"
     ],
-    "gitHistory": "10 commits, initial commit containing the full system followed by iterative refinements to animation, logo, mobile interface, menu scrolling, and aggregator integration"
+    "gitHistory": "Initial commit containing the full system, followed by iterative refinements to animation, logo, mobile interface, menu scrolling and aggregator integration; then replacement of the placeholder menu with the real trilingual halal menu and removal of all fake and demo data.",
+    "halalCertified": true,
+    "menuLanguages": [
+      "English",
+      "Simplified Chinese",
+      "Arabic"
+    ]
   }
 }
 ```
 
 ---
+
+---
+
+## Change Log
+
+### 2026-08-25 — Real menu added, fabricated data removed
+
+The site previously shipped an **entirely invented placeholder menu** (Har Gow, Peking Duck, Xiao Long Bao, and so on) alongside several pieces of fabricated demo content. The client supplied the official printed menu, and all of it has been replaced with verified data.
+
+**The pork problem.** The placeholder menu contained six pork dishes — Char Siu Bao, Braised Pork Belly, Sweet & Sour Pork, Twice-Cooked Pork, and pork fillings in two others — plus a `pork_belly.jpg` asset. The restaurant is **halal certified** (清真; its printed menu is branded "CHINA HALAL FOOD"). Serving pork is not merely inaccurate here, it inverts the restaurant's core proposition and would have been offensive to its primary audience. This is the clearest possible illustration of why placeholder content must never reach production.
+
+**Added**
+
+- `menu-data.js` — the complete printed menu as a single source of truth: **90 dishes across 13 categories**, each with its official menu code (L1, J4, M12…), English, Simplified Chinese and Arabic names, price, and vegetarian/spicy flags. Price range EGP 70–1390; 16 vegetarian dishes, 13 spicy.
+- Halal certification surfaced as a badge on the marketing hero and the menu hero, and answered directly in the FAQ.
+- Vegetarian and spicy tags on catalogue cards.
+- Menu codes displayed throughout, so customer, waiter and kitchen share one vocabulary.
+- Marketing menus on all three editions now render from the shared dataset in the page's own language.
+
+**Removed**
+
+- The 27-item invented menu, previously duplicated verbatim in `menu.html` and `order.html`.
+- Three fabricated testimonials with invented names, from all three editions.
+- The invented "Peking Duck" FAQ, replaced with a halal question the menu actually supports.
+- Hotlinked Unsplash stock dish photography (12 images across the three editions).
+- `images/pork_belly.jpg` and `images/hot_sour_soup.jpg`.
+- The fake tracking order ("Demo User", "Sheikh Zayed City") and the `DEMO-` synthetic order-ID path.
+- Fake success toasts in the admin dashboard and driver app that reported writes as succeeding when nothing was connected.
+- A hardcoded default driver password containing the client's name.
+- **An authentication bypass**: when Firebase configuration was absent, both `admin.html` and `driver.html` granted access to their full interface on any sign-in attempt. Both now refuse and say the service is not connected. This was the most serious finding in the original analysis and is now closed.
+- A dead `favicon.ico` reference.
+
+**Verified after the change** — 90 items with no duplicate codes, no orphaned categories, no missing translations, and zero pork. All pages render without JavaScript errors; the cart totals correctly and carries through the catalogue → checkout handoff; the Arabic edition renders right-to-left with Arabic dish names throughout.
+
+**Not done** — per-dish photography. The catalogue uses category emoji. The menu PDF contains a professional photograph of most dishes, but they are flattened into the page images rather than supplied as separate files, and guessing which photo belongs to which dish would reintroduce exactly the kind of unverified content this change removed. Requested from the client in *Questions for WebLite*.
 
 *Dossier compiled from full static analysis of the repository. No files were modified and no code was executed during this analysis. Every claim above is traceable to source code or assets in this repository; where it is not, it is explicitly marked as inferred or as requiring owner confirmation.*
