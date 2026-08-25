@@ -255,6 +255,99 @@ const MENU = [
       en:'Fruit Yogurt', zh:'水果酸奶', ar:'زبادي فواكهة' },
 ];
 
+/* ─── Dish photography ──────────────────────────────────────────────────
+   Photographs extracted from the restaurant's official printed menu and
+   matched to each dish by its position on the page. Dishes not listed here
+   have no photograph in the printed menu and fall back to their emoji.   */
+
+const MENU_IMAGES = [
+    "D1",
+    "D2",
+    "F1",
+    "F10",
+    "F2",
+    "F3",
+    "F4",
+    "F5",
+    "F6",
+    "F7",
+    "F8",
+    "F9",
+    "H1",
+    "H2",
+    "H3",
+    "H4",
+    "H5",
+    "H6",
+    "H7",
+    "J1",
+    "J2",
+    "J3",
+    "J4",
+    "J5",
+    "J6",
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "L1",
+    "L2",
+    "L3",
+    "L4",
+    "L5",
+    "L6",
+    "L7",
+    "L8",
+    "M1",
+    "M10",
+    "M11",
+    "M12",
+    "M13",
+    "M14",
+    "M2",
+    "M3",
+    "M4",
+    "M5",
+    "M6",
+    "M7",
+    "M8",
+    "M9",
+    "N1",
+    "N2",
+    "N3",
+    "N4",
+    "P11",
+    "P4",
+    "P6",
+    "S1",
+    "S2",
+    "S3",
+    "S4",
+    "S5",
+    "S6",
+    "S7",
+    "T1",
+    "T2",
+    "T3",
+    "T4",
+    "X1",
+    "X2",
+    "X3",
+    "X4",
+    "X5",
+    "X6",
+    "X7",
+    "Y1",
+    "Y2"
+];
+
+/** Path to a dish photo, or null when the printed menu has none. */
+function menuItemImage(item) {
+    return MENU_IMAGES.indexOf(item.id) !== -1 ? 'images/dishes/' + item.id + '.webp' : null;
+}
+
 /* ─── Helpers ───────────────────────────────────────────────────────────
    `lang` is one of 'en' | 'ar' | 'zh'. Pages pass their own language so
    one dataset drives all three editions of the site.                    */
@@ -291,5 +384,5 @@ function menuItemsIn(catId) {
 const MENU_HIGHLIGHTS = ['J4', 'N3', 'Y2', 'H4', 'D1', 'M1', 'F1', 'X4'];
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { MENU, MENU_CATEGORIES, MENU_HIGHLIGHTS };
+    module.exports = { MENU, MENU_CATEGORIES, MENU_HIGHLIGHTS, MENU_IMAGES };
 }

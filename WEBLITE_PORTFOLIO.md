@@ -78,6 +78,7 @@ Staff get their own tools: an authenticated operations dashboard with live order
 | Feature | What it does | Why it matters |
 |---|---|---|
 | **Full ordering catalog** | The restaurant's complete printed menu — **90 dishes across 13 categories** — each carrying its official menu code (L1, J4, M12…), its name in English, Chinese and Arabic, its price, and vegetarian/spicy tags. Category filtering includes an "All" view. | The entire menu becomes a transactional surface, not a PDF. Menu codes mean customer, waiter and kitchen all speak the same language about an order. |
+| **Photography for every dish** | All 77 food dishes carry the restaurant's own plated photograph, served as ~21 KB WebP and lazy-loaded. | Food photography is the single biggest driver of order value on a delivery menu; stock imagery reads as generic and untrustworthy. |
 | **Trilingual dish data** | Every dish stores its English, Simplified Chinese and Arabic name in one shared dataset, so the same catalogue drives all three editions of the site. | A Chinese diner, an Arabic-speaking local and an English-speaking expat each read the menu in their own language — rare in this market. |
 | **Halal signalling** | Halal certification (清真) is surfaced as a badge on the hero and menu hero, and answered directly in the FAQ. 16 dishes are flagged vegetarian and 13 spicy. | Halal status is the single most important trust signal for this restaurant's local audience, and dietary tags cut pre-order phone calls. |
 | **Persistent cart with live quantity controls** | Add/increment/decrement per item, cards visually flag their in-cart state, cart persists to `sessionStorage` and survives the page change into checkout. | Removes friction at the exact point where food orders are most often abandoned. |
@@ -611,6 +612,7 @@ The strongest single asset for the case study header is the three-panel dispatch
 - Firestore collections in use: `orders`, `drivers`, `promo_codes`
 - Halal certification (清真) stated on the printed menu cover ("CHINA HALAL FOOD" / الطعام الصيني الحلال) and consistent with the dish list: no pork, no alcohol
 - Menu price range EGP 70–1390; 16 vegetarian dishes and 13 dishes marked spicy
+- 80 dish photographs extracted from the printed menu (every one of the 77 food dishes, plus 3 of 13 drinks), stored as WebP averaging 21 KB, 1.7 MB in total
 - Realtime Database path in use: `driver_locations/{uid}`
 - Email/password authentication gating both `admin.html` and `driver.html`
 - Driver account creation from the admin UI, writing both an Auth account and a Firestore profile
@@ -656,7 +658,7 @@ These must **not** be described as working features in any published portfolio c
 - **The ordering flow's interface is still English-only.** Dish *data* is now trilingual and the catalogue renders from a `LANG` constant, so translating the ordering UI is now a small change — but the catalogue, checkout, receipt and tracking chrome still ship in English, and the Arabic and Chinese editions link into them.
 - **SEO is minimal.** Titles and meta descriptions are present, but there are no Open Graph or Twitter Card tags, no canonical URLs, no `hreflang` annotations between the three language editions, no structured data (`Restaurant`, `Menu`, or `LocalBusiness` schema), no sitemap, and no `robots.txt`. Do not claim SEO as a capability on this project.
 - **Accessibility is not implemented.** There are zero ARIA attributes and zero explicit roles across all nine pages. Interactive elements are built from `div` elements with click handlers in several places. The viewport meta tag sets `maximum-scale=1.0, user-scalable=no`, which blocks pinch-zoom. Alt text is present on images (65 instances), which is the one positive. Do not claim accessibility on this project.
-- **No per-dish photography.** The catalogue uses category emoji rather than photographs. The previous stock-photo hotlinks were removed with the placeholder menu. The official menu PDF contains a professional photograph of most dishes, so this is a solvable gap — see *Questions for WebLite*.
+- **Dish photography now covers every food item.** All 77 food dishes carry the restaurant's own photograph, extracted from the official printed menu and matched to each dish by its position on the page. Only 10 of the 13 drinks lack a photo — the printed menu itself only photographs three of them.
 - **The logo is a 553KB PNG** embedded twice as inline base64 in each marketing page, inflating each of the three files to roughly 300KB. An SVG or optimised raster would be substantially smaller.
 - **`GOOGLE_MAPS_API_KEY` is declared but never used** — vestigial from an approach later replaced by Leaflet.
 - **The tracking page retains an older colour palette** (blush accent on near-black) rather than the green-and-gold brand applied to the ordering and receipt pages — a visual inconsistency to note before capturing screenshots side by side.
@@ -774,6 +776,11 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
       "name": "Interactive digital catalog with persistent cart",
       "description": "The restaurant's complete printed menu - 90 dishes across 13 categories - each with its official menu code (L1, J4, M12), its name in English, Chinese and Arabic, its price, and vegetarian or spicy tags. Category filtering, per-item quantity controls, in-cart visual state and a floating cart bar showing live count and subtotal. The cart persists across the page transition into checkout.",
       "value": "The entire menu becomes transactional rather than a PDF, and menu codes mean the customer, the waiter and the kitchen all refer to a dish the same way."
+    },
+    {
+      "name": "Photography for every dish",
+      "description": "All 77 food dishes carry the restaurant's own plated photograph, extracted from the official printed menu and matched to each dish by page position. Served as WebP averaging 21 KB and lazy-loaded.",
+      "value": "Food photography is the strongest driver of order value on a delivery menu, and the restaurant's own plating reads as trustworthy where stock imagery does not."
     },
     {
       "name": "Trilingual dish data",
@@ -1258,6 +1265,13 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
       "usedOn": "All backend-connected pages",
       "issue": "No live secrets committed - contains only placeholder values such as YOUR_API_KEY. No API key, token or private credential appears anywhere in the repository.",
       "action": "No action required"
+    },
+    {
+      "severity": "medium",
+      "asset": "images/dishes/*.webp - notably N2, H1, H5",
+      "usedOn": "Menu catalogue and marketing menu cards",
+      "issue": "The restaurant serves on custom tableware hand-painted with its own name in Chinese calligraphy and a red seal, which is visible in the dish photographs.",
+      "action": "For anonymised portfolio use pick dishes plated on unmarked ware - most noodle, rice and barbecue photographs qualify - or blur the calligraphy."
     }
   ],
   "knownImplementationGaps": [
@@ -1272,8 +1286,8 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     "The tracking page retains an older blush-on-near-black palette rather than the green-and-gold brand applied to the ordering and receipt pages - a visual inconsistency to note before capturing screenshots side by side.",
     "All business logic including pricing, distance, ETA, earnings and analytics is computed client-side; no server-side validation exists.",
     "Firestore security rules are not present in this repository and cannot be verified.",
-    "No per-dish photography. The catalogue uses category emoji. The official menu PDF contains a professional photograph of most dishes, so this is solvable if the client supplies the source images.",
-    "Menu data is transcribed from the printed menu and is not admin-editable; a price change is a one-line edit in menu-data.js rather than a dashboard action."
+    "Menu data is transcribed from the printed menu and is not admin-editable; a price change is a one-line edit in menu-data.js rather than a dashboard action.",
+    "Dish photography covers all 77 food dishes but only 3 of the 13 drinks, because the printed menu photographs only three drinks."
   ],
   "portfolioCard": {
     "title": "Authentic Chinese Restaurant - Trilingual Website & Delivery Platform",
@@ -1316,7 +1330,6 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     "Is the client's identity permitted to be public, or must this stay anonymised?",
     "Are screenshots allowed publicly, and specifically may the storefront hero photograph be published - do the staff and customers visible in it have any consent on record?",
     "Were the branding, logo mark and photography supplied by the client or created by WebLite? If WebLite created the brand identity, that is a significant additional capability this dossier cannot currently claim.",
-    "The menu PDF contains a professional photograph of most dishes. Can you supply those images as separate files so each dish can carry its own photo instead of a category emoji?",
     "Are the printed menu prices current? They were transcribed exactly as printed, and EGP pricing moves quickly.",
     "Are the dish photographs the restaurant's own or licensed stock? Several marketing thumbnails are hotlinked to Unsplash - was that a deliberate placeholder pending the client's own photography?",
     "Is the website currently live, and at what URL?",
@@ -1332,7 +1345,8 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     "Is the menu intended to become admin-editable? It is currently hardcoded in two page files, so every price change requires a code edit.",
     "Should this be positioned primarily as a restaurant website or as a custom delivery application? The repository supports either framing and they attract very different prospects.",
     "Are there other WebLite projects sharing this stack that should be presented as a coherent capability cluster?",
-    "Should the ordering flow (catalogue, checkout, receipt, tracking) be translated into Arabic and Chinese now that the dish data already carries all three languages?"
+    "Should the ordering flow (catalogue, checkout, receipt, tracking) be translated into Arabic and Chinese now that the dish data already carries all three languages?",
+    "Dish photographs were extracted from the printed menu PDF, so they are limited to that file's resolution. Do you hold the original photography at full resolution?"
   ],
   "repositoryFacts": {
     "pages": [
@@ -1351,7 +1365,7 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
       "animations.js - click-spark canvas system and progressive-blur engine",
       "firebase-config.js - backend credentials placeholders and business constants"
     ],
-    "imageAssets": 9,
+    "imageAssets": 87,
     "menuItems": 90,
     "menuCategories": 13,
     "languages": 3,
@@ -1378,7 +1392,8 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
       "English",
       "Simplified Chinese",
       "Arabic"
-    ]
+    ],
+    "dishPhotographs": 80
   }
 }
 ```

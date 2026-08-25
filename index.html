@@ -331,7 +331,9 @@
                 var items = menuItemsIn(id).slice(0, 6).map(function(item){
                     var note = menuItemNote(item, HOME_LANG);
                     return '<div class="menu-item reveal">'
-                        + '<div class="menu-img-wrapper"><div class="menu-emoji">' + item.emoji + '</div></div>'
+                        + '<div class="menu-img-wrapper">' + (menuItemImage(item)
+                              ? '<img src="' + menuItemImage(item) + '" alt="" class="menu-img" loading="lazy" decoding="async">'
+                              : '<div class="menu-emoji">' + item.emoji + '</div>') + '</div>'
                         + '<div class="menu-content"><div class="menu-head">'
                         + '<span class="menu-name"><span class="menu-code">' + item.id + '</span>' + menuItemName(item, HOME_LANG)
                         + (item.spicy ? '<span class="menu-badge">' + (HOME_LANG==='ar'?'حار':HOME_LANG==='zh'?'辣':'Spicy') + '</span>' : '')
