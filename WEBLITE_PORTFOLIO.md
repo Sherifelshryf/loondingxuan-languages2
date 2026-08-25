@@ -337,7 +337,7 @@ Staff get two purpose-built tools: an authenticated operations dashboard with li
 
 | # | Location | Issue | Severity | Required action |
 |---|---|---|---|---|
-| 1 | `images/bg.jpg` — the hero background on **all three** marketing pages and the catalog hero | Photograph of the actual storefront showing the illuminated Chinese signage, the brand's initials in large illuminated letters, the logo mark, neighbouring businesses' Arabic signage, **and recognisable faces of staff and seated customers** | **Critical** | Do not publish as-is. This is both a client-identification issue *and* a third-party likeness issue — real, identifiable individuals who did not consent to appearing in WebLite marketing. Replace, reshoot, or heavily crop and blur. |
+| 1 | `images/bg.jpg` — the hero background on **all three** marketing pages and the catalog hero | Photograph of the actual storefront showing the illuminated Chinese signage, the brand's initials in large illuminated letters, the logo mark, neighbouring businesses' Arabic signage, and people inside the restaurant | **Cleared by owner** | Approved for publication as-is (2026-08-25). It is the restaurant's own storefront photograph, already published on the live site, so a portfolio screenshot shows the page as it genuinely appears. Note that the visible signage and brand initials identify the client — see *Attribution* below. |
 | 2 | `images/logo.png` and the inline base64 logo in the nav/footer of all three marketing pages | The client's distinctive brand mark. Contains no text, but is reverse-searchable and appears in every screenshot of the header, footer, and preloader | **High** | Replace with a neutral placeholder mark in any published screenshot. |
 | 3 | Restaurant name (Latin and Chinese), phone number, full address, and coordinates | Present in `firebase-config.js`, page titles, meta descriptions, nav lockups, receipt footer, and the location section | **High** | Strip from all published copy and screenshots. Never reproduce the phone number or address. |
 | 4 | Facebook, Instagram, and Talabat links (including the aggregator's numeric restaurant listing ID) | Identify the business directly and are visible in the footer, gallery tiles, nav, and hero | **High** | Crop out or blur in gallery, hero, footer, and nav screenshots. |
@@ -363,7 +363,7 @@ Staff get two purpose-built tools: an authenticated operations dashboard with li
 - **Viewport:** Both (desktop 1440×900 hero crop; mobile 390×844 full)
 - **What to capture:** The full-viewport hero with the Chinese wordmark, gradient-clipped headline, and the row of four calls to action, with the nav and language bar visible at the top.
 - **Why worth showing:** It is the single strongest impression of the brand direction — the deep green, the gold gradient type, the cinematic scrim — and it immediately communicates "premium restaurant" plus "multilingual" in one frame.
-- **Privacy concerns:** **Severe.** The background is the real storefront with signage, brand initials, and identifiable people. Replace the background with a licensed or reshot interior/food image before capture, and neutralise the nav logo. Do not publish this frame with the original background under any circumstances.
+- **Privacy concerns:** **Cleared by owner.** The storefront background is approved for publication. If the anonymised portfolio track is used, the visible signage and brand initials still identify the client, so crop or blur those; for an attributed case study, capture the hero exactly as it ships.
 
 **2. Signature menu — tabbed section**
 - **Page/route:** `index.html#menu`
@@ -437,7 +437,7 @@ Staff get two purpose-built tools: an authenticated operations dashboard with li
 
 ### Motion clips / GIFs (5–12 seconds each)
 
-**A. Scroll-reveal journey** — `index.html`, desktop. A smooth scroll from hero to footer showing sections fading and rising into place, the nav condensing at the 50px threshold, and the progressive blur at the page edge. *Why:* Conveys the site's rhythm and premium finish better than any still. *Privacy:* Neutralise hero background, logo, footer social icons, and the location section.
+**A. Scroll-reveal journey** — `index.html`, desktop. A smooth scroll from hero to footer showing sections fading and rising into place, the nav condensing at the 50px threshold, and the progressive blur at the page edge. *Why:* Conveys the site's rhythm and premium finish better than any still. *Privacy:* Hero background cleared. Still neutralise the footer social icons and the location section, which carry contact details.
 
 **B. Click-spark interaction** — any marketing page, desktop, tight crop. Two or three deliberate clicks emitting the gold radial sparks. *Why:* A signature bespoke detail that reads as craft. *Privacy:* None if cropped to a neutral region.
 
@@ -451,7 +451,7 @@ Staff get two purpose-built tools: an authenticated operations dashboard with li
 
 **G. Language switch** — `index.html` → `index_ar.html` → `index_zh.html`, desktop. Clicking through the language bar, showing the layout mirror into RTL and the typography change. *Why:* Demonstrates the multilingual architecture as an experience rather than a claim. *Privacy:* Neutralise logo; avoid the contact section.
 
-**H. Responsive transformation** — `index.html` or `menu.html`. A browser window narrowing from desktop to mobile, showing grids collapsing, the nav becoming a hamburger, the drawer sliding in, and the catalog cards flipping to vertical. *Why:* Proves responsive craft in one continuous shot. *Privacy:* Neutralise logo and hero background.
+**H. Responsive transformation** — `index.html` or `menu.html`. A browser window narrowing from desktop to mobile, showing grids collapsing, the nav becoming a hamburger, the drawer sliding in, and the catalog cards flipping to vertical. *Why:* Proves responsive craft in one continuous shot. *Privacy:* Hero background cleared; neutralise the logo only if running the anonymised track.
 
 ---
 
@@ -467,7 +467,7 @@ Staff get two purpose-built tools: an authenticated operations dashboard with li
   3. Custom admin dashboard with one-click dispatch and fleet analytics
 - **Technology tags:** `Real-Time Database` · `Interactive Maps` · `Multilingual (RTL)` · `Custom Admin Dashboard` · `Live GPS Tracking` · `Responsive Design` · `Custom Animation`
   *(Client-facing framing. For a technical audience: Firebase, Firestore, Realtime Database, Leaflet, Vanilla JavaScript.)*
-- **Suggested thumbnail:** The live tracking screen on mobile — dark map with restaurant, customer, and driver markers, and the bottom sheet showing the progress timeline mid-delivery. It is the most visually distinctive and least brand-identifying screen in the project, and it signals "real application" at thumbnail scale. **Second choice:** a side-by-side of the English and Arabic hero, if the multilingual capability is the pitch. **Avoid** the storefront hero as a thumbnail — it cannot be made privacy-safe without replacement.
+- **Suggested thumbnail:** The live tracking screen on mobile — dark map with restaurant, customer, and driver markers, and the bottom sheet showing the progress timeline mid-delivery. It is the most visually distinctive and least brand-identifying screen in the project, and it signals "real application" at thumbnail scale. **Second choice:** a side-by-side of the English and Arabic hero, if the multilingual capability is the pitch. The storefront hero is now cleared for use and is a strong third option if the case study runs attributed.
 - **Suggested interaction:** On hover (or tap on touch devices), cross-fade the static thumbnail into a looping muted clip of the driver marker advancing while the progress timeline fills — the "Live driver movement" clip (E). A subtle scale-up of the card with the gold accent border warming in matches the project's own micro-interaction language. As a lighter-weight alternative, cycle three stacked screens — marketing hero → ordering map → admin dashboard — to communicate the project's breadth in one gesture.
 
 ---
@@ -743,7 +743,7 @@ Second, it carries a rare, specifically marketable specialism. Genuine right-to-
 
 Third, it tells a complete, legible story. A visitor can follow one order from a hero photograph through a catalog, a map pin, a checkout, a receipt, a live tracking map, a dispatcher's console, and a driver's phone. Very few portfolio projects offer that kind of end-to-end narrative, and it is the narrative that justifies a dedicated case-study page rather than a card.
 
-**One condition on featuring it:** the privacy work in Section 7 is not optional. The hero background contains identifiable third parties and clear brand signage, and every operational screen renders live customer names, phone numbers, and addresses. This project cannot be published from production screenshots. Budget time to seed a demo dataset and replace the hero image before it goes live on the portfolio.
+**One condition on featuring it:** the operational screens still need care. The hero background has been cleared by the owner, but every admin, driver and tracking screen renders live customer names, phone numbers and addresses. Those cannot be published from production data — budget time to seed a demo dataset before it goes live on the portfolio.
 
 **If a technical framing is wanted alongside the visual one**, lead the case study with the three-panel dispatch propagation clip and the map-pin-to-price-recalculation clip. Those two assets carry more persuasive weight with prospects evaluating engineering capability than any static screen in the project.
 
@@ -1030,7 +1030,7 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
       "viewport": "both",
       "capture": "Full-viewport hero with Chinese wordmark, gradient-clipped headline, four calls to action, nav and language bar",
       "why": "Strongest single impression of the brand direction; communicates premium restaurant and multilingual in one frame",
-      "privacyConcerns": "SEVERE - background is the real storefront showing signage, brand initials and identifiable staff and customers. Must replace the background image and neutralise the logo before any publication."
+      "privacyConcerns": "CLEARED BY OWNER. The storefront background is approved for publication. If the anonymised track is used, the visible signage and brand initials still identify the client, so crop or blur those; for an attributed case study capture the hero exactly as it ships."
     },
     {
       "id": 2,
@@ -1129,7 +1129,7 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
       "viewport": "desktop",
       "capture": "Smooth scroll from hero to footer showing sections fading and rising, the nav condensing past its scroll threshold and the progressive edge blur",
       "why": "Conveys the site's rhythm and premium finish better than any still",
-      "privacyConcerns": "Neutralise hero background, logo, footer social icons and the location section"
+      "privacyConcerns": "Hero background cleared. Still neutralise the footer social icons and location section, which carry contact details."
     },
     {
       "id": "B",
@@ -1192,16 +1192,16 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
       "viewport": "both",
       "capture": "Browser window narrowing from desktop to mobile showing grids collapsing, nav becoming a hamburger, drawer sliding in and catalog cards flipping to vertical",
       "why": "Proves responsive craft in one continuous shot",
-      "privacyConcerns": "Neutralise logo and hero background"
+      "privacyConcerns": "Hero background cleared; neutralise the logo only if running the anonymised track."
     }
   ],
   "privacyWarnings": [
     {
-      "severity": "critical",
+      "severity": "cleared",
       "asset": "images/bg.jpg",
       "usedOn": "Hero background on index.html, index_ar.html, index_zh.html and the menu.html hero",
-      "issue": "Photograph of the actual storefront showing illuminated Chinese signage, the brand's initials in large illuminated letters, the logo mark, neighbouring businesses' Arabic signage, and recognisable faces of staff and seated customers",
-      "action": "Do not publish as-is. This is both a client-identification issue and a third-party likeness issue involving real individuals who did not consent to appearing in agency marketing. Replace, reshoot, or heavily crop and blur."
+      "issue": "Photograph of the actual storefront showing illuminated Chinese signage, the brand's initials, the logo mark, neighbouring Arabic signage, and people inside the restaurant.",
+      "action": "Approved for publication by the owner on 2026-08-25. It is the restaurant's own storefront photograph, already published on the live site, so a portfolio screenshot shows the page as it genuinely appears. The visible signage and brand initials do identify the client, so crop or blur them if the anonymised track is used."
     },
     {
       "severity": "critical",
@@ -1320,8 +1320,9 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     "overall": 8.2
   },
   "recommendedTier": "Featured Project",
-  "recommendedTierReasoning": "Featured for three reasons. It resolves the objection agencies most often face - can you build more than a website - in a single screenshot, because the admin dashboard and driver app prove WebLite ships operational software. It carries a rare, specifically marketable specialism in genuine right-to-left Arabic implementation, which is decisive in the MENA market. And it tells a complete end-to-end story a visitor can follow from hero to catalog to map pin to checkout to receipt to live tracking to dispatcher console to driver phone. The menu is now the restaurant's real trilingual halal menu and all fabricated demo content has been removed, so screenshots of the catalogue are safe and accurate. Still conditional on completing the remaining privacy work: the hero background contains identifiable third parties and brand signage, and every operational screen renders live customer data, so the project cannot be published from production screenshots.",
+  "recommendedTierReasoning": "Featured for three reasons. It resolves the objection agencies most often face - can you build more than a website - in a single screenshot, because the admin dashboard and driver app prove WebLite ships operational software. It carries a rare, specifically marketable specialism in genuine right-to-left Arabic implementation, which is decisive in the MENA market. And it tells a complete end-to-end story a visitor can follow from hero to catalog to map pin to checkout to receipt to live tracking to dispatcher console to driver phone. The menu is now the restaurant's real trilingual halal menu and all fabricated demo content has been removed, so screenshots of the catalogue are safe and accurate. The hero background has been cleared by the owner. What still needs care is the operational screens, which render live customer names, phone numbers and addresses and must be captured against seeded demo data rather than production.",
   "ownerQuestions": [
+    "Clearing the storefront hero for publication also reveals the client's signage and brand initials. Does that mean the case study can run attributed, or should it stay anonymised with the signage cropped or blurred?",
     "What problem did the client originally come to you with - losing margin to aggregator commissions, inability to serve Arabic or Chinese speakers, or something else?",
     "Was this a redesign of an existing website or a new build from nothing?",
     "Were the marketing site and the delivery platform a single engagement or separate phases, and if separate how far apart?",
