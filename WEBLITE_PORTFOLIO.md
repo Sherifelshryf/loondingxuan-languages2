@@ -658,7 +658,7 @@ These must **not** be described as working features in any published portfolio c
 - **The ordering flow's interface is still English-only.** Dish *data* is now trilingual and the catalogue renders from a `LANG` constant, so translating the ordering UI is now a small change — but the catalogue, checkout, receipt and tracking chrome still ship in English, and the Arabic and Chinese editions link into them.
 - **SEO is minimal.** Titles and meta descriptions are present, but there are no Open Graph or Twitter Card tags, no canonical URLs, no `hreflang` annotations between the three language editions, no structured data (`Restaurant`, `Menu`, or `LocalBusiness` schema), no sitemap, and no `robots.txt`. Do not claim SEO as a capability on this project.
 - **Accessibility is not implemented.** There are zero ARIA attributes and zero explicit roles across all nine pages. Interactive elements are built from `div` elements with click handlers in several places. The viewport meta tag sets `maximum-scale=1.0, user-scalable=no`, which blocks pinch-zoom. Alt text is present on images (65 instances), which is the one positive. Do not claim accessibility on this project.
-- **Dish photography now covers every food item.** All 77 food dishes carry the restaurant's own photograph, extracted from the official printed menu and matched to each dish by its position on the page. Only 10 of the 13 drinks lack a photo — the printed menu itself only photographs three of them.
+- **Dish photography now covers every food item.** All 77 food dishes carry the restaurant's own photograph, extracted from the official printed menu and matched to each dish by its position on the page. Only 10 of the 13 drinks lack a photo — the printed menu itself only photographs three of them. The client has confirmed no higher-resolution originals exist, so the PDF is the final source; images are capped at 640 px on the long edge and never upscaled beyond what the file holds.
 - **The logo is a 553KB PNG** embedded twice as inline base64 in each marketing page, inflating each of the three files to roughly 300KB. An SVG or optimised raster would be substantially smaller.
 - **`GOOGLE_MAPS_API_KEY` is declared but never used** — vestigial from an approach later replaced by Leaflet.
 - **The tracking page retains an older colour palette** (blush accent on near-black) rather than the green-and-gold brand applied to the ordering and receipt pages — a visual inconsistency to note before capturing screenshots side by side.
@@ -1287,7 +1287,7 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     "All business logic including pricing, distance, ETA, earnings and analytics is computed client-side; no server-side validation exists.",
     "Firestore security rules are not present in this repository and cannot be verified.",
     "Menu data is transcribed from the printed menu and is not admin-editable; a price change is a one-line edit in menu-data.js rather than a dashboard action.",
-    "Dish photography covers all 77 food dishes but only 3 of the 13 drinks, because the printed menu photographs only three drinks."
+    "Dish photography covers all 77 food dishes but only 3 of the 13 drinks, because the printed menu photographs only three drinks. The owner has confirmed no higher-resolution originals exist, so the menu PDF is the final source and images are capped at 640 px on the long edge."
   ],
   "portfolioCard": {
     "title": "Authentic Chinese Restaurant - Trilingual Website & Delivery Platform",
@@ -1345,8 +1345,7 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     "Is the menu intended to become admin-editable? It is currently hardcoded in two page files, so every price change requires a code edit.",
     "Should this be positioned primarily as a restaurant website or as a custom delivery application? The repository supports either framing and they attract very different prospects.",
     "Are there other WebLite projects sharing this stack that should be presented as a coherent capability cluster?",
-    "Should the ordering flow (catalogue, checkout, receipt, tracking) be translated into Arabic and Chinese now that the dish data already carries all three languages?",
-    "Dish photographs were extracted from the printed menu PDF, so they are limited to that file's resolution. Do you hold the original photography at full resolution?"
+    "Should the ordering flow (catalogue, checkout, receipt, tracking) be translated into Arabic and Chinese now that the dish data already carries all three languages?"
   ],
   "repositoryFacts": {
     "pages": [
