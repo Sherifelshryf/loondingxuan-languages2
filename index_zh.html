@@ -207,7 +207,7 @@
             <button class="nav-close" id="navClose"><i class="fas fa-arrow-left"></i> 返回</button>
             <a href="#home">首页</a>
             <a href="#menu">菜单</a>
-            <a href="order.html"><i class="fas fa-bag-shopping" style="margin-right:4px;"></i>在线点餐</a>
+            <a href="menu_zh.html"><i class="fas fa-bag-shopping" style="margin-right:4px;"></i>在线点餐</a>
             <a href="#gallery">相册</a>
             <a href="#contact">位置</a>
             <a href="#res" class="btn-reserve">预订</a>
@@ -220,14 +220,14 @@
             <div class="hero-content">
                 <span class="hero-chinese reveal">龙鼎轩</span>
                 <span class="hero-subtitle reveal">正宗中国美食</span>
-                <span class="hero-halal reveal"><i class="fas fa-certificate"></i> 清真 · 清真认证</span>
+                <span class="hero-halal reveal"><i class="fas fa-certificate"></i> 清真认证</span>
                 <h1 class="reveal">品味<br><span>皇朝风味</span></h1>
                 <p class="reveal">传承千年饮食文化精髓--从手工制作的点心到慢火炖制的经典佳肴，以真诚的中国式热情款待每一位宾客。</p>
                 <div class="hero-btns reveal">
                     <a href="#menu" class="btn-solid">探索菜单</a>
                     <a href="#res" class="btn-outline">预订餐桌</a>
                     <a href="https://www.talabat.com/egypt/restaurant/799867/loongdingxuan-el-rehab-city-1?aid=7600" target="_blank" class="btn-talabat"><img src="images/t_logo.svg" style="height:22px;width:22px;border-radius:5px;object-fit:contain;" alt="Talabat"> 在Talabat订餐</a>
-                    <a href="order.html" class="btn-solid" style="background:var(--gradient);"><i class="fas fa-bag-shopping" style="margin-right:8px;"></i>外卖配送</a>
+                    <a href="menu_zh.html" class="btn-solid" style="background:var(--gradient);"><i class="fas fa-bag-shopping" style="margin-right:8px;"></i>外卖配送</a>
                 </div>
             </div>
         </section>
@@ -244,7 +244,7 @@
             <div class="menu-container">
                 <div class="menu-tabs reveal" id="menu-tabs"></div>
                 <div id="menu-cats"></div>
-                <div style="text-align:center;margin-top:40px" class="reveal"><a href="menu.html" class="btn-outline">查看完整菜单</a></div>
+                <div style="text-align:center;margin-top:40px" class="reveal"><a href="menu_zh.html" class="btn-outline">查看完整菜单</a></div>
             </div>
         </section>
                 <section class="section bg-sec">
@@ -335,9 +335,9 @@
                               : '<div class="menu-emoji">' + item.emoji + '</div>') + '</div>'
                         + '<div class="menu-content"><div class="menu-head">'
                         + '<span class="menu-name"><span class="menu-code">' + item.id + '</span>' + menuItemName(item, HOME_LANG)
-                        + (item.spicy ? '<span class="menu-badge">' + (HOME_LANG==='ar'?'حار':HOME_LANG==='zh'?'辣':'Spicy') + '</span>' : '')
-                        + '</span><span class="menu-price">EGP ' + item.price + '</span></div>'
-                        + '<p class="menu-desc">' + (HOME_LANG==='zh' ? item.en : item.zh) + (note ? ' · ' + note : '') + '</p>'
+                        + (item.spicy ? '<span class="menu-badge">' + MENU_UI[HOME_LANG].spicyTag + '</span>' : '')
+                        + '</span><span class="menu-price">' + MENU_UI[HOME_LANG].price(item.price) + '</span></div>'
+                        + (note ? '<p class="menu-desc">' + note + '</p>' : '')
                         + '</div></div>';
                 }).join('');
                 cats.insertAdjacentHTML('beforeend',
