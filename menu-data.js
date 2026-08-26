@@ -63,13 +63,13 @@ const MENU = [
       en:'Longding Spicy Chicken', zh:'龙鼎辣子鸡', ar:'دجاج لونغ دينغ الحار' },
     { id:'J2', cat:'chicken', price:490, emoji:'🥡',
       en:'Peking Chicken Strips', zh:'京酱肉丝', ar:'شرائح الدجاج بصوص بكين',
-      note_en:'Served with pancakes, spring onion and cucumber' },
+      note_en:'Served with pancakes, spring onion and cucumber', note_zh:'配薄饼、葱丝与黄瓜' },
     { id:'J3', cat:'chicken', price:490, emoji:'🍗',
       en:'Sweet and Sour Chicken', zh:'糖醋里脊', ar:'دجاج حلو وحامض (صدور فراخ)',
-      note_en:'Chicken breast' },
+      note_en:'Chicken breast', note_zh:'鸡胸肉' },
     { id:'J4', cat:'chicken', price:980, emoji:'🌶️', spicy:true,
       en:'Xinjiang-Style Spicy Fried Chicken', zh:'新疆大盘鸡', ar:'دجاج شينجيانغ الحار (بطاطس، فلفل أخضر وأحمر، بصل، نودلز زجاجية)',
-      note_en:'Potato, green and red pepper, onion, glass noodles' },
+      note_en:'Potato, green and red pepper, onion, glass noodles', note_zh:'土豆、青红椒、洋葱、粉条' },
     { id:'J5', cat:'chicken', price:540, emoji:'🥭',
       en:'Mango Sauce and Sour Fried Chicken', zh:'龙鼎秘制锅爆肉', ar:'دجاج مقلي بصوص المانجو والصوص الحلو والحامض' },
     { id:'J6', cat:'chicken', price:580, emoji:'🍯',
@@ -110,10 +110,10 @@ const MENU = [
     // ─── 火锅 HOT POT ────────────────────────────────────────────────────
     { id:'D1', cat:'hotpot', price:1290, emoji:'🍲', spicy:true,
       en:'Spicy Steak Beef Mini Hot Pot', zh:'辣huhu牛排火锅', ar:'هوت بوت صغير حار مع لحم ستيك بقري وخضراوات',
-      note_en:'Beef steak and vegetables' },
+      note_en:'Beef steak and vegetables', note_zh:'牛排与时蔬' },
     { id:'D2', cat:'hotpot', price:1080, emoji:'🍲', spicy:true,
       en:'Longding Tom Yum Hot Pot', zh:'冬阴功小火锅', ar:'هوت بوت توم يام على طريقة لونغ دينغ (مأكولات بحرية، خضروات)',
-      note_en:'Seafood and vegetables' },
+      note_en:'Seafood and vegetables', note_zh:'海鲜与时蔬' },
 
     // ─── 素菜 / 干锅 VEGETABLES & DRY POT ────────────────────────────────
     { id:'S1', cat:'veg', price:290, emoji:'🥬', veg:true,
@@ -126,13 +126,13 @@ const MENU = [
       en:'Oyster Sauce Lettuce', zh:'蚝油生菜', ar:'خس بصوص المحار' },
     { id:'S5', cat:'veg', price:290, emoji:'🥦', veg:true,
       en:'Dry Pot Cauliflower', zh:'干锅花菜', ar:'قرنبيط مقلي جاف (قرنبيط، فلفل ألوان، بصل)',
-      note_en:'Cauliflower, mixed peppers, onion' },
+      note_en:'Cauliflower, mixed peppers, onion', note_zh:'花菜、彩椒、洋葱' },
     { id:'S6', cat:'veg', price:360, emoji:'🧈', veg:true,
       en:'Dry Pot Tofu', zh:'干锅豆腐', ar:'توفو مقلي جاف (توفو، فلفل ألوان، بصل)',
-      note_en:'Tofu, mixed peppers, onion' },
+      note_en:'Tofu, mixed peppers, onion', note_zh:'豆腐、彩椒、洋葱' },
     { id:'S7', cat:'veg', price:360, emoji:'🥔', veg:true,
       en:'Dry Pot Potato Slices', zh:'干锅土豆片', ar:'شرائح البطاطس المقلية الجافة (بطاطس، فلفل ألوان، بصل)',
-      note_en:'Potato, mixed peppers, onion' },
+      note_en:'Potato, mixed peppers, onion', note_zh:'土豆、彩椒、洋葱' },
 
     // ─── 汤类 SOUPS ──────────────────────────────────────────────────────
     { id:'T1', cat:'soup', price:890, emoji:'🍲',
@@ -255,6 +255,75 @@ const MENU = [
       en:'Fruit Yogurt', zh:'水果酸奶', ar:'زبادي فواكهة' },
 ];
 
+/* ─── Catalogue interface strings ───────────────────────────────────────
+   Every label the menu pages render, in all three languages. A page sets
+   LANG once and reads only from its own block, so a given edition never
+   shows text from another language.                                     */
+
+const MENU_UI = {
+    en: {
+        dir: 'ltr',
+        docTitle: 'Menu — Loongdingxuan',
+        metaDesc: 'The full halal Chinese menu — 90 dishes across cold dishes, chicken, beef, lamb, seafood, hot pot, noodles, rice and drinks. Order for delivery.',
+        navHome: 'Home', navDineIn: 'Dine In', navOrder: 'Order', navTrack: 'Track Order',
+        heroEyebrow: 'Browse & Order', heroTitleA: 'Our ', heroTitleB: 'Full Menu',
+        heroLead: 'Add your favourites directly to the cart and proceed to checkout for delivery.',
+        halal: 'Halal Certified',
+        all: 'All',
+        currency: 'EGP',
+        price: function (n) { return 'EGP ' + n; },
+        vegTag: 'Vegetarian', spicyTag: 'Spicy',
+        itemsInCart: function (n) { return n + (n === 1 ? ' item in cart' : ' items in cart'); },
+        checkout: 'Proceed to Checkout',
+        addedToCart: function (name) { return name + ' added to cart'; },
+        cartEmpty: 'Your cart is empty',
+        addToCart: 'Add to cart',
+    },
+    ar: {
+        dir: 'rtl',
+        docTitle: 'القائمة — لونغدينغشوان',
+        metaDesc: 'قائمة الطعام الصيني الحلال كاملة — 90 طبقاً تشمل المقبلات الباردة والدجاج واللحم البقري والضاني والمأكولات البحرية والهوت بوت والنودلز والأرز والمشروبات. اطلب التوصيل.',
+        navHome: 'الرئيسية', navDineIn: 'تناول في المطعم', navOrder: 'اطلب الآن', navTrack: 'تتبع الطلب',
+        heroEyebrow: 'تصفّح واطلب', heroTitleA: 'قائمتنا ', heroTitleB: 'الكاملة',
+        heroLead: 'أضف أطباقك المفضلة إلى السلة مباشرة ثم أكمل الطلب للتوصيل.',
+        halal: 'حلال معتمد',
+        all: 'الكل',
+        currency: 'ج.م',
+        price: function (n) { return n + ' ج.م'; },
+        vegTag: 'نباتي', spicyTag: 'حار',
+        itemsInCart: function (n) { return n === 1 ? 'طبق واحد في السلة' : n + ' أطباق في السلة'; },
+        checkout: 'إتمام الطلب',
+        addedToCart: function (name) { return 'تمت إضافة ' + name + ' إلى السلة'; },
+        cartEmpty: 'سلتك فارغة',
+        addToCart: 'أضف إلى السلة',
+    },
+    zh: {
+        dir: 'ltr',
+        docTitle: '菜单 — 龙鼎轩',
+        metaDesc: '全清真中餐菜单——凉菜、鸡肉、牛肉、羊肉、海鲜、火锅、面食、炒饭与饮品共 90 道菜品。可订外送。',
+        navHome: '首页', navDineIn: '堂食', navOrder: '在线订餐', navTrack: '订单追踪',
+        heroEyebrow: '浏览下单', heroTitleA: '我们的', heroTitleB: '完整菜单',
+        heroLead: '将喜爱的菜品直接加入购物车，即可下单外送。',
+        halal: '清真认证',
+        all: '全部',
+        currency: '埃镑',
+        price: function (n) { return n + ' 埃镑'; },
+        vegTag: '素食', spicyTag: '辣',
+        itemsInCart: function (n) { return '购物车内 ' + n + ' 件'; },
+        checkout: '去结算',
+        addedToCart: function (name) { return '已加入购物车：' + name; },
+        cartEmpty: '购物车是空的',
+        addToCart: '加入购物车',
+    },
+};
+
+/** The other two editions, for the language switcher. */
+const MENU_PAGES = [
+    { lang: 'en', label: 'EN',   href: 'menu.html' },
+    { lang: 'ar', label: 'عربي', href: 'menu_ar.html' },
+    { lang: 'zh', label: '中文', href: 'menu_zh.html' },
+];
+
 /* ─── Dish photography ──────────────────────────────────────────────────
    Photographs extracted from the restaurant's official printed menu and
    matched to each dish by its position on the page. Dishes not listed here
@@ -363,8 +432,9 @@ function menuItemLabel(item, lang) {
 
 /** Ingredient detail where the printed menu supplies it, otherwise ''. */
 function menuItemNote(item, lang) {
-    if (lang === 'ar') return item.note_ar || '';
-    return item.note_en || '';
+    // No cross-language fallback: a missing translation renders nothing rather
+    // than leaking another language into this edition of the menu.
+    return item['note_' + lang] || '';
 }
 
 function menuCategoryName(cat, lang) {
@@ -384,5 +454,5 @@ function menuItemsIn(catId) {
 const MENU_HIGHLIGHTS = ['J4', 'N3', 'Y2', 'H4', 'D1', 'M1', 'F1', 'X4'];
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { MENU, MENU_CATEGORIES, MENU_HIGHLIGHTS, MENU_IMAGES };
+    module.exports = { MENU, MENU_CATEGORIES, MENU_HIGHLIGHTS, MENU_IMAGES, MENU_UI, MENU_PAGES };
 }

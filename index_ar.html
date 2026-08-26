@@ -207,7 +207,7 @@
             <button class="nav-close" id="navClose"><i class="fas fa-arrow-right"></i> رجوع</button>
             <a href="#home">الرئيسية</a>
             <a href="#menu">القائمة</a>
-            <a href="order.html"><i class="fas fa-bag-shopping" style="margin-left:4px;"></i>اطلب الآن</a>
+            <a href="menu_ar.html"><i class="fas fa-bag-shopping" style="margin-left:4px;"></i>اطلب الآن</a>
             <a href="#gallery">معرض الصور</a>
             <a href="#contact">الموقع</a>
             <a href="#res" class="btn-reserve">احجز طاولة</a>
@@ -220,14 +220,14 @@
             <div class="hero-content">
                 <span class="hero-chinese reveal">龙鼎轩</span>
                 <span class="hero-subtitle reveal">مطبخ صيني أصيل</span>
-                <span class="hero-halal reveal"><i class="fas fa-certificate"></i> 清真 · حلال معتمد</span>
+                <span class="hero-halal reveal"><i class="fas fa-certificate"></i> حلال معتمد</span>
                 <h1 class="reveal">نكهة من<br><span>الصين الإمبراطورية</span></h1>
                 <p class="reveal">استمتع بقرون من التقاليد الطهوية - من الدِم سَم المُعدّ يدوياً إلى الأطباق المطهوة ببطء، مقدَّمة بدفء الضيافة الصينية الحقيقية.</p>
                 <div class="hero-btns reveal">
                     <a href="#menu" class="btn-solid">استكشف القائمة</a>
                     <a href="#res" class="btn-outline">احجز طاولة</a>
                     <a href="https://www.talabat.com/egypt/restaurant/799867/loongdingxuan-el-rehab-city-1?aid=7600" target="_blank" class="btn-talabat"><img src="images/t_logo.svg" style="height:22px;width:22px;border-radius:5px;object-fit:contain;" alt="Talabat"> اطلب على طلبات</a>
-                    <a href="order.html" class="btn-solid" style="background:var(--gradient);"><i class="fas fa-bag-shopping" style="margin-left:8px;"></i>اطلب توصيل</a>
+                    <a href="menu_ar.html" class="btn-solid" style="background:var(--gradient);"><i class="fas fa-bag-shopping" style="margin-left:8px;"></i>اطلب توصيل</a>
                 </div>
             </div>
         </section>
@@ -244,7 +244,7 @@
             <div class="menu-container">
                 <div class="menu-tabs reveal" id="menu-tabs"></div>
                 <div id="menu-cats"></div>
-                <div style="text-align:center;margin-top:40px" class="reveal"><a href="menu.html" class="btn-outline">اطّلع على القائمة كاملة</a></div>
+                <div style="text-align:center;margin-top:40px" class="reveal"><a href="menu_ar.html" class="btn-outline">اطّلع على القائمة كاملة</a></div>
             </div>
         </section>
                 <section class="section bg-sec">
@@ -335,9 +335,9 @@
                               : '<div class="menu-emoji">' + item.emoji + '</div>') + '</div>'
                         + '<div class="menu-content"><div class="menu-head">'
                         + '<span class="menu-name"><span class="menu-code">' + item.id + '</span>' + menuItemName(item, HOME_LANG)
-                        + (item.spicy ? '<span class="menu-badge">' + (HOME_LANG==='ar'?'حار':HOME_LANG==='zh'?'辣':'Spicy') + '</span>' : '')
-                        + '</span><span class="menu-price">EGP ' + item.price + '</span></div>'
-                        + '<p class="menu-desc">' + (HOME_LANG==='zh' ? item.en : item.zh) + (note ? ' · ' + note : '') + '</p>'
+                        + (item.spicy ? '<span class="menu-badge">' + MENU_UI[HOME_LANG].spicyTag + '</span>' : '')
+                        + '</span><span class="menu-price">' + MENU_UI[HOME_LANG].price(item.price) + '</span></div>'
+                        + (note ? '<p class="menu-desc">' + note + '</p>' : '')
                         + '</div></div>';
                 }).join('');
                 cats.insertAdjacentHTML('beforeend',

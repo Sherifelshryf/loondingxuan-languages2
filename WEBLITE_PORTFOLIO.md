@@ -79,7 +79,7 @@ Staff get their own tools: an authenticated operations dashboard with live order
 |---|---|---|
 | **Full ordering catalog** | The restaurant's complete printed menu — **90 dishes across 13 categories** — each carrying its official menu code (L1, J4, M12…), its name in English, Chinese and Arabic, its price, and vegetarian/spicy tags. Category filtering includes an "All" view. | The entire menu becomes a transactional surface, not a PDF. Menu codes mean customer, waiter and kitchen all speak the same language about an order. |
 | **Photography for every dish** | All 77 food dishes carry the restaurant's own plated photograph, served as ~21 KB WebP and lazy-loaded. | Food photography is the single biggest driver of order value on a delivery menu; stock imagery reads as generic and untrustworthy. |
-| **Trilingual dish data** | Every dish stores its English, Simplified Chinese and Arabic name in one shared dataset, so the same catalogue drives all three editions of the site. | A Chinese diner, an Arabic-speaking local and an English-speaking expat each read the menu in their own language — rare in this market. |
+| **Trilingual catalogue** | Three full catalogue editions — English, Arabic (RTL) and Chinese — each rendering strictly one language: dish names, categories, ingredient notes, dietary tags, currency, cart labels and toasts. A language switcher moves between them without leaving the menu. | A Chinese diner, an Arabic-speaking local and an English-speaking expat each read and order from the menu entirely in their own language — rare in this market, and the thing a mixed-language menu quietly undermines. |
 | **Halal signalling** | Halal certification (清真) is surfaced as a badge on the hero and menu hero, and answered directly in the FAQ. 16 dishes are flagged vegetarian and 13 spicy. | Halal status is the single most important trust signal for this restaurant's local audience, and dietary tags cut pre-order phone calls. |
 | **Persistent cart with live quantity controls** | Add/increment/decrement per item, cards visually flag their in-cart state, cart persists to `sessionStorage` and survives the page change into checkout. | Removes friction at the exact point where food orders are most often abandoned. |
 | **Floating cart bar** | Slide-up bar pinned to the viewport showing live item count, running subtotal, and a checkout button with a count badge. | The order total is always visible — a proven conversion pattern. |
@@ -624,6 +624,7 @@ The strongest single asset for the case study header is the three-panel dispatch
 - Four payment methods: Cash on Delivery, Card on Delivery, InstaPay, Vodafone Cash
 - Promo code lookup against Firestore with an `active` flag check
 - Cart persistence via `sessionStorage` across the catalog → checkout transition
+- Three single-language catalogue editions (`menu.html`, `menu_ar.html`, `menu_zh.html`) sharing one `menu.css`, one `menu-page.js` and one dataset; verified by an automated scan that finds zero foreign-script text in each edition's menu UI
 - 90 menu items across 13 categories in a single shared `menu-data.js`, each with menu code, English/Chinese/Arabic names, price, and vegetarian/spicy flags, transcribed from the restaurant's official printed menu
 - Four-stage order status model shared across all consuming pages
 - Driver GPS broadcasting via `watchPosition`, with a toggle that deletes the location record
@@ -655,7 +656,7 @@ These must **not** be described as working features in any published portfolio c
 - **The table reservation form does not submit anywhere.** It shows a confirmation message after a simulated delay and resets. No data is transmitted, stored, or emailed.
 - **The newsletter signup does not submit anywhere.** It shows an alert and resets.
 - **No online payment capture.** All four payment methods are recorded as a selection on the order; nothing is charged through the site.
-- **The ordering flow's interface is still English-only.** Dish *data* is now trilingual and the catalogue renders from a `LANG` constant, so translating the ordering UI is now a small change — but the catalogue, checkout, receipt and tracking chrome still ship in English, and the Arabic and Chinese editions link into them.
+- **Checkout onward is still English-only.** The catalogue now ships in all three languages (`menu.html`, `menu_ar.html`, `menu_zh.html`), each rendering strictly one language. From the checkout step on — `order.html`, `receipt.html`, `track.html` — the interface is still English, so an Arabic or Chinese customer changes language at that boundary. Prices also revert from ج.م / 埃镑 to EGP there.
 - **SEO is minimal.** Titles and meta descriptions are present, but there are no Open Graph or Twitter Card tags, no canonical URLs, no `hreflang` annotations between the three language editions, no structured data (`Restaurant`, `Menu`, or `LocalBusiness` schema), no sitemap, and no `robots.txt`. Do not claim SEO as a capability on this project.
 - **Accessibility is not implemented.** There are zero ARIA attributes and zero explicit roles across all nine pages. Interactive elements are built from `div` elements with click handlers in several places. The viewport meta tag sets `maximum-scale=1.0, user-scalable=no`, which blocks pinch-zoom. Alt text is present on images (65 instances), which is the one positive. Do not claim accessibility on this project.
 - **Dish photography now covers every food item.** All 77 food dishes carry the restaurant's own photograph, extracted from the official printed menu and matched to each dish by its position on the page. Only 10 of the 13 drinks lack a photo — the printed menu itself only photographs three of them. The client has confirmed no higher-resolution originals exist, so the PDF is the final source; images are capped at 640 px on the long edge and never upscaled beyond what the file holds.
@@ -783,9 +784,9 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
       "value": "Food photography is the strongest driver of order value on a delivery menu, and the restaurant's own plating reads as trustworthy where stock imagery does not."
     },
     {
-      "name": "Trilingual dish data",
-      "description": "Every dish stores its English, Simplified Chinese and Arabic name in one shared dataset that drives the catalogue, the checkout and all three editions of the marketing site.",
-      "value": "A Chinese diner, an Arabic-speaking local and an English-speaking expatriate each read the same menu in their own language."
+      "name": "Trilingual catalogue",
+      "description": "Three full catalogue editions - English, Arabic (right-to-left) and Chinese - each rendering strictly one language: dish names, categories, ingredient notes, dietary tags, currency, cart labels and toasts. A language switcher moves between them without leaving the menu.",
+      "value": "A Chinese diner, an Arabic-speaking local and an English-speaking expatriate each read and order from the menu entirely in their own language."
     },
     {
       "name": "Halal certification signalling and dietary tags",
@@ -1278,7 +1279,6 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     "The table reservation form does not submit anywhere - it shows a confirmation message after a simulated delay and resets. No data is transmitted, stored or emailed.",
     "The newsletter signup does not submit anywhere - it shows an alert and resets.",
     "No online payment capture - all four payment methods are recorded as a selection on the order; nothing is charged through the site.",
-    "The ordering flow's interface is still English-only. Dish data is now trilingual and the catalogue renders from a single LANG constant, so translating the ordering UI is a small change, but the catalogue, checkout, receipt and tracking chrome still ship in English.",
     "SEO is minimal - titles and meta descriptions are present, but there are no Open Graph or Twitter Card tags, no canonical URLs, no hreflang annotations between language editions, no structured data, no sitemap and no robots.txt.",
     "Accessibility is not implemented - zero ARIA attributes and zero explicit roles across all nine pages, several interactive elements built from div elements with click handlers, and a viewport meta tag that blocks pinch-zoom. Alt text is present on images.",
     "The logo is a 553KB PNG embedded twice as inline base64 in each marketing page, inflating each of the three files to roughly 300KB.",
@@ -1287,7 +1287,8 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     "All business logic including pricing, distance, ETA, earnings and analytics is computed client-side; no server-side validation exists.",
     "Firestore security rules are not present in this repository and cannot be verified.",
     "Menu data is transcribed from the printed menu and is not admin-editable; a price change is a one-line edit in menu-data.js rather than a dashboard action.",
-    "Dish photography covers all 77 food dishes but only 3 of the 13 drinks, because the printed menu photographs only three drinks. The owner has confirmed no higher-resolution originals exist, so the menu PDF is the final source and images are capped at 640 px on the long edge."
+    "Dish photography covers all 77 food dishes but only 3 of the 13 drinks, because the printed menu photographs only three drinks. The owner has confirmed no higher-resolution originals exist, so the menu PDF is the final source and images are capped at 640 px on the long edge.",
+    "Checkout onward is still English-only. The catalogue ships in all three languages, but order.html, receipt.html and track.html remain English, and prices revert from the localised currency to EGP at that boundary."
   ],
   "portfolioCard": {
     "title": "Authentic Chinese Restaurant - Trilingual Website & Delivery Platform",
@@ -1353,7 +1354,9 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
       "index.html - English marketing site",
       "index_ar.html - Arabic marketing site (RTL)",
       "index_zh.html - Chinese marketing site",
-      "menu.html - ordering catalog with cart",
+      "menu.html - English ordering catalogue",
+      "menu_ar.html - Arabic ordering catalogue (RTL)",
+      "menu_zh.html - Chinese ordering catalogue",
       "order.html - two-step checkout with map location selection",
       "receipt.html - order confirmation and printable receipt",
       "track.html - live customer order tracking",
@@ -1361,7 +1364,9 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
       "driver.html - mobile driver application"
     ],
     "sharedModules": [
-      "menu-data.js - trilingual menu dataset (90 dishes, 13 categories), single source of truth for catalogue, checkout and marketing pages",
+      "menu-data.js - trilingual menu dataset (90 dishes, 13 categories) plus the catalogue interface strings for all three languages",
+      "menu-page.js - catalogue rendering and cart behaviour, driven entirely by the page's LANG",
+      "menu.css - catalogue styles shared by the three language editions, including right-to-left rules",
       "animations.js - click-spark canvas system and progressive-blur engine",
       "firebase-config.js - backend credentials placeholders and business constants"
     ],

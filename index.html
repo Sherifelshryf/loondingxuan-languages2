@@ -221,7 +221,7 @@
             <div class="hero-content">
                 <span class="hero-chinese reveal">龙鼎轩</span>
                 <span class="hero-subtitle reveal">Authentic Chinese Cuisine</span>
-                <span class="hero-halal reveal"><i class="fas fa-certificate"></i> 清真 · Halal Certified</span>
+                <span class="hero-halal reveal"><i class="fas fa-certificate"></i> Halal Certified</span>
                 <h1 class="reveal">A Taste of <br><span>Imperial China</span></h1>
                 <p class="reveal">Experience centuries of culinary tradition - from hand-crafted dim sum to slow-braised masterpieces, served with the warmth of true Chinese hospitality.</p>
                 <div class="hero-btns reveal">
@@ -336,9 +336,9 @@
                               : '<div class="menu-emoji">' + item.emoji + '</div>') + '</div>'
                         + '<div class="menu-content"><div class="menu-head">'
                         + '<span class="menu-name"><span class="menu-code">' + item.id + '</span>' + menuItemName(item, HOME_LANG)
-                        + (item.spicy ? '<span class="menu-badge">' + (HOME_LANG==='ar'?'حار':HOME_LANG==='zh'?'辣':'Spicy') + '</span>' : '')
-                        + '</span><span class="menu-price">EGP ' + item.price + '</span></div>'
-                        + '<p class="menu-desc">' + (HOME_LANG==='zh' ? item.en : item.zh) + (note ? ' · ' + note : '') + '</p>'
+                        + (item.spicy ? '<span class="menu-badge">' + MENU_UI[HOME_LANG].spicyTag + '</span>' : '')
+                        + '</span><span class="menu-price">' + MENU_UI[HOME_LANG].price(item.price) + '</span></div>'
+                        + (note ? '<p class="menu-desc">' + note + '</p>' : '')
                         + '</div></div>';
                 }).join('');
                 cats.insertAdjacentHTML('beforeend',
