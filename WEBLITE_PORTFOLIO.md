@@ -656,7 +656,7 @@ These must **not** be described as working features in any published portfolio c
 - **The table reservation form does not submit anywhere.** It shows a confirmation message after a simulated delay and resets. No data is transmitted, stored, or emailed.
 - **The newsletter signup does not submit anywhere.** It shows an alert and resets.
 - **No online payment capture.** All four payment methods are recorded as a selection on the order; nothing is charged through the site.
-- **Checkout onward is still English-only.** The catalogue now ships in all three languages (`menu.html`, `menu_ar.html`, `menu_zh.html`), each rendering strictly one language. From the checkout step on — `order.html`, `receipt.html`, `track.html` — the interface is still English, so an Arabic or Chinese customer changes language at that boundary. Prices also revert from ج.م / 埃镑 to EGP there.
+- **Guinea has no menu.** The branch is registered with its real address, phone numbers, languages and map link, but no menu was supplied, so it is marked `online: false` and its catalogue shows its phone numbers instead of dishes. Its map pin is approximate and its delivery pricing is unset — both must be supplied before it can take orders online.
 - **SEO is minimal.** Titles and meta descriptions are present, but there are no Open Graph or Twitter Card tags, no canonical URLs, no `hreflang` annotations between the three language editions, no structured data (`Restaurant`, `Menu`, or `LocalBusiness` schema), no sitemap, and no `robots.txt`. Do not claim SEO as a capability on this project.
 - **Accessibility is not implemented.** There are zero ARIA attributes and zero explicit roles across all nine pages. Interactive elements are built from `div` elements with click handlers in several places. The viewport meta tag sets `maximum-scale=1.0, user-scalable=no`, which blocks pinch-zoom. Alt text is present on images (65 instances), which is the one positive. Do not claim accessibility on this project.
 - **Dish photography now covers every food item.** All 77 food dishes carry the restaurant's own photograph, extracted from the official printed menu and matched to each dish by its position on the page. Only 10 of the 13 drinks lack a photo — the printed menu itself only photographs three of them. The client has confirmed no higher-resolution originals exist, so the PDF is the final source; images are capped at 640 px on the long edge and never upscaled beyond what the file holds.
@@ -1288,7 +1288,9 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     "Firestore security rules are not present in this repository and cannot be verified.",
     "Menu data is transcribed from the printed menu and is not admin-editable; a price change is a one-line edit in menu-data.js rather than a dashboard action.",
     "Dish photography covers all 77 food dishes but only 3 of the 13 drinks, because the printed menu photographs only three drinks. The owner has confirmed no higher-resolution originals exist, so the menu PDF is the final source and images are capped at 640 px on the long edge.",
-    "Checkout onward is still English-only. The catalogue ships in all three languages, but order.html, receipt.html and track.html remain English, and prices revert from the localised currency to EGP at that boundary."
+    "Guinea is registered as a branch with its real address, phones, languages and map link, but no menu was supplied. It is marked offline and its catalogue shows phone numbers instead of dishes.",
+    "Guinea's map pin is approximate (Kipe district, Conakry) and its delivery pricing is unset. Both drive distance-based fees, so both must be confirmed before that branch takes orders online.",
+    "Country detection depends on a third-party IP lookup (api.country.is, then ipapi.co). Both are best-effort with a 2.5 second timeout; when they fail the visitor is asked to choose."
   ],
   "portfolioCard": {
     "title": "Authentic Chinese Restaurant - Trilingual Website & Delivery Platform",
@@ -1373,7 +1375,7 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     "imageAssets": 87,
     "menuItems": 90,
     "menuCategories": 13,
-    "languages": 3,
+    "languages": 4,
     "userRoles": 3,
     "buildSystem": "none",
     "dependencyManifest": "none",
@@ -1398,7 +1400,11 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
       "Simplified Chinese",
       "Arabic"
     ],
-    "dishPhotographs": 80
+    "dishPhotographs": 80,
+    "countries": [
+      "Egypt (New Cairo) - en/ar/zh, EGP, 90-dish menu, online",
+      "Guinea (Conakry) - fr/en/zh, GNF, menu not yet supplied, phone ordering"
+    ]
   }
 }
 ```

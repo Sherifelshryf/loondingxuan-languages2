@@ -23,7 +23,7 @@
  * Changing a price here changes it everywhere.
  */
 
-const MENU_CATEGORIES = [
+const EG_CATEGORIES = [
     { id: 'cold',    code: 'L', emoji: '🥗', en: 'Cold Dishes',          zh: '凉菜',       ar: 'المقبلات الباردة' },
     { id: 'chicken', code: 'J', emoji: '🍗', en: 'Chicken',              zh: '鸡肉',       ar: 'الدجاج' },
     { id: 'beef',    code: 'N', emoji: '🥩', en: 'Beef',                 zh: '牛肉',       ar: 'اللحم البقري' },
@@ -39,7 +39,7 @@ const MENU_CATEGORIES = [
     { id: 'drinks',  code: 'P', emoji: '🥤', en: 'Drinks',               zh: '饮品',       ar: 'المشروبات' },
 ];
 
-const MENU = [
+const EG_ITEMS = [
     // ─── 凉菜 COLD DISHES ────────────────────────────────────────────────
     { id:'L1', cat:'cold', price:290, emoji:'🥬', veg:true,
       en:'Organic Spinach with Nuts', zh:'有机菠菜拌果仁', ar:'سبانخ عضوية مع مكسرات' },
@@ -255,74 +255,22 @@ const MENU = [
       en:'Fruit Yogurt', zh:'水果酸奶', ar:'زبادي فواكهة' },
 ];
 
-/* ─── Catalogue interface strings ───────────────────────────────────────
-   Every label the menu pages render, in all three languages. A page sets
-   LANG once and reads only from its own block, so a given edition never
-   shows text from another language.                                     */
 
-const MENU_UI = {
-    en: {
-        dir: 'ltr',
-        docTitle: 'Menu — Loongdingxuan',
-        metaDesc: 'The full halal Chinese menu — 90 dishes across cold dishes, chicken, beef, lamb, seafood, hot pot, noodles, rice and drinks. Order for delivery.',
-        navHome: 'Home', navDineIn: 'Dine In', navOrder: 'Order', navTrack: 'Track Order',
-        heroEyebrow: 'Browse & Order', heroTitleA: 'Our ', heroTitleB: 'Full Menu',
-        heroLead: 'Add your favourites directly to the cart and proceed to checkout for delivery.',
-        halal: 'Halal Certified',
-        all: 'All',
-        currency: 'EGP',
-        price: function (n) { return 'EGP ' + n; },
-        vegTag: 'Vegetarian', spicyTag: 'Spicy',
-        itemsInCart: function (n) { return n + (n === 1 ? ' item in cart' : ' items in cart'); },
-        checkout: 'Proceed to Checkout',
-        addedToCart: function (name) { return name + ' added to cart'; },
-        cartEmpty: 'Your cart is empty',
-        addToCart: 'Add to cart',
-    },
-    ar: {
-        dir: 'rtl',
-        docTitle: 'القائمة — لونغدينغشوان',
-        metaDesc: 'قائمة الطعام الصيني الحلال كاملة — 90 طبقاً تشمل المقبلات الباردة والدجاج واللحم البقري والضاني والمأكولات البحرية والهوت بوت والنودلز والأرز والمشروبات. اطلب التوصيل.',
-        navHome: 'الرئيسية', navDineIn: 'تناول في المطعم', navOrder: 'اطلب الآن', navTrack: 'تتبع الطلب',
-        heroEyebrow: 'تصفّح واطلب', heroTitleA: 'قائمتنا ', heroTitleB: 'الكاملة',
-        heroLead: 'أضف أطباقك المفضلة إلى السلة مباشرة ثم أكمل الطلب للتوصيل.',
-        halal: 'حلال معتمد',
-        all: 'الكل',
-        currency: 'ج.م',
-        price: function (n) { return n + ' ج.م'; },
-        vegTag: 'نباتي', spicyTag: 'حار',
-        itemsInCart: function (n) { return n === 1 ? 'طبق واحد في السلة' : n + ' أطباق في السلة'; },
-        checkout: 'إتمام الطلب',
-        addedToCart: function (name) { return 'تمت إضافة ' + name + ' إلى السلة'; },
-        cartEmpty: 'سلتك فارغة',
-        addToCart: 'أضف إلى السلة',
-    },
-    zh: {
-        dir: 'ltr',
-        docTitle: '菜单 — 龙鼎轩',
-        metaDesc: '全清真中餐菜单——凉菜、鸡肉、牛肉、羊肉、海鲜、火锅、面食、炒饭与饮品共 90 道菜品。可订外送。',
-        navHome: '首页', navDineIn: '堂食', navOrder: '在线订餐', navTrack: '订单追踪',
-        heroEyebrow: '浏览下单', heroTitleA: '我们的', heroTitleB: '完整菜单',
-        heroLead: '将喜爱的菜品直接加入购物车，即可下单外送。',
-        halal: '清真认证',
-        all: '全部',
-        currency: '埃镑',
-        price: function (n) { return n + ' 埃镑'; },
-        vegTag: '素食', spicyTag: '辣',
-        itemsInCart: function (n) { return '购物车内 ' + n + ' 件'; },
-        checkout: '去结算',
-        addedToCart: function (name) { return '已加入购物车：' + name; },
-        cartEmpty: '购物车是空的',
-        addToCart: '加入购物车',
-    },
+/* ─── Menus by branch ───────────────────────────────────────────────────
+   Each country sells its own menu. A branch points at one of these by its
+   `menuId`; a branch with `menuId: null` has no menu loaded yet and the
+   site shows its phone numbers instead of inventing dishes.            */
+
+const MENUS = {
+    eg: { categories: EG_CATEGORIES, items: EG_ITEMS },
+    // Guinea (Conakry) — menu not yet supplied by the owner.
+    gn: null,
 };
 
-/** The other two editions, for the language switcher. */
-const MENU_PAGES = [
-    { lang: 'en', label: 'EN',   href: 'menu.html' },
-    { lang: 'ar', label: 'عربي', href: 'menu_ar.html' },
-    { lang: 'zh', label: '中文', href: 'menu_zh.html' },
-];
+/** The menu for a branch, or null when none has been loaded. */
+function menuFor(branch) {
+    return branch && branch.menuId ? (MENUS[branch.menuId] || null) : null;
+}
 
 /* ─── Dish photography ──────────────────────────────────────────────────
    Photographs extracted from the restaurant's official printed menu and
@@ -441,18 +389,20 @@ function menuCategoryName(cat, lang) {
     return cat[lang] || cat.en;
 }
 
-function findMenuItem(id) {
-    return MENU.find(function (i) { return i.id === id; });
+function findMenuItem(menu, id) {
+    if (!menu) return null;
+    return menu.items.find(function (i) { return i.id === id; });
 }
 
 /** Items in printed-menu order for a category id, or all items for 'all'. */
-function menuItemsIn(catId) {
-    return catId === 'all' ? MENU : MENU.filter(function (i) { return i.cat === catId; });
+function menuItemsIn(menu, catId) {
+    if (!menu) return [];
+    return catId === 'all' ? menu.items : menu.items.filter(function (i) { return i.cat === catId; });
 }
 
 /** A short curated selection for the marketing pages, by menu code. */
 const MENU_HIGHLIGHTS = ['J4', 'N3', 'Y2', 'H4', 'D1', 'M1', 'F1', 'X4'];
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { MENU, MENU_CATEGORIES, MENU_HIGHLIGHTS, MENU_IMAGES, MENU_UI, MENU_PAGES };
+    module.exports = { MENUS, MENU_IMAGES, MENU_HIGHLIGHTS, menuFor, menuItemsIn, findMenuItem, menuItemName, menuItemNote, menuCategoryName, menuItemImage };
 }

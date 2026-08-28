@@ -4,16 +4,18 @@
  * ║   Shared by menu.html, menu_ar.html and menu_zh.html.             ║
  * ╚══════════════════════════════════════════════════════════════════╝
  *
- * Each page sets `window.LANG` to 'en', 'ar' or 'zh' before loading this
- * file. Everything rendered here — dish names, categories, tags, prices,
- * cart labels, toasts — is read from that one language, so an edition
- * never shows text from another language.
+ * The branch and language are resolved by country.js before anything is
+ * drawn. Everything rendered here — dish names, categories, tags, cart
+ * labels, toasts — comes from that one language, and every price from that
+ * one branch's currency, so an edition never mixes either.
  *
- * Requires menu-data.js (MENU, MENU_CATEGORIES, MENU_UI, helpers).
+ * A branch whose menu has not been supplied shows its phone numbers instead
+ * of an empty catalogue.
+ *
+ * Requires countries.js, i18n.js, country.js and menu-data.js.
  */
 
-const LANG = window.LANG || 'en';
-const T = MENU_UI[LANG];
+let T, MENU, BRANCH;   // set once the branch and language are resolved
 
 let cart = {};
 let currentCat = 'all';
@@ -24,14 +26,14 @@ try {
 } catch (e) {}
 
 // ─── STATIC CHROME ────────────────────────────────────────────────────────
-// Filled from MENU_UI so the markup carries no language of its own.
+// Filled from the language block so the markup carries no language of its own.
 function paintChrome() {
     document.title = T.docTitle;
     const meta = document.querySelector('meta[name="description"]');
     if (meta) meta.setAttribute('content', T.metaDesc);
     document.documentElement.lang = LANG;
-    document.documentElement.dir = T.dir;
-    if (T.dir === 'rtl') document.body.classList.add('rtl');
+    document.documentElement.dir = I18N[LANG].dir;
+    if (I18N[LANG].dir === 'rtl') document.body.classList.add('rtl');
 
     const set = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
     set('nav-home', T.navHome);
@@ -51,14 +53,39 @@ function paintChrome() {
     link('nav-home', home);
     link('nav-dinein', home + '#menu');
 
-    // Language switcher stays inside the catalogue instead of jumping home,
-    // so "the menu in Arabic" is a place you can actually be.
+    // The switcher offers only the languages this branch serves, and stays
+    // inside the catalogue instead of jumping home — so "the menu in Arabic"
+    // is a place you can actually be.
     const bar = document.getElementById('lang-bar');
     if (bar) {
-        bar.innerHTML = MENU_PAGES.map(p =>
-            `<button class="lang-btn${p.lang === LANG ? ' active' : ''}" onclick="location.href='${p.href}'">${p.label}</button>`
+        bar.innerHTML = BRANCH.languages.map(l =>
+            `<button class="lang-btn${l === LANG ? ' active' : ''}" onclick="setLang('${l}');location.href='${pageFor('menu', l)}'">${I18N[l].langName}</button>`
         ).join('');
+        mountCountrySwitcher(bar, BRANCH, LANG);
     }
+}
+
+/** Prices always come from the branch, never from the language. */
+function money(n) { return formatMoney(BRANCH, LANG, n); }
+
+/** A branch with no menu loaded shows its phone numbers instead. */
+function renderNoMenu() {
+    document.getElementById('menu-tabs').innerHTML = '';
+    document.getElementById('cart-float').style.display = 'none';
+    const phones = BRANCH.phones || {};
+    const numbers = [];
+    if (phones.order) numbers.push(phones.order);
+    if (phones.reservation && phones.reservation !== phones.order) numbers.push(phones.reservation);
+    document.getElementById('menu-cats').innerHTML =
+        '<div class="ldx-offline">' +
+          '<h3>' + T.noMenuTitle + '</h3>' +
+          '<p>' + T.noMenuLead + '</p>' +
+          '<div class="ldx-offline-phones">' +
+            numbers.map(function (p) {
+                return '<a href="tel:' + p.replace(/[^+\d]/g, '') + '"><i class="fas fa-phone"></i> ' + p + '</a>';
+            }).join('') +
+          '</div>' +
+        '</div>';
 }
 
 // ─── BUILD MENU ───────────────────────────────────────────────────────────
@@ -67,7 +94,7 @@ function buildMenu() {
     const catsEl = document.getElementById('menu-cats');
 
     tabsEl.innerHTML = `<button class="menu-tab active" onclick="switchTab('all', this)">🍽️ ${T.all}</button>`
-        + MENU_CATEGORIES.map(c =>
+        + MENU.categories.map(c =>
             `<button class="menu-tab" onclick="switchTab('${c.id}', this)">${c.emoji} ${menuCategoryName(c, LANG)}</button>`
         ).join('');
 
@@ -76,7 +103,7 @@ function buildMenu() {
     allGrid.id = 'cat-all';
     catsEl.appendChild(allGrid);
 
-    MENU_CATEGORIES.forEach(c => {
+    MENU.categories.forEach(c => {
         const grid = document.createElement('div');
         grid.className = 'menu-cat';
         grid.id = `cat-${c.id}`;
@@ -84,13 +111,13 @@ function buildMenu() {
     });
 
     renderCat('all');
-    MENU_CATEGORIES.forEach(c => renderCat(c.id));
+    MENU.categories.forEach(c => renderCat(c.id));
 }
 
 function renderCat(catId) {
     const el = document.getElementById(`cat-${catId}`);
     if (!el) return;
-    el.innerHTML = menuItemsIn(catId).map(item => buildCardHTML(item)).join('');
+    el.innerHTML = menuItemsIn(MENU, catId).map(item => buildCardHTML(item)).join('');
 }
 
 function actionsHTML(item, qty) {
@@ -122,7 +149,7 @@ function buildCardHTML(item) {
                 <div class="card-code">${item.id}</div>
                 <div class="card-name">${name}</div>
                 ${note ? `<div class="card-desc">${note}</div>` : ''}
-                <div class="card-price">${T.price(item.price)}${tags}</div>
+                <div class="card-price">${money(item.price)}${tags}</div>
             </div>
             <div class="card-actions" id="ca-${item.id}">${actionsHTML(item, qty)}</div>
         </div>`;
@@ -143,7 +170,7 @@ function addItem(id) {
     refreshCard(id);
     saveCart();
     updateCartBar();
-    const item = findMenuItem(id);
+    const item = findMenuItem(MENU, id);
     if (item) showToast(T.addedToCart(menuItemName(item, LANG)));
 }
 
@@ -155,7 +182,7 @@ function changeQty(id, delta) {
 }
 
 function refreshCard(id) {
-    const item = findMenuItem(id);
+    const item = findMenuItem(MENU, id);
     if (!item) return;
     const qty = cart[id] || 0;
 
@@ -173,7 +200,7 @@ function saveCart() {
 }
 
 function getSubtotal() {
-    return MENU.reduce((s, i) => s + (cart[i.id] || 0) * i.price, 0);
+    return MENU.items.reduce((s, i) => s + (cart[i.id] || 0) * i.price, 0);
 }
 
 function getTotalItems() {
@@ -184,7 +211,7 @@ function updateCartBar() {
     const count = getTotalItems();
     document.getElementById('cf-count').textContent = T.itemsInCart(count);
     document.getElementById('cf-badge').textContent = count;
-    document.getElementById('cf-total').textContent = T.price(getSubtotal());
+    document.getElementById('cf-total').textContent = money(getSubtotal());
     document.getElementById('cart-float').classList.toggle('visible', count > 0);
 }
 
@@ -217,9 +244,15 @@ window.addEventListener('scroll', () => {
 
 // ─── INIT ─────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-    paintChrome();
-    buildMenu();
-    updateCartBar();
+    resolveSite(function (branch, lang) {
+        BRANCH = branch;
+        T = I18N[lang].menu;
+        MENU = menuFor(branch);
+        paintChrome();
+        if (!MENU) { renderNoMenu(); return; }
+        buildMenu();
+        updateCartBar();
+    });
 });
 
 window.addEventListener('load', () => {
