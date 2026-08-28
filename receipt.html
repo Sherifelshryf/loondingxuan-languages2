@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Montserrat:wght@400;500;600;700&family=Reenie+Beanie&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="firebase-config.js"></script>
+    <link rel="stylesheet" href="country.css">
     <style>
         :root {
             --bg-base: #2B4B3E;
@@ -92,64 +93,67 @@
 <div class="page-wrap">
     <div class="confirm-banner">
         <div class="confirm-icon"><i class="fas fa-check"></i></div>
-        <h1 class="confirm-title">Order Confirmed! 🎉</h1>
-        <p class="confirm-sub">Your order has been received and our kitchen is preparing it right now. You'll receive updates as your delivery progresses.</p>
+        <h1 class="confirm-title" id="i-confirmed"></h1>
+        <p class="confirm-sub" id="i-confirmlead"></p>
         <div class="order-id-pill" id="order-id-display">Order #—</div>
     </div>
     <div class="eta-bar">
         <div class="eta-icon"><i class="fas fa-clock"></i></div>
         <div>
-            <div class="eta-label">Estimated Delivery</div>
+            <div class="eta-label" id="i-eta"></div>
             <div class="eta-val" id="eta-display">~45 min</div>
-            <div class="eta-label" style="margin-top:2px;" id="eta-note">Based on your delivery distance</div>
+            <div class="eta-label" style="margin-top:2px;" id="eta-note"></div>
         </div>
         <div style="margin-left:auto;text-align:right;">
-            <div class="eta-label">Payment</div>
+            <div class="eta-label" id="i-payment"></div>
             <div style="font-weight:600;font-size:0.95rem;" id="payment-display">—</div>
         </div>
     </div>
     <div class="receipt-card" id="printable-receipt">
         <div class="receipt-header">
-            <h3><i class="fas fa-receipt" style="margin-right:0.4rem;color:var(--accent)"></i> Receipt</h3>
+            <h3><i class="fas fa-receipt" style="margin-right:0.4rem;color:var(--accent)"></i> <span id="i-receipt"></span></h3>
             <span style="font-size:0.78rem;color:var(--text-muted);" id="receipt-date">—</span>
         </div>
         <div class="receipt-body">
-            <div class="receipt-row"><span class="lbl">Name</span><span class="val" id="r-name">—</span></div>
-            <div class="receipt-row"><span class="lbl">Phone</span><span class="val" id="r-phone">—</span></div>
-            <div class="receipt-row"><span class="lbl">Address</span><span class="val" id="r-address">—</span></div>
-            <div class="receipt-row" id="r-landmark-row" style="display:none;"><span class="lbl">Landmark</span><span class="val" id="r-landmark">—</span></div>
-            <div class="receipt-row" id="r-notes-row" style="display:none;"><span class="lbl">Notes</span><span class="val" id="r-notes">—</span></div>
+            <div class="receipt-row"><span class="lbl" id="i-name"></span><span class="val" id="r-name">—</span></div>
+            <div class="receipt-row"><span class="lbl" id="i-phone"></span><span class="val" id="r-phone">—</span></div>
+            <div class="receipt-row"><span class="lbl" id="i-address"></span><span class="val" id="r-address">—</span></div>
+            <div class="receipt-row" id="r-landmark-row" style="display:none;"><span class="lbl" id="i-landmark"></span><span class="val" id="r-landmark">—</span></div>
+            <div class="receipt-row" id="r-notes-row" style="display:none;"><span class="lbl" id="i-notes"></span><span class="val" id="r-notes">—</span></div>
             <div class="receipt-divider"></div>
             <table class="items-table">
-                <thead><tr><th>Item</th><th>Qty</th><th>Price</th></tr></thead>
+                <thead><tr><th id="i-item"></th><th id="i-qty"></th><th id="i-price"></th></tr></thead>
                 <tbody id="r-items"></tbody>
             </table>
             <div class="receipt-divider"></div>
-            <div class="receipt-row"><span class="lbl">Subtotal</span><span class="val" id="r-subtotal">—</span></div>
-            <div class="receipt-row"><span class="lbl">Delivery Fee</span><span class="val" id="r-delivery">—</span></div>
-            <div class="receipt-row" id="r-discount-row" style="display:none;"><span class="lbl">Discount</span><span class="val" id="r-discount" style="color:var(--green)">—</span></div>
+            <div class="receipt-row"><span class="lbl" id="i-subtotal"></span><span class="val" id="r-subtotal">—</span></div>
+            <div class="receipt-row"><span class="lbl" id="i-delfee"></span><span class="val" id="r-delivery">—</span></div>
+            <div class="receipt-row" id="r-discount-row" style="display:none;"><span class="lbl" id="i-discount"></span><span class="val" id="r-discount" style="color:var(--green)">—</span></div>
             <div class="receipt-divider"></div>
-            <div class="receipt-total"><span>Total</span><span class="t-val" id="r-total">—</span></div>
+            <div class="receipt-total"><span id="i-total"></span><span class="t-val" id="r-total">—</span></div>
             <div style="margin-top:1.5rem;padding:1rem;background:rgba(255,255,255,0.03);border-radius:12px;font-size:0.78rem;color:var(--text-muted);text-align:center;line-height:1.6;">
-                Loongdingxuan (龙鼎轩) · Rehab – New Cairo, Cairo · <span id="r-restaurant-phone">Egypt</span><br>
-                Thank you for your order! We hope you enjoy every bite. 🥟
+                <span id="r-branch-line"></span><br>
+                <span id="i-thanks"></span>
             </div>
         </div>
     </div>
     <div class="actions no-print">
-        <button class="action-btn" onclick="window.print()"><i class="fas fa-print"></i> Print Receipt</button>
-        <button class="action-btn" id="share-btn" onclick="shareReceipt()"><i class="fas fa-share-nodes"></i> Share</button>
-        <a class="action-btn whatsapp" id="whatsapp-btn" href="#" target="_blank"><i class="fab fa-whatsapp"></i> Contact Us</a>
-        <a class="action-btn primary" href="order.html"><i class="fas fa-plus"></i> New Order</a>
+        <button class="action-btn" onclick="window.print()"><i class="fas fa-print"></i> <span id="i-print"></span></button>
+        <button class="action-btn" id="share-btn" onclick="shareReceipt()"><i class="fas fa-share-nodes"></i> <span id="i-share"></span></button>
+        <a class="action-btn whatsapp" id="whatsapp-btn" href="#" target="_blank"><i class="fab fa-whatsapp"></i> <span id="i-contact"></span></a>
+        <a class="action-btn primary" href="order.html"><i class="fas fa-plus"></i> <span id="i-neworder"></span></a>
     </div>
     <div style="text-align:center;margin-top:1rem;" class="no-print">
-        <a href="track.html" style="color:var(--text-muted);font-size:0.88rem;text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;"><i class="fas fa-location-arrow" style="color:var(--accent)"></i> Track your order</a>
+        <a href="track.html" style="color:var(--text-muted);font-size:0.88rem;text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;"><i class="fas fa-location-arrow" style="color:var(--accent)"></i> <span id="i-trackorder"></span></a>
     </div>
 </div>
+<script src="countries.js"></script>
+<script src="i18n.js"></script>
+<script src="country.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-const PAYMENT_LABELS = { cash: 'Cash on Delivery', card: 'Card on Delivery', instapay: 'InstaPay', vodafone: 'Vodafone Cash' };
+let T, BRANCH;
 let orderData = null;
 let db = null;
 try {
@@ -158,6 +162,34 @@ try {
         db = firebase.firestore();
     }
 } catch(e) { console.warn('Firebase not configured:', e.message); }
+
+const RECEIPT_LOCALE = { en: 'en-GB', ar: 'ar-EG', zh: 'zh-CN', fr: 'fr-FR' };
+
+function money(n) { return formatMoney(BRANCH, LANG, n); }
+
+const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+
+function paintChrome() {
+    document.title = T.docTitle;
+    document.documentElement.lang = LANG;
+    document.documentElement.dir = I18N[LANG].dir;
+    if (I18N[LANG].dir === 'rtl') document.body.classList.add('rtl');
+    setTxt('i-confirmed', T.confirmed);      setTxt('i-confirmlead', T.confirmedLead);
+    setTxt('i-eta', T.estDelivery);          setTxt('eta-note', T.etaNote);
+    setTxt('i-payment', T.payment);          setTxt('i-receipt', T.receipt);
+    setTxt('i-name', T.name);                setTxt('i-phone', T.phone);
+    setTxt('i-address', T.address);          setTxt('i-landmark', T.landmark);
+    setTxt('i-notes', T.notes);
+    setTxt('i-item', T.item);                setTxt('i-qty', T.qty);        setTxt('i-price', T.price);
+    setTxt('i-subtotal', T.subtotal);        setTxt('i-delfee', T.deliveryFee);
+    setTxt('i-discount', T.discount);        setTxt('i-total', T.total);
+    setTxt('i-print', T.print);              setTxt('i-share', T.share);
+    setTxt('i-contact', T.contact);          setTxt('i-neworder', T.newOrder);
+    setTxt('i-trackorder', T.trackOrder);    setTxt('i-thanks', T.thanks);
+    setTxt('r-branch-line', 'Loongdingxuan · ' + (BRANCH.address[LANG] || BRANCH.address.en) + ' · ' + BRANCH.phones.order);
+    const newOrder = document.querySelector('a[href="order.html"]');
+    if (newOrder) newOrder.setAttribute('href', pageFor('menu', LANG));
+}
 
 async function loadOrder() {
     const params = new URLSearchParams(window.location.search);
@@ -173,7 +205,7 @@ async function loadOrder() {
             if (snap.exists) { orderData = { id: orderId, ...snap.data() }; renderOrder(orderData); return; }
         } catch(e) { console.error(e); }
     }
-    document.querySelector('.confirm-banner').innerHTML = '<p style="color:var(--text-muted)">Order not found. Please check your link or contact us.</p>';
+    document.querySelector('.confirm-banner').innerHTML = '<p style="color:var(--text-muted)">' + T.notFound + '</p>';
 }
 
 function renderOrder(o) {
@@ -181,11 +213,11 @@ function renderOrder(o) {
     document.getElementById('nav-order-id').textContent = '#' + shortId;
     document.getElementById('order-id-display').textContent = 'Order #' + shortId;
     const eta = o.estimatedMinutes || 45;
-    document.getElementById('eta-display').textContent = `~${eta} min`;
-    if (o.lat && o.lng) document.getElementById('eta-note').textContent = 'Based on your delivery distance from Rehab';
-    document.getElementById('payment-display').textContent = PAYMENT_LABELS[o.paymentMethod] || o.paymentMethod || '—';
+    document.getElementById('eta-display').textContent = I18N[LANG].track.minutes(eta);
+    if (o.lat && o.lng) document.getElementById('eta-note').textContent = T.etaNote;
+    document.getElementById('payment-display').textContent = T.__pay[o.paymentMethod] || o.paymentMethod || '—';
     const d = o.createdAt ? new Date(o.createdAt) : new Date();
-    document.getElementById('receipt-date').textContent = d.toLocaleDateString('en-EG', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    document.getElementById('receipt-date').textContent = d.toLocaleDateString(RECEIPT_LOCALE[LANG] || 'en-GB', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
     document.getElementById('r-name').textContent = o.customerName || '—';
     document.getElementById('r-phone').textContent = o.customerPhone || '—';
     document.getElementById('r-address').textContent = o.customerAddress || '—';
@@ -203,32 +235,35 @@ function renderOrder(o) {
         badge.textContent = item.qty;
         tdQty.appendChild(badge);
         const tdPrice = document.createElement('td');
-        tdPrice.textContent = 'EGP ' + item.subtotal;
+        tdPrice.textContent = money(item.subtotal);
         tr.appendChild(tdName); tr.appendChild(tdQty); tr.appendChild(tdPrice);
         tbody.appendChild(tr);
     });
-    document.getElementById('r-subtotal').textContent = `EGP ${o.subtotal || 0}`;
-    document.getElementById('r-delivery').textContent = `EGP ${o.deliveryFee || 0}`;
-    if (o.discount > 0) { document.getElementById('r-discount').textContent = `-EGP ${o.discount}`; document.getElementById('r-discount-row').style.display = 'flex'; }
-    document.getElementById('r-total').textContent = `EGP ${o.total || 0}`;
-    if (typeof RESTAURANT_PHONE !== 'undefined') document.getElementById('r-restaurant-phone').textContent = RESTAURANT_PHONE;
-    if (typeof RESTAURANT_PHONE !== 'undefined') {
-        const msg = encodeURIComponent(`Hi Loongdingxuan! My order #${shortId} — ${o.customerName} — ${o.customerPhone}`);
-        document.getElementById('whatsapp-btn').href = `https://wa.me/${RESTAURANT_PHONE.replace(/\D/g,'')}?text=${msg}`;
-    }
+    document.getElementById('r-subtotal').textContent = money(o.subtotal || 0);
+    document.getElementById('r-delivery').textContent = money(o.deliveryFee || 0);
+    if (o.discount > 0) { document.getElementById('r-discount').textContent = '−' + money(o.discount); document.getElementById('r-discount-row').style.display = 'flex'; }
+    document.getElementById('r-total').textContent = money(o.total || 0);
+    const msg = encodeURIComponent(T.waMessage(shortId, o.customerName, o.customerPhone));
+    document.getElementById('whatsapp-btn').href = 'https://wa.me/' + BRANCH.phones.order.replace(/[^0-9]/g, '') + '?text=' + msg;
 }
 
 async function shareReceipt() {
     const url = window.location.href;
     if (navigator.share) {
-        try { await navigator.share({ title: 'Loongdingxuan Order', text: 'My Loongdingxuan delivery order!', url }); } catch(e) {}
+        try { await navigator.share({ title: T.docTitle, text: T.shareText, url }); } catch(e) {}
     } else {
         await navigator.clipboard.writeText(url);
-        alert('Link copied to clipboard!');
+        alert(T.copied);
     }
 }
 
-loadOrder();
+resolveSite(function (branch, lang) {
+    BRANCH = branch;
+    T = I18N[lang].receipt;
+    T.__pay = I18N[lang].order.pay;
+    paintChrome();
+    loadOrder();
+});
 </script>
 <script src="animations.js"></script>
 </body>

@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="firebase-config.js"></script>
+    <link rel="stylesheet" href="country.css">
     <style>
         :root {
             --bg-base: #2B4B3E;
@@ -170,92 +171,75 @@
 
 <nav>
     <a href="index.html" class="logo-text"><img src="images/logo.png" style="height:36px;width:auto;object-fit:contain;" alt="Loongdingxuan"><span style="margin-left:6px;">Loongdingxuan <span style="font-size:0.85rem;color:var(--text-muted);font-weight:400;">龙鼎轩</span></span></a>
-    <div style="display:flex;gap:1rem;align-items:center;">
-        <a href="menu.html" style="color:var(--text-muted);font-size:0.85rem;display:flex;align-items:center;gap:0.4rem;text-decoration:none;"><i class="fas fa-utensils" style="color:var(--accent)"></i> Full Menu</a>
-        <a href="track.html" style="color:var(--text-muted);font-size:0.85rem;display:flex;align-items:center;gap:0.4rem;text-decoration:none;"><i class="fas fa-location-arrow" style="color:var(--accent)"></i> Track Order</a>
+    <div style="display:flex;gap:1rem;align-items:center;" id="nav-right">
+        <a href="menu.html" style="color:var(--text-muted);font-size:0.85rem;display:flex;align-items:center;gap:0.4rem;text-decoration:none;"><i class="fas fa-utensils" style="color:var(--accent)"></i> <span id="i-fullmenu"></span></a>
+        <a href="track.html" style="color:var(--text-muted);font-size:0.85rem;display:flex;align-items:center;gap:0.4rem;text-decoration:none;"><i class="fas fa-location-arrow" style="color:var(--accent)"></i> <span id="i-track"></span></a>
     </div>
 </nav>
 
 <!-- Steps bar -->
 <div class="steps-bar" id="steps-bar">
-    <div class="step active" id="step-indicator-1"><div class="step-num">1</div><span>Location</span></div>
+    <div class="step active" id="step-indicator-1"><div class="step-num">1</div><span id="i-step1"></span></div>
     <div class="step-sep"></div>
-    <div class="step" id="step-indicator-2"><div class="step-num">2</div><span>Details</span></div>
+    <div class="step" id="step-indicator-2"><div class="step-num">2</div><span id="i-step2"></span></div>
 </div>
 
 <div class="page-wrap">
 
     <!-- STEP 1: LOCATION -->
     <div class="step-panel active" id="panel-step-1">
-        <button class="back-btn" onclick="window.location.href='menu.html'"><i class="fas fa-arrow-left"></i> Back to Menu</button>
+        <button class="back-btn" onclick="window.location.href='menu.html'"><i class="fas fa-arrow-left"></i> <span id="i-backmenu"></span></button>
         <div class="loc-mode-tabs">
-            <button class="loc-mode-tab active" id="loc-tab-map" onclick="switchLocMode('map')"><i class="fas fa-map-pin"></i> Pin on Map</button>
-            <button class="loc-mode-tab" id="loc-tab-gps" onclick="useMyLocation()"><i class="fas fa-location-crosshairs"></i> Use My Location</button>
-            <button class="loc-mode-tab" id="loc-tab-manual" onclick="switchLocMode('manual')"><i class="fas fa-keyboard"></i> Type Address</button>
+            <button class="loc-mode-tab active" id="loc-tab-map" onclick="switchLocMode('map')"><i class="fas fa-map-pin"></i> <span id="i-tabmap"></span></button>
+            <button class="loc-mode-tab" id="loc-tab-gps" onclick="useMyLocation()"><i class="fas fa-location-crosshairs"></i> <span id="i-tabgps"></span></button>
+            <button class="loc-mode-tab" id="loc-tab-manual" onclick="switchLocMode('manual')"><i class="fas fa-keyboard"></i> <span id="i-tabmanual"></span></button>
         </div>
         <div id="order-map"></div>
-        <p class="map-hint" id="map-hint">Tap on the map to drop your delivery pin</p>
+        <p class="map-hint" id="map-hint"></p>
         <div class="address-display" id="address-display"><i class="fas fa-location-dot" style="color:var(--accent);margin-right:0.5rem;"></i><span id="address-text">—</span></div>
         <div class="manual-address-field" id="manual-address-wrap" style="display:none;">
-            <div class="field"><label>Your Address</label><input type="text" id="manual-address" placeholder="Building, Street, Area, Giza..."></div>
+            <div class="field"><label id="i-youraddr"></label><input type="text" id="manual-address" placeholder=""></div>
         </div>
     </div>
 
     <!-- STEP 2: DETAILS & PAYMENT -->
     <div class="step-panel" id="panel-step-2">
-        <button class="back-btn" onclick="goStep(1)"><i class="fas fa-arrow-left"></i> Back to Location</button>
+        <button class="back-btn" onclick="goStep(1)"><i class="fas fa-arrow-left"></i> <span id="i-backloc"></span></button>
 
         <div class="section-card">
-            <h3><i class="fas fa-user" style="margin-right:0.4rem;color:var(--accent)"></i> Contact Details</h3>
+            <h3><i class="fas fa-user" style="margin-right:0.4rem;color:var(--accent)"></i> <span id="i-contact"></span></h3>
             <div class="field-row">
-                <div class="field"><label>Full Name</label><input type="text" id="f-name" placeholder="Your name"></div>
-                <div class="field"><label>Phone Number</label><input type="tel" id="f-phone" placeholder="+20 1XX XXX XXXX"></div>
+                <div class="field"><label id="i-name"></label><input type="text" id="f-name" placeholder=""></div>
+                <div class="field"><label id="i-phone"></label><input type="tel" id="f-phone" placeholder=""></div>
             </div>
-            <div class="field"><label>Delivery Address</label><input type="text" id="f-address" placeholder="Building, street, area..."></div>
-            <div class="field" style="margin-top:0.8rem;"><label>Landmark (optional)</label><input type="text" id="f-landmark" placeholder="Nearest landmark or building name"></div>
-            <div class="field" style="margin-top:0.8rem;"><label>Order Notes (optional)</label><textarea id="f-notes" placeholder="Special requests, allergies, spice level..."></textarea></div>
+            <div class="field"><label id="i-deladdr"></label><input type="text" id="f-address" placeholder=""></div>
+            <div class="field" style="margin-top:0.8rem;"><label id="i-landmark"></label><input type="text" id="f-landmark" placeholder=""></div>
+            <div class="field" style="margin-top:0.8rem;"><label id="i-notes"></label><textarea id="f-notes" placeholder=""></textarea></div>
         </div>
 
         <div class="section-card">
-            <h3><i class="fas fa-credit-card" style="margin-right:0.4rem;color:var(--accent)"></i> Payment Method</h3>
-            <div class="payment-grid">
-                <div class="pay-opt selected" id="pay-cash" onclick="selectPayment(this,'cash')">
-                    <div class="pay-icon" style="background:rgba(74,222,128,0.1);color:var(--green)"><i class="fas fa-money-bill-wave"></i></div>
-                    <div class="pay-label">Cash on Delivery</div>
-                </div>
-                <div class="pay-opt" id="pay-card" onclick="selectPayment(this,'card')">
-                    <div class="pay-icon" style="background:rgba(139,92,246,0.1);color:#a78bfa"><i class="fas fa-credit-card"></i></div>
-                    <div class="pay-label">Card on Delivery</div>
-                </div>
-                <div class="pay-opt" id="pay-instapay" onclick="selectPayment(this,'instapay')">
-                    <div class="pay-icon" style="background:rgba(255,183,178,0.1);color:var(--accent)"><i class="fas fa-mobile-screen"></i></div>
-                    <div class="pay-label">InstaPay</div>
-                </div>
-                <div class="pay-opt" id="pay-vodafone" onclick="selectPayment(this,'vodafone')">
-                    <div class="pay-icon" style="background:rgba(239,68,68,0.1);color:#f87171"><i class="fas fa-sim-card"></i></div>
-                    <div class="pay-label">Vodafone Cash</div>
-                </div>
-            </div>
+            <h3><i class="fas fa-credit-card" style="margin-right:0.4rem;color:var(--accent)"></i> <span id="i-payment"></span></h3>
+            <div class="payment-grid" id="payment-grid"></div>
         </div>
 
         <div class="section-card">
-            <h3><i class="fas fa-receipt" style="margin-right:0.4rem;color:var(--accent)"></i> Order Summary</h3>
+            <h3><i class="fas fa-receipt" style="margin-right:0.4rem;color:var(--accent)"></i> <span id="i-summary"></span></h3>
             <div id="cart-lines"></div>
             <div class="summary-divider"></div>
-            <div class="summary-line"><span class="label">Subtotal</span><span class="val" id="sum-subtotal">EGP 0</span></div>
-            <div class="summary-line"><span class="label">Delivery Fee</span><span class="val" id="sum-delivery">EGP —</span></div>
-            <div class="summary-line" id="sum-discount-row" style="display:none;"><span class="label">Discount</span><span class="val" id="sum-discount" style="color:var(--green)">−EGP 0</span></div>
+            <div class="summary-line"><span class="label" id="i-subtotal"></span><span class="val" id="sum-subtotal">EGP 0</span></div>
+            <div class="summary-line"><span class="label" id="i-delfee"></span><span class="val" id="sum-delivery">EGP —</span></div>
+            <div class="summary-line" id="sum-discount-row" style="display:none;"><span class="label" id="i-discount"></span><span class="val" id="sum-discount" style="color:var(--green)">−EGP 0</span></div>
             <div class="summary-divider"></div>
-            <div class="summary-total"><span>Total</span><span class="t-val" id="sum-total">EGP —</span></div>
+            <div class="summary-total"><span id="i-total"></span><span class="t-val" id="sum-total">EGP —</span></div>
             <div class="promo-row">
-                <input class="promo-input" type="text" id="promo-code" placeholder="Promo code">
-                <button class="promo-btn" onclick="applyPromo()">Apply</button>
+                <input class="promo-input" type="text" id="promo-code" placeholder="">
+                <button class="promo-btn" onclick="applyPromo()" id="i-apply"></button>
             </div>
             <div id="promo-msg" style="font-size:0.78rem;margin-top:0.5rem;min-height:1.2em;"></div>
         </div>
 
         <button class="place-order-btn" id="place-order-btn" onclick="placeOrder()">
-            <i class="fas fa-bag-shopping"></i> Place Order
+            <i class="fas fa-bag-shopping"></i> <span id="i-placeorder"></span>
         </button>
     </div>
 
@@ -265,23 +249,84 @@
 <div class="cart-bar" id="cart-bar">
     <div class="cart-bar-inner">
         <div>
-            <div class="cart-summary-text"><span class="cart-count" id="cb-count">0 items</span> in cart</div>
+            <div class="cart-summary-text"><span class="cart-count" id="cb-count"></span> <span id="i-incart"></span></div>
             <div class="cart-subtotal" id="cb-subtotal">EGP 0</div>
         </div>
-        <button class="next-btn" id="next-btn" onclick="goNextStep()" disabled>Continue <i class="fas fa-arrow-right"></i></button>
+        <button class="next-btn" id="next-btn" onclick="goNextStep()" disabled><span id="i-continue"></span> <i class="fas fa-arrow-right"></i></button>
     </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <!-- Firebase SDKs -->
+<script src="countries.js"></script>
+<script src="i18n.js"></script>
+<script src="country.js"></script>
+<script src="menu-data.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="menu-data.js"></script>
 <script>
 
-// Menu data (MENU, MENU_CATEGORIES and helpers) comes from menu-data.js.
-const LANG = 'en';
+
+
+// ─── LANGUAGE + BRANCH ─────────────────────────────────────────────────────
+let T, MENU, BRANCH;
+
+const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+const setPh  = (id, v) => { const el = document.getElementById(id); if (el) el.placeholder = v; };
+
+function paintChrome() {
+    document.title = T.docTitle;
+    document.documentElement.lang = LANG;
+    document.documentElement.dir = I18N[LANG].dir;
+    if (I18N[LANG].dir === 'rtl') document.body.classList.add('rtl');
+
+    setTxt('i-fullmenu', T.navFullMenu);   setTxt('i-track', T.navTrack);
+    setTxt('i-step1', T.step1);            setTxt('i-step2', T.step2);
+    setTxt('i-backmenu', T.backToMenu);    setTxt('i-backloc', T.backToLocation);
+    setTxt('i-tabmap', T.tabMap);          setTxt('i-tabgps', T.tabGps);
+    setTxt('i-tabmanual', T.tabManual);    setTxt('map-hint', T.mapHint);
+    setTxt('i-youraddr', T.yourAddress);   setPh('manual-address', T.addressPlaceholder);
+    setTxt('i-contact', T.contactDetails);
+    setTxt('i-name', T.fullName);          setPh('f-name', T.namePlaceholder);
+    setTxt('i-phone', T.phone);            setPh('f-phone', '+' + (BRANCH.phones.order || '').replace(/[^\d]/g, '').slice(0, 3) + ' …');
+    setTxt('i-deladdr', T.deliveryAddress); setPh('f-address', T.addressPlaceholder);
+    setTxt('i-landmark', T.landmark);      setPh('f-landmark', T.landmarkPlaceholder);
+    setTxt('i-notes', T.notes);            setPh('f-notes', T.notesPlaceholder);
+    setTxt('i-payment', T.paymentMethod);  setTxt('i-summary', T.orderSummary);
+    setTxt('i-subtotal', T.subtotal);      setTxt('i-delfee', T.deliveryFee);
+    setTxt('i-discount', T.discount);      setTxt('i-total', T.total);
+    setPh('promo-code', T.promoPlaceholder); setTxt('i-apply', T.apply);
+    setTxt('i-placeorder', T.placeOrder);  setTxt('i-continue', T.continue);
+    setTxt('i-incart', T.inCart);
+
+    const backMenu = document.querySelector('[onclick*="menu.html"]');
+    if (backMenu) backMenu.setAttribute('onclick', "window.location.href='" + pageFor('menu', LANG) + "'");
+    const fullMenuLink = document.querySelector('nav a[href="menu.html"]');
+    if (fullMenuLink) fullMenuLink.setAttribute('href', pageFor('menu', LANG));
+
+    mountCountrySwitcher(document.getElementById('nav-right'), BRANCH, LANG);
+}
+
+const PAY_ICONS = {
+    cash:     { icon: 'fa-money-bill-wave', bg: 'rgba(74,222,128,0.1)',  color: 'var(--green)' },
+    card:     { icon: 'fa-credit-card',     bg: 'rgba(139,92,246,0.1)',  color: '#a78bfa' },
+    instapay: { icon: 'fa-mobile-screen',   bg: 'rgba(255,183,178,0.1)', color: 'var(--accent)' },
+    vodafone: { icon: 'fa-sim-card',        bg: 'rgba(239,68,68,0.1)',   color: '#f87171' },
+};
+
+/** Payment options come from the branch — countries differ in what they accept. */
+function renderPayments() {
+    const methods = BRANCH.payments || ['cash'];
+    selectedPayment = methods[0];
+    document.getElementById('payment-grid').innerHTML = methods.map(function (m, i) {
+        const s = PAY_ICONS[m] || PAY_ICONS.cash;
+        return '<div class="pay-opt' + (i === 0 ? ' selected' : '') + '" id="pay-' + m + '" onclick="selectPayment(this,\'' + m + '\')">' +
+                 '<div class="pay-icon" style="background:' + s.bg + ';color:' + s.color + '"><i class="fas ' + s.icon + '"></i></div>' +
+                 '<div class="pay-label">' + (T.pay[m] || m) + '</div>' +
+               '</div>';
+    }).join('');
+}
 
 // ─── STATE ─────────────────────────────────────────────────────────────────
 let cart = {};
@@ -304,7 +349,21 @@ try {
 
 // ─── INIT ──────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-    // Load cart from sessionStorage (pre-filled from menu.html)
+    resolveSite(function (branch, lang) {
+        BRANCH = branch;
+        T = I18N[lang].order;
+        MENU = menuFor(branch);
+        // A branch with no online menu has nothing to check out; send the
+        // visitor back to the catalogue, which shows its phone numbers.
+        if (!MENU || !branch.online) { location.replace(pageFor('menu', lang)); return; }
+        paintChrome();
+        renderPayments();
+        initOrderPage();
+    });
+});
+
+function initOrderPage() {
+    // Load cart from sessionStorage (pre-filled from the catalogue)
     try {
         const saved = sessionStorage.getItem('bs_cart');
         if (saved) {
@@ -313,10 +372,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     } catch(e) { /* ignore */ }
 
-    // Remove buildMenu as it's no longer needed
     updateSummary();
     goStep(1);
-});
+}
 
 window.addEventListener('load', () => {
     const preloader = document.getElementById('preloader');
@@ -330,57 +388,59 @@ window.addEventListener('load', () => {
 
 // ─── SUMMARY ──────────────────────────────────────────────────────────────
 function getSubtotal() {
-    return MENU.reduce((s, item) => s + (cart[item.id] || 0) * item.price, 0);
+    return MENU.items.reduce((s, item) => s + (cart[item.id] || 0) * item.price, 0);
 }
 
 function calcDeliveryFee(distKm) {
-    if (typeof DELIVERY_BASE_FEE_EGP === 'undefined') return 25;
-    return DELIVERY_BASE_FEE_EGP + Math.ceil(distKm) * DELIVERY_PER_KM_EGP;
+    const d = BRANCH.delivery;
+    return d.baseFee + Math.ceil(distKm) * d.perKm;
 }
+
+/** Prices always follow the branch's currency, never the language. */
+function money(n) { return formatMoney(BRANCH, LANG, n); }
 
 function updateSummary() {
     const subtotal = getSubtotal();
     const itemCount = Object.values(cart).reduce((s,v) => s + v, 0);
 
-    document.getElementById('cb-count').textContent = `${itemCount} item${itemCount !== 1 ? 's' : ''}`;
-    document.getElementById('cb-subtotal').textContent = `EGP ${subtotal}`;
+    document.getElementById('cb-count').textContent = T.itemCount(itemCount);
+    document.getElementById('cb-subtotal').textContent = money(subtotal);
     const nextBtn = document.getElementById('next-btn');
     if (nextBtn) nextBtn.disabled = itemCount === 0;
 
     const cartLines = document.getElementById('cart-lines');
     if (cartLines) {
-        cartLines.innerHTML = MENU.filter(i => (cart[i.id] || 0) > 0).map(i => {
+        cartLines.innerHTML = MENU.items.filter(i => (cart[i.id] || 0) > 0).map(i => {
             const note = cartNotes[i.id] ? ` <span style="font-size:0.72rem;color:var(--text-muted);">(${cartNotes[i.id]})</span>` : '';
-            return `<div class="summary-line"><span class="label">${menuItemLabel(i, LANG)} ×${cart[i.id]}${note}</span><span class="val">EGP ${i.price * cart[i.id]}</span></div>`;
+            return `<div class="summary-line"><span class="label">${menuItemLabel(i, LANG)} ×${cart[i.id]}${note}</span><span class="val">${money(i.price * cart[i.id])}</span></div>`;
         }).join('');
     }
 
-    document.getElementById('sum-subtotal').textContent = `EGP ${subtotal}`;
+    document.getElementById('sum-subtotal').textContent = money(subtotal);
 
     let deliveryFee = null;
     if (selectedLat !== null) {
         const dist = getDistKm(selectedLat, selectedLng);
         deliveryFee = calcDeliveryFee(dist);
     }
-    document.getElementById('sum-delivery').textContent = deliveryFee !== null ? `EGP ${deliveryFee}` : 'Set location';
+    document.getElementById('sum-delivery').textContent = deliveryFee !== null ? money(deliveryFee) : T.setLocation;
 
     const total = deliveryFee !== null ? subtotal + deliveryFee - discount : null;
-    document.getElementById('sum-total').textContent = total !== null ? `EGP ${total}` : '—';
+    document.getElementById('sum-total').textContent = total !== null ? money(total) : '—';
 
     if (discount > 0) {
         document.getElementById('sum-discount-row').style.display = 'flex';
-        document.getElementById('sum-discount').textContent = `−EGP ${discount}`;
+        document.getElementById('sum-discount').textContent = '−' + money(discount);
     } else {
         document.getElementById('sum-discount-row').style.display = 'none';
     }
 }
 
 function getDistKm(lat, lng) {
-    if (typeof RESTAURANT_LAT === 'undefined') return 5;
     const R = 6371;
-    const dLat = (lat - RESTAURANT_LAT) * Math.PI / 180;
-    const dLng = (lng - RESTAURANT_LNG) * Math.PI / 180;
-    const a = Math.sin(dLat/2)**2 + Math.cos(RESTAURANT_LAT * Math.PI/180) * Math.cos(lat * Math.PI/180) * Math.sin(dLng/2)**2;
+    const dLat = (lat - BRANCH.lat) * Math.PI / 180;
+    const dLng = (lng - BRANCH.lng) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(BRANCH.lat * Math.PI/180) * Math.cos(lat * Math.PI/180) * Math.sin(dLng/2)**2;
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
@@ -399,7 +459,7 @@ async function applyPromo() {
 
     if (!db) {
         msgEl.style.color = '#ff8080';
-        msgEl.textContent = 'Promo codes require Firebase to be configured.';
+        msgEl.textContent = T.promoNeedsDb;
         return;
     }
 
@@ -410,19 +470,19 @@ async function applyPromo() {
             if (promo.active) {
                 discount = promo.discount || 0;
                 msgEl.style.color = 'var(--green)';
-                msgEl.textContent = `✓ Promo applied! −EGP ${discount}`;
+                msgEl.textContent = T.promoApplied(money(discount));
                 updateSummary();
             } else {
                 msgEl.style.color = '#ff8080';
-                msgEl.textContent = 'This promo code has expired.';
+                msgEl.textContent = T.promoExpired;
             }
         } else {
             msgEl.style.color = '#ff8080';
-            msgEl.textContent = 'Invalid promo code.';
+            msgEl.textContent = T.promoInvalid;
         }
     } catch(e) {
         msgEl.style.color = '#ff8080';
-        msgEl.textContent = 'Could not verify promo code.';
+        msgEl.textContent = T.promoFailed;
     }
 }
 
@@ -437,8 +497,7 @@ function makeIcon(color) {
 
 function initMap() {
     if (mapInstance) return;
-    const lat = typeof RESTAURANT_LAT !== 'undefined' ? RESTAURANT_LAT : 30.0251;
-    const lng = typeof RESTAURANT_LNG !== 'undefined' ? RESTAURANT_LNG : 30.9882;
+    const lat = BRANCH.lat, lng = BRANCH.lng;
     mapInstance = L.map('order-map', { zoomControl: true }).setView([lat, lng], 13);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
@@ -461,7 +520,7 @@ function placeDeliveryPin(lat, lng) {
 
 async function reverseGeocode(lat, lng) {
     try {
-        const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=en`;
+        const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=${LANG}`;
         const resp = await fetch(url);
         const data = await resp.json();
         const addr = data.display_name || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
@@ -506,7 +565,7 @@ function useMyLocation() {
     document.getElementById('map-hint').style.display = 'block';
     document.getElementById('manual-address-wrap').style.display = 'none';
     locMode = 'map';
-    if (!navigator.geolocation) { showToast('Geolocation not supported', 'error'); return; }
+    if (!navigator.geolocation) { showToast(T.errNoGeo, 'error'); return; }
     navigator.geolocation.getCurrentPosition(
         pos => {
             const { latitude: lat, longitude: lng } = pos.coords;
@@ -516,7 +575,7 @@ function useMyLocation() {
             reverseGeocode(lat, lng);
             setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 200);
         },
-        () => { showToast('Could not get your location', 'error'); }
+        () => { showToast(T.errGeoFail, 'error'); }
     );
 }
 
@@ -554,11 +613,11 @@ function goStep(n) {
 function goNextStep() {
     if (currentStep === 1) {
         if (locMode === 'map' && selectedLat === null) {
-            showToast('Please pin your delivery location on the map', 'error'); return;
+            showToast(T.errNoPin, 'error'); return;
         }
         if (locMode === 'manual') {
             const manualAddr = document.getElementById('manual-address').value.trim();
-            if (!manualAddr) { showToast('Please enter your address', 'error'); return; }
+            if (!manualAddr) { showToast(T.errNoAddress, 'error'); return; }
             selectedAddress = manualAddr;
         }
         goStep(2);
@@ -574,9 +633,9 @@ function validate() {
     const phone = document.getElementById('f-phone').value.trim();
     const address = document.getElementById('f-address').value.trim();
 
-    if (!name) { showToast('Please enter your name', 'error'); return false; }
-    if (!phone || phone.length < 8) { showToast('Please enter a valid phone number', 'error'); return false; }
-    if (!address) { showToast('Please enter your delivery address', 'error'); return false; }
+    if (!name) { showToast(T.errName, 'error'); return false; }
+    if (!phone || phone.length < 8) { showToast(T.errPhone, 'error'); return false; }
+    if (!address) { showToast(T.errAddress, 'error'); return false; }
     return true;
 }
 
@@ -586,21 +645,23 @@ async function placeOrder() {
 
     const btn = document.getElementById('place-order-btn');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing order...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + T.placing;
 
     const subtotal = getSubtotal();
     const distKm = selectedLat !== null ? getDistKm(selectedLat, selectedLng) : 5;
     const deliveryFee = calcDeliveryFee(distKm);
     const total = subtotal + deliveryFee - discount;
-    const estimatedMinutes = (typeof ESTIMATED_PREP_MINUTES !== 'undefined' ? ESTIMATED_PREP_MINUTES : 30)
-        + Math.round(distKm * (typeof ESTIMATED_DRIVE_MINUTES_PER_KM !== 'undefined' ? ESTIMATED_DRIVE_MINUTES_PER_KM : 3));
+    const estimatedMinutes = BRANCH.delivery.prepMinutes + Math.round(distKm * BRANCH.delivery.driveMinutesPerKm);
 
-    const orderItems = MENU.filter(i => (cart[i.id] || 0) > 0).map(i => ({
+    const orderItems = MENU.items.filter(i => (cart[i.id] || 0) > 0).map(i => ({
         id: i.id, name: menuItemLabel(i, LANG), qty: cart[i.id], price: i.price,
         subtotal: cart[i.id] * i.price, note: cartNotes[i.id] || ''
     }));
 
     const order = {
+        country:         BRANCH.code,
+        currency:        BRANCH.currency.code,
+        lang:            LANG,
         customerName:    document.getElementById('f-name').value.trim(),
         customerPhone:   document.getElementById('f-phone').value.trim(),
         customerAddress: document.getElementById('f-address').value.trim(),
@@ -621,9 +682,9 @@ async function placeOrder() {
     };
 
     if (!db) {
-        showToast('Online ordering is temporarily unavailable. Please call us to order.', 'error');
+        showToast(T.errOffline, 'error');
         btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-bag-shopping"></i> Place Order';
+        btn.innerHTML = '<i class="fas fa-bag-shopping"></i> ' + T.placeOrder;
         return;
     }
 
@@ -636,9 +697,9 @@ async function placeOrder() {
         order.shortId = shortId;
     } catch(e) {
         console.error(e);
-        showToast('Failed to place order. Please try again.', 'error');
+        showToast(T.errPlaceFailed, 'error');
         btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-bag-shopping"></i> Place Order';
+        btn.innerHTML = '<i class="fas fa-bag-shopping"></i> ' + T.placeOrder;
         return;
     }
 

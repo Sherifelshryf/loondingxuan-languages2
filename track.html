@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="firebase-config.js"></script>
+    <link rel="stylesheet" href="country.css">
     <style>
         :root {
             --bg-base: #121010;
@@ -95,7 +96,7 @@
 
 <nav>
     <a href="index.html" class="logo-text"><div class="logo-dot"></div> Loongdingxuan <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400;">龙鼎轩</span></a>
-    <span style="color:var(--text-muted);font-size:0.9rem;display:flex;align-items:center;gap:0.5rem;"><i class="fas fa-location-arrow" style="color:var(--accent)"></i> Live Tracking</span>
+    <span style="color:var(--text-muted);font-size:0.9rem;display:flex;align-items:center;gap:0.5rem;"><i class="fas fa-location-arrow" style="color:var(--accent)"></i> <span id="i-live"></span></span>
 </nav>
 
 <div id="track-map"></div>
@@ -104,8 +105,8 @@
     <div class="panel-handle"></div>
 
     <div class="search-wrap">
-        <input type="text" id="order-search" placeholder="Enter Order ID (e.g. ABC12345)" style="text-transform:uppercase;">
-        <button class="search-btn" onclick="searchOrder()">Track</button>
+        <input type="text" id="order-search" placeholder="" style="text-transform:uppercase;">
+        <button class="search-btn" onclick="searchOrder()" id="i-trackbtn"></button>
     </div>
 
     <div id="order-info" style="display:none;">
@@ -122,10 +123,10 @@
 
         <div class="progress-track">
             <div class="progress-steps">
-                <div class="prog-step"><div class="prog-dot active" id="ps-0"><i class="fas fa-inbox"></i></div><div class="prog-label">Received</div></div>
-                <div class="prog-step"><div class="prog-dot pending" id="ps-1"><i class="fas fa-kitchen-set"></i></div><div class="prog-label">Preparing</div></div>
-                <div class="prog-step"><div class="prog-dot pending" id="ps-2"><i class="fas fa-motorcycle"></i></div><div class="prog-label">On the way</div></div>
-                <div class="prog-step"><div class="prog-dot pending" id="ps-3"><i class="fas fa-house-chimney"></i></div><div class="prog-label">Delivered</div></div>
+                <div class="prog-step"><div class="prog-dot active" id="ps-0"><i class="fas fa-inbox"></i></div><div class="prog-label" id="i-s0"></div></div>
+                <div class="prog-step"><div class="prog-dot pending" id="ps-1"><i class="fas fa-kitchen-set"></i></div><div class="prog-label" id="i-s1"></div></div>
+                <div class="prog-step"><div class="prog-dot pending" id="ps-2"><i class="fas fa-motorcycle"></i></div><div class="prog-label" id="i-s2"></div></div>
+                <div class="prog-step"><div class="prog-dot pending" id="ps-3"><i class="fas fa-house-chimney"></i></div><div class="prog-label" id="i-s3"></div></div>
             </div>
             <div style="position:relative;height:0;"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
         </div>
@@ -133,8 +134,8 @@
         <div class="driver-card" id="driver-card" style="display:none;">
             <div class="driver-avatar"><i class="fas fa-motorcycle"></i></div>
             <div class="driver-info">
-                <div class="name" id="t-driver-name">Your Driver</div>
-                <div class="vehicle" id="t-driver-vehicle">On the way to you</div>
+                <div class="name" id="t-driver-name"></div>
+                <div class="vehicle" id="t-driver-vehicle"></div>
             </div>
             <div class="driver-call">
                 <a class="call-btn" id="t-driver-call" href="#"><i class="fas fa-phone"></i></a>
@@ -144,16 +145,19 @@
 
     <div class="not-found" id="not-found" style="display:none;">
         <i class="fas fa-magnifying-glass"></i>
-        <p>Order not found.<br>Please check your Order ID.</p>
+        <p id="i-notfound"></p>
     </div>
 </div>
 
+<script src="countries.js"></script>
+<script src="i18n.js"></script>
+<script src="country.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
 const STATUS_ORDER = ['pending', 'confirmed', 'picked_up', 'delivered'];
-const STATUS_LABELS = { pending:'Pending', confirmed:'Confirmed', picked_up:'Out for Delivery', delivered:'Delivered', cancelled:'Cancelled' };
+let T, BRANCH, STATUS_LABELS = {};
 
 let db = null, rtdb = null, map = null, customerMarker = null, driverMarker = null, restaurantMarker = null;
 let driverLocationRef = null;
@@ -166,6 +170,29 @@ try {
     }
 } catch(e) { console.warn('Firebase not configured:', e.message); }
 
+
+const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+
+function paintChrome() {
+    document.title = T.docTitle;
+    document.documentElement.lang = LANG;
+    document.documentElement.dir = I18N[LANG].dir;
+    if (I18N[LANG].dir === 'rtl') document.body.classList.add('rtl');
+    STATUS_LABELS = T.status;
+    setTxt('i-live', T.liveTracking);
+    setTxt('i-trackbtn', T.trackBtn);
+    const search = document.getElementById('order-search');
+    if (search) search.placeholder = T.searchPlaceholder;
+    T.steps.forEach(function (label, i) { setTxt('i-s' + i, label); });
+    setTxt('t-driver-name', T.yourDriver);
+    setTxt('t-driver-vehicle', T.onTheWay);
+    const nf = document.getElementById('i-notfound');
+    if (nf) nf.innerHTML = T.notFound;
+    mountCountrySwitcher(document.querySelector('nav'), BRANCH, LANG);
+    const home = document.querySelector('nav a.logo-text');
+    if (home) home.setAttribute('href', pageFor('index', LANG));
+}
+
 function makeLeafletIcon(color) {
     return L.divIcon({
         className: '',
@@ -175,8 +202,7 @@ function makeLeafletIcon(color) {
 }
 
 function initMap() {
-    const lat = typeof RESTAURANT_LAT !== 'undefined' ? RESTAURANT_LAT : 30.0251;
-    const lng = typeof RESTAURANT_LNG !== 'undefined' ? RESTAURANT_LNG : 30.9882;
+    const lat = BRANCH.lat, lng = BRANCH.lng;
     map = L.map('track-map', { zoomControl: true }).setView([lat, lng], 13);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -198,7 +224,7 @@ async function searchOrder() {
     document.getElementById('order-info').style.display = 'none';
     document.getElementById('not-found').style.display = 'none';
     if (!db) {
-        showUnavailable('Order tracking is temporarily unavailable.<br>Please call us for an update on your order.');
+        showUnavailable(T.unavailable);
         return;
     }
     try {
@@ -248,9 +274,9 @@ function subscribeToOrder(orderId) {
 function renderTracking(o) {
     document.getElementById('order-info').style.display = 'block';
     document.getElementById('not-found').style.display = 'none';
-    document.getElementById('t-name').textContent = `${o.customerName}'s Order`;
+    document.getElementById('t-name').textContent = T.orderOf(o.customerName);
     document.getElementById('t-address').textContent = o.customerAddress || '';
-    document.getElementById('t-eta').textContent = `~${o.estimatedMinutes || 45} min`;
+    document.getElementById('t-eta').textContent = T.minutes(o.estimatedMinutes || 45);
 
     const status = o.status || 'pending';
     const idx = STATUS_ORDER.indexOf(status);
@@ -267,8 +293,7 @@ function renderTracking(o) {
     const pct = idx === 0 ? 0 : idx === 1 ? 33 : idx === 2 ? 66 : 100;
     document.getElementById('progress-fill').style.width = pct + '%';
 
-    const lat = typeof RESTAURANT_LAT !== 'undefined' ? RESTAURANT_LAT : 30.0251;
-    const lng = typeof RESTAURANT_LNG !== 'undefined' ? RESTAURANT_LNG : 30.9882;
+    const lat = BRANCH.lat, lng = BRANCH.lng;
 
     if (o.lat && o.lng && map) {
         if (customerMarker) customerMarker.remove();
@@ -281,8 +306,8 @@ function renderTracking(o) {
 
     if (o.assignedDriver && (status === 'picked_up' || status === 'confirmed')) {
         document.getElementById('driver-card').style.display = 'flex';
-        document.getElementById('t-driver-name').textContent = o.assignedDriver.name || 'Your Driver';
-        document.getElementById('t-driver-vehicle').textContent = o.assignedDriver.vehicle || 'On the way';
+        document.getElementById('t-driver-name').textContent = o.assignedDriver.name || T.yourDriver;
+        document.getElementById('t-driver-vehicle').textContent = o.assignedDriver.vehicle || T.onTheWay;
         if (o.assignedDriver.phone) document.getElementById('t-driver-call').href = `tel:${o.assignedDriver.phone}`;
         if (rtdb && o.assignedDriver.id) watchDriverLocation(o.assignedDriver.id);
     } else {
@@ -308,7 +333,12 @@ function showUnavailable(msg) {
     document.getElementById('order-info').style.display = 'none';
 }
 
-initMap();
+resolveSite(function (branch, lang) {
+    BRANCH = branch;
+    T = I18N[lang].track;
+    paintChrome();
+    initMap();
+});
 </script>
 </body>
 </html>
