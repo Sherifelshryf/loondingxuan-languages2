@@ -165,7 +165,27 @@
     </style>
 </head>
 <body>
-<div id="preloader"><div class="loader-dragon"><img src="images/logo.png" alt="Logo" class="loader-logo"></div></div>
+<div id="preloader"><div class="loader-dragon"><img src="images/logo.png" alt="Logo" class="loader-logo"></div>
+<script>
+/* The preloader hides itself, before any other script runs and regardless of
+   whether they succeed. Nothing downstream can trap the page on this screen. */
+(function () {
+    var p = document.getElementById('preloader');
+    if (!p) return;
+    var gone = false;
+    function hide() {
+        if (gone) return;
+        gone = true;
+        p.classList.add('hidden');
+        p.style.opacity = '0';
+        p.style.visibility = 'hidden';
+        setTimeout(function () { if (p.parentNode) p.parentNode.removeChild(p); }, 600);
+    }
+    setTimeout(hide, 1500);
+    window.addEventListener('load', function () { setTimeout(hide, 200); });
+    window.addEventListener('error', hide);          // a dead script must not hold the page
+})();
+</script></div>
 <div class="global-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
 <div class="grain-overlay"></div>
 
@@ -349,17 +369,19 @@ try {
 
 // ─── INIT ──────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-    resolveSite(function (branch, lang) {
-        BRANCH = branch;
-        T = I18N[lang].order;
-        MENU = menuFor(branch);
-        // A branch with no online menu has nothing to check out; send the
-        // visitor back to the catalogue, which shows its phone numbers.
-        if (!MENU || !branch.online) { location.replace(pageFor('menu', lang)); return; }
-        paintChrome();
-        renderPayments();
-        initOrderPage();
-    });
+    try {
+        resolveSite(function (branch, lang) {
+            BRANCH = branch;
+            T = I18N[lang].order;
+            MENU = menuFor(branch);
+            // A branch with no online menu has nothing to check out; send the
+            // visitor back to the catalogue, which shows its phone numbers.
+            if (!MENU || !branch.online) { location.replace(pageFor('menu', lang)); return; }
+            paintChrome();
+            renderPayments();
+            initOrderPage();
+        });
+    } catch (e) { console.error('site init failed:', e); }
 });
 
 function initOrderPage() {
