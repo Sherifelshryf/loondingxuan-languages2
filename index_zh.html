@@ -199,7 +199,27 @@
     </style>
 </head>
 <body class="">
-    <div id="preloader"><div class="loader-dragon"><img src="images/logo.png" alt="Logo" class="loader-logo"></div></div>
+    <div id="preloader"><div class="loader-dragon"><img src="images/logo.png" alt="Logo" class="loader-logo"></div>
+<script>
+/* The preloader hides itself, before any other script runs and regardless of
+   whether they succeed. Nothing downstream can trap the page on this screen. */
+(function () {
+    var p = document.getElementById('preloader');
+    if (!p) return;
+    var gone = false;
+    function hide() {
+        if (gone) return;
+        gone = true;
+        p.classList.add('hidden');
+        p.style.opacity = '0';
+        p.style.visibility = 'hidden';
+        setTimeout(function () { if (p.parentNode) p.parentNode.removeChild(p); }, 600);
+    }
+    setTimeout(hide, 1500);
+    window.addEventListener('load', function () { setTimeout(hide, 200); });
+    window.addEventListener('error', hide);          // a dead script must not hold the page
+})();
+</script></div>
     <button class="back-to-top" id="topBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-arrow-up"></i></button>
     <div class="lang-bar" id="lang-bar"></div>
     <nav id="nav">
@@ -382,7 +402,7 @@
             if (talabat && !BRANCH.social.talabat) talabat.style.display = 'none';
         }
 
-        resolveSite(function(branch, lang){
+        try { resolveSite(function(branch, lang){
             BRANCH = branch;
             HOME_LANG = lang;
             paintBranch();
@@ -449,7 +469,7 @@
 
         selAll('.faq-question').forEach(function(q){
             q.addEventListener('click', function(){ q.parentElement.classList.toggle('active'); });
-        });
+        }); } catch (e) { console.error("site init failed:", e); }
 
         sel('#reservationForm').onsubmit = function(e){
             e.preventDefault();

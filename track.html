@@ -333,12 +333,12 @@ function showUnavailable(msg) {
     document.getElementById('order-info').style.display = 'none';
 }
 
-resolveSite(function (branch, lang) {
+try { resolveSite(function (branch, lang) {
     BRANCH = branch;
     T = I18N[lang].track;
     paintChrome();
     initMap();
-});
+}); } catch (e) { console.error("site init failed:", e); }
 </script>
 </body>
 </html>

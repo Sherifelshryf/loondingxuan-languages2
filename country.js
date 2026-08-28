@@ -55,6 +55,7 @@ function setLang(lang) {
    or blocked lookup never holds up the page. Anything unexpected falls
    through to the picker rather than guessing.                          */
 function lookupCountryByIP(timeoutMs) {
+    if (typeof fetch !== 'function') return Promise.resolve(null);
     const endpoints = [
         { url: 'https://api.country.is/', pick: d => d && d.country },
         { url: 'https://ipapi.co/json/', pick: d => d && d.country_code },
@@ -164,39 +165,65 @@ function mountCountrySwitcher(container, branch, lang) {
  * `ready(branch, lang)` is called exactly once.
  */
 function resolveSite(ready) {
+    let done = false;
+    function hand(branch, lang) {
+        if (done) return;
+        done = true;
+        window.BRANCH = branch;
+        window.LANG = lang;
+        try { ready(branch, lang); } catch (e) { console.error('site init failed:', e); }
+    }
+
     const filesLang = pageLang();
     if (filesLang) setLang(filesLang);
 
     function finish(code) {
-        const branch = COUNTRIES[code];
+        const branch = COUNTRIES[code] || COUNTRIES[COUNTRY_ORDER[0]];
         let lang = filesLang || savedLang() || branch.defaultLang;
 
         // A branch only shows languages it serves.
         if (!countrySpeaks(branch, lang)) {
             const fallback = branch.defaultLang;
             const family = currentFamily();
-            if (family && filesLang && !sessionStorage.getItem(LDX_REDIRECT_GUARD)) {
+            let redirected = false;
+            try { redirected = !!sessionStorage.getItem(LDX_REDIRECT_GUARD); } catch (e) {}
+            if (family && filesLang && !redirected) {
                 try { sessionStorage.setItem(LDX_REDIRECT_GUARD, '1'); } catch (e) {}
                 location.replace(pageFor(family, fallback));
                 return;
             }
             lang = fallback;
         }
-
-        window.BRANCH = branch;
-        window.LANG = lang;
-        ready(branch, lang);
+        hand(branch, lang);
     }
+
+    // Whatever happens — a blocked lookup, a hung request, a picker the visitor
+    // ignores — the page must not sit there waiting. After six seconds we fall
+    // back to the first branch so the site is usable; an explicit choice made
+    // later still overrides it.
+    setTimeout(function () {
+        if (!done) finish(savedCountry() || COUNTRY_ORDER[0]);
+    }, 6000);
 
     const saved = savedCountry();
     if (saved) { finish(saved); return; }
 
-    // First visit: try IP, then ask.
     const guessLang = filesLang || savedLang() || 'en';
-    lookupCountryByIP(2500).then(function (code) {
-        if (code && COUNTRIES[code]) { setCountry(code); finish(code); return; }
-        renderCountryPicker(guessLang, function (picked) { finish(picked); });
-    });
+    lookupCountryByIP(2500)
+        .then(function (code) {
+            if (done) return;
+            if (code && COUNTRIES[code]) { setCountry(code); finish(code); return; }
+            try {
+                renderCountryPicker(guessLang, function (picked) { finish(picked); });
+            } catch (e) {
+                console.error('country picker failed:', e);
+                finish(COUNTRY_ORDER[0]);
+            }
+        })
+        .catch(function (e) {
+            console.error('country lookup failed:', e);
+            if (!done) finish(COUNTRY_ORDER[0]);
+        });
 }
 
 if (typeof module !== 'undefined' && module.exports) {

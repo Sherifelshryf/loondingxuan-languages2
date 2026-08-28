@@ -75,17 +75,14 @@ const COUNTRIES = {
             fr: 'Kipé, Rue Commerciale Xinghai Bay 211, Conakry, Guinée',
         },
         phones: { order: '+224614865742', reservation: '+224611081542' },
-        // Supplied by the owner as a Google Maps short link. Short links cannot be
-        // resolved to an embeddable URL without following them, so the embed below
-        // searches the written address instead and the button opens the real link.
-        map: 'https://maps.google.com/maps?q=Kip%C3%A9%20Conakry%20Guinea&output=embed',
+        // Pinned from the Plus Code supplied by the owner: J952+29 Conakry
+        // (full code 6CX8J952+29), which decodes to the coordinates below.
+        plusCode: '6CX8J952+29',
+        map: 'https://maps.google.com/maps?q=9.607563,-13.649062&z=17&output=embed',
         mapLink: 'https://maps.app.goo.gl/nrQhdkbfyPGWUiiu7',
-        // APPROXIMATE — the Kipé district of Ratoma, Conakry. Delivery pricing and
-        // distance are computed from this pin, so it must be confirmed against the
-        // maps link above before this branch takes orders online.
-        lat: 9.5957,
-        lng: -13.6470,
-        coordsConfirmed: false,
+        lat: 9.607563,
+        lng: -13.649062,
+        coordsConfirmed: true,
         // Not supplied for this branch. Left null rather than copied from Egypt,
         // whose fees are in EGP and priced for a different city.
         delivery: null,

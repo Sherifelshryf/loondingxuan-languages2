@@ -257,13 +257,13 @@ async function shareReceipt() {
     }
 }
 
-resolveSite(function (branch, lang) {
+try { resolveSite(function (branch, lang) {
     BRANCH = branch;
     T = I18N[lang].receipt;
     T.__pay = I18N[lang].order.pay;
     paintChrome();
     loadOrder();
-});
+}); } catch (e) { console.error("site init failed:", e); }
 </script>
 <script src="animations.js"></script>
 </body>
