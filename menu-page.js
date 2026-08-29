@@ -43,7 +43,8 @@ function paintChrome() {
     set('hero-eyebrow', T.heroEyebrow);
     set('hero-title-a', T.heroTitleA);
     set('hero-title-b', T.heroTitleB);
-    set('hero-lead', T.heroLead);
+    // A branch that cannot take orders online must not invite you to a cart.
+    set('hero-lead', BRANCH.online ? T.heroLead : T.noMenuLead);
     set('halal-text', T.halal);
     set('checkout-label', T.checkout);
 
@@ -68,24 +69,28 @@ function paintChrome() {
 /** Prices always come from the branch, never from the language. */
 function money(n) { return formatMoney(BRANCH, LANG, n); }
 
-/** A branch with no menu loaded shows its phone numbers instead. */
-function renderNoMenu() {
-    document.getElementById('menu-tabs').innerHTML = '';
-    document.getElementById('cart-float').style.display = 'none';
+/** Phone numbers, for a branch that cannot take the order online. */
+function phonePanel() {
     const phones = BRANCH.phones || {};
     const numbers = [];
     if (phones.order) numbers.push(phones.order);
     if (phones.reservation && phones.reservation !== phones.order) numbers.push(phones.reservation);
-    document.getElementById('menu-cats').innerHTML =
-        '<div class="ldx-offline">' +
-          '<h3>' + T.noMenuTitle + '</h3>' +
-          '<p>' + T.noMenuLead + '</p>' +
-          '<div class="ldx-offline-phones">' +
-            numbers.map(function (p) {
-                return '<a href="tel:' + p.replace(/[^+\d]/g, '') + '"><i class="fas fa-phone"></i> ' + p + '</a>';
-            }).join('') +
-          '</div>' +
-        '</div>';
+    return '<div class="ldx-offline">' +
+             '<h3>' + T.noMenuTitle + '</h3>' +
+             '<p>' + T.noMenuLead + '</p>' +
+             '<div class="ldx-offline-phones">' +
+               numbers.map(function (p) {
+                   return '<a href="tel:' + p.replace(/[^+\d]/g, '') + '"><i class="fas fa-phone"></i> ' + p + '</a>';
+               }).join('') +
+             '</div>' +
+           '</div>';
+}
+
+/** No menu at all: nothing to show but the phone numbers. */
+function renderNoMenu() {
+    document.getElementById('menu-tabs').innerHTML = '';
+    document.getElementById('cart-float').style.display = 'none';
+    document.getElementById('menu-cats').innerHTML = phonePanel();
 }
 
 // ─── BUILD MENU ───────────────────────────────────────────────────────────
@@ -137,7 +142,7 @@ function buildCardHTML(item) {
     const name = menuItemName(item, LANG);
     const tags = (item.veg ? `<span class="tag veg">${T.vegTag}</span>` : '')
                + (item.spicy ? `<span class="tag spicy">${T.spicyTag}</span>` : '');
-    const img = menuItemImage(item);
+    const img = menuItemImage(BRANCH.menuId, item);
     const imgHTML = img
         ? `<img src="${img}" alt="${name}" loading="lazy" decoding="async"
                 onerror="this.parentElement.innerHTML='<div class=&quot;menu-img-placeholder&quot;>${item.emoji}</div>'">`
@@ -251,7 +256,16 @@ document.addEventListener('DOMContentLoaded', () => {
         paintChrome();
         if (!MENU) { renderNoMenu(); return; }
         buildMenu();
-        updateCartBar();
+        if (branch.online) {
+            updateCartBar();
+        } else {
+            // The menu is real, but this branch cannot price a delivery yet, so
+            // the cart is hidden and the order goes by phone.
+            document.getElementById('cart-float').style.display = 'none';
+            document.getElementById('menu-cats')
+                .insertAdjacentHTML('beforebegin', phonePanel());
+            document.querySelectorAll('.add-btn').forEach(function (b) { b.style.display = 'none'; });
+        }
     });
 });
 

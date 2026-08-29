@@ -87,9 +87,10 @@ const COUNTRIES = {
         // whose fees are in EGP and priced for a different city.
         delivery: null,
         payments: null,
-        // No menu has been supplied for Guinea yet. Until one is, the branch shows
-        // its contact details and takes orders by phone instead of inventing dishes.
-        menuId: null,
+        menuId: 'gn',
+        // The menu is loaded, but delivery pricing and accepted payment methods
+        // have not been supplied, so a delivery fee cannot be computed. The
+        // catalogue is browsable and orders are taken by phone until they are.
         online: false,
         social: {},
     },
