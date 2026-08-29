@@ -304,7 +304,7 @@ const GN_ITEMS = [
     { id:'R9', cat:'fusion', price:210000, emoji:'✨',
       en:'Longding Sausage Platter', zh:'龙鼎香肠拼盘', fr:'Plateau de saucisses Longding' },
     { id:'R10', cat:'fusion', price:210000, emoji:'✨',
-      en:'Fresh Shrimp and Mango Salad', zh:'鲜虾芒果沙拉', fr:'Poulet épicé Longding' },
+      en:'Fresh Shrimp and Mango Salad', zh:'鲜虾芒果沙拉', fr:'Salade de crevettes fraîches à la mangue' },
     { id:'R11', cat:'fusion', price:200000, emoji:'✨',
       en:'Longding Signature Beef Salad', zh:'招牌龙鼎牛肉沙拉', fr:'Salade signature de bœuf Longding' },
     { id:'R12', cat:'fusion', price:200000, emoji:'✨',
@@ -600,10 +600,10 @@ function menuFor(branch) {
    have no photograph in the printed menu and fall back to their emoji.   */
 
 const MENU_IMAGES = {
-    // Photographs exist only for the Egyptian menu. Guinea's own menu PDF has
-    // photos too, but none have been extracted, and the two branches reuse the
-    // same dish codes — so an unscoped lookup would show Egypt's L1 for
-    // Guinea's L1. Scoping by menu keeps that from happening.
+    // Each branch's photographs come from that branch's own printed menu and
+    // live in their own folder. The two menus reuse the same dish codes for
+    // different dishes — Egypt's L1 is not Guinea's L1 — so both the list and
+    // the folder are scoped by menu, and a lookup can never cross over.
     eg: [
     "D1",
     "D2",
@@ -686,13 +686,131 @@ const MENU_IMAGES = {
     "Y1",
     "Y2"
 ],
-    gn: [],
+    gn: [
+    "D1",
+    "D2",
+    "F1",
+    "F10",
+    "F2",
+    "F3",
+    "F4",
+    "F5",
+    "F6",
+    "F7",
+    "F8",
+    "F9",
+    "H1",
+    "H10",
+    "H11",
+    "H12",
+    "H2",
+    "H3",
+    "H4",
+    "H5",
+    "H6",
+    "H7",
+    "H8",
+    "H9",
+    "J1",
+    "J10",
+    "J2",
+    "J3",
+    "J4",
+    "J5",
+    "J6",
+    "J7",
+    "J8",
+    "J9",
+    "K1",
+    "K2",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "L1",
+    "L10",
+    "L11",
+    "L2",
+    "L3",
+    "L4",
+    "L5",
+    "L6",
+    "L7",
+    "L8",
+    "L9",
+    "M1",
+    "M10",
+    "M11",
+    "M12",
+    "M13",
+    "M14",
+    "M15",
+    "M16",
+    "M17",
+    "M18",
+    "M2",
+    "M3",
+    "M4",
+    "M5",
+    "M6",
+    "M7",
+    "M8",
+    "M9",
+    "N1",
+    "N2",
+    "N3",
+    "N4",
+    "N5",
+    "N6",
+    "R10",
+    "R11",
+    "R12",
+    "R2",
+    "R3",
+    "R4",
+    "R5",
+    "R6",
+    "R7",
+    "R8",
+    "R9",
+    "S1",
+    "S10",
+    "S11",
+    "S2",
+    "S3",
+    "S4",
+    "S5",
+    "S6",
+    "S7",
+    "S8",
+    "S9",
+    "T1",
+    "T2",
+    "T3",
+    "T4",
+    "X1",
+    "X2",
+    "X3",
+    "X6",
+    "X7",
+    "X8",
+    "X9",
+    "Y1",
+    "Y2",
+    "Y3",
+    "Y4",
+    "Y5"
+],
 };
+
+/** Where each menu's photographs live. */
+const MENU_IMAGE_DIR = { eg: 'images/dishes/', gn: 'images/dishes-gn/' };
 
 /** Path to a dish photo for this branch's menu, or null when there is none. */
 function menuItemImage(menuId, item) {
     const set = MENU_IMAGES[menuId] || [];
-    return set.indexOf(item.id) !== -1 ? 'images/dishes/' + item.id + '.webp' : null;
+    const dir = MENU_IMAGE_DIR[menuId];
+    return dir && set.indexOf(item.id) !== -1 ? dir + item.id + '.webp' : null;
 }
 
 /* ─── Helpers ───────────────────────────────────────────────────────────

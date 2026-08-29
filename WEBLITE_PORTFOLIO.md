@@ -3,7 +3,7 @@
 **Repository analyzed:** `loondingxuan-languages2`
 **Analysis date:** 2026-07-28
 **Analysis method:** Full static inspection of every file in the repository (9 HTML pages, 2 JS files, 9 image assets, git history). No code was executed or modified.
-**Last updated:** 2026-08-25 — the fabricated placeholder menu was replaced with the restaurant's real printed menu (90 dishes, trilingual, halal), and all fake/demo data was removed. See *Change Log* at the end.
+**Last updated:** 2026-08-29 — 113 dish photographs extracted from the Guinea menu PDFs and wired into that branch's catalogue. Earlier: the fabricated placeholder menu replaced with the restaurant's real printed menu, all fake/demo data removed, a fourth language and a second country added. See *Change Log* at the end.
 **Purpose of this document:** Give another AI or designer enough accurate information to build a WebLite portfolio entry for this project without needing repository access.
 
 > **Accuracy note.** Everything in this dossier is derived from the source code and assets in this repository. No business outcomes, traffic figures, conversion data, client briefs, or testimonials are claimed, because none are evidenced in the repository. See **Section 13 — Evidence & Confidence** for a per-claim breakdown and **Questions for WebLite** for the gaps that only the owner can fill.
@@ -612,7 +612,8 @@ The strongest single asset for the case study header is the three-panel dispatch
 - Firestore collections in use: `orders`, `drivers`, `promo_codes`
 - Halal certification (清真) stated on the printed menu cover ("CHINA HALAL FOOD" / الطعام الصيني الحلال) and consistent with the dish list: no pork, no alcohol
 - Menu price range EGP 70–1390; 16 vegetarian dishes and 13 dishes marked spicy
-- 80 dish photographs extracted from the printed menu (every one of the 77 food dishes, plus 3 of 13 drinks), stored as WebP averaging 21 KB, 1.7 MB in total
+- 80 Egyptian dish photographs extracted from the printed menu (every one of the 77 food dishes, plus 3 of 13 drinks), stored as WebP averaging 21 KB, 1.7 MB in total
+- 113 Guinean dish photographs extracted from that branch's two menu PDFs (113 of 131 dishes), WebP averaging 24 KB, 2.6 MB in total, in their own `images/dishes-gn/` folder so the two menus' identical dish codes cannot collide
 - Realtime Database path in use: `driver_locations/{uid}`
 - Email/password authentication gating both `admin.html` and `driver.html`
 - Driver account creation from the admin UI, writing both an Auth account and a Firestore profile
@@ -659,7 +660,9 @@ These must **not** be described as working features in any published portfolio c
 - **Guinea browses but cannot check out.** Its 131-dish menu is loaded and priced in GNF, but delivery pricing and accepted payment methods were never supplied, so no delivery fee can be computed. The catalogue is fully browsable in French, English and Chinese with the cart hidden and the branch's two phone numbers shown instead.
 - **SEO is minimal.** Titles and meta descriptions are present, but there are no Open Graph or Twitter Card tags, no canonical URLs, no `hreflang` annotations between the three language editions, no structured data (`Restaurant`, `Menu`, or `LocalBusiness` schema), no sitemap, and no `robots.txt`. Do not claim SEO as a capability on this project.
 - **Accessibility is not implemented.** There are zero ARIA attributes and zero explicit roles across all nine pages. Interactive elements are built from `div` elements with click handlers in several places. The viewport meta tag sets `maximum-scale=1.0, user-scalable=no`, which blocks pinch-zoom. Alt text is present on images (65 instances), which is the one positive. Do not claim accessibility on this project.
-- **Dish photography now covers every food item.** All 77 food dishes carry the restaurant's own photograph, extracted from the official printed menu and matched to each dish by its position on the page. Only 10 of the 13 drinks lack a photo — the printed menu itself only photographs three of them. The client has confirmed no higher-resolution originals exist, so the PDF is the final source; images are capped at 640 px on the long edge and never upscaled beyond what the file holds.
+- **Dish photography now covers every Egyptian food item.** All 77 food dishes carry the restaurant's own photograph, extracted from the official printed menu and matched to each dish by its position on the page. Only 10 of the 13 drinks lack a photo — the printed menu itself only photographs three of them. The client has confirmed no higher-resolution originals exist, so the PDF is the final source; images are capped at 640 px on the long edge and never upscaled beyond what the file holds.
+- **Guinea's photography covers 113 of its 131 dishes.** The 18 without one are the 13 P-range drinks, R1, F11, K3, X4 and X5 — none of which the printed menu photographs in a way that can be tied to a single dish. X4 and X5 (beef and vegetarian dumplings) share one page whose only images are two full-bleed dumpling shots; neither is attributable, and guessing risks showing beef on the vegetarian dish, so both were left without a photo.
+- **Seven Guinean photographs carry a visible "豆包AI生成" watermark** — the mark of the AI image tool used to make them, present in the restaurant's own menu artwork (J6, L6, L7, L8, L9, N6, S8). They were extracted unaltered rather than cropped, because removing a generation mark is the owner's call, not ours. Flag these before any portfolio screenshot; the owner may prefer them cropped or replaced.
 - **The logo is a 553KB PNG** embedded twice as inline base64 in each marketing page, inflating each of the three files to roughly 300KB. An SVG or optimised raster would be substantially smaller.
 - **`GOOGLE_MAPS_API_KEY` is declared but never used** — vestigial from an approach later replaced by Leaflet.
 - **The tracking page retains an older colour palette** (blush accent on near-black) rather than the green-and-gold brand applied to the ordering and receipt pages — a visual inconsistency to note before capturing screenshots side by side.
@@ -1288,12 +1291,14 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     "Firestore security rules are not present in this repository and cannot be verified.",
     "Menu data is transcribed from the printed menu and is not admin-editable; a price change is a one-line edit in menu-data.js rather than a dashboard action.",
     "Dish photography covers all 77 food dishes but only 3 of the 13 drinks, because the printed menu photographs only three drinks. The owner has confirmed no higher-resolution originals exist, so the menu PDF is the final source and images are capped at 640 px on the long edge.",
-    "Guinea is registered as a branch with its real address, phones, languages and map link, but no menu was supplied. It is marked offline and its catalogue shows phone numbers instead of dishes.",
+    "Guinea is registered as a branch with its real address, phones, languages, map pin and its own 131-dish menu, but it is marked offline because delivery pricing and payment methods were never supplied.",
     "Country detection depends on a third-party IP lookup (api.country.is, then ipapi.co). Both are best-effort with a 2.5 second timeout; when they fail the visitor is asked to choose.",
     "Guinea's delivery pricing and accepted payment methods are unset, so it cannot compute a delivery fee and takes orders by phone. Its 131-dish menu is loaded and browsable.",
     "Guinea dish X7 is printed at 1,400,000 GNF while the comparable X6 is 150,000. Recorded as printed and flagged priceSuspect rather than silently corrected.",
     "Guinea dish J1 carries another dish's French caption in the printed menu. The French was corrected from the Chinese name and flagged frCorrected.",
-    "Guinea has no dish photography. Its menu PDF contains photos but none were extracted, and image lookup is scoped per menu so Egypt's photos are never shown for Guinea's identically-coded dishes."
+    "Guinea dish R10's French name had been overwritten by J1's correction and was restored to the caption printed under it. A duplicate-name sweep across both menus in all four languages now finds none.",
+    "Guinea photography covers 113 of 131 dishes. The 18 without one are the 13 P-range drinks plus R1, F11, K3, X4 and X5, none of which the PDFs photograph attributably. Image lookup is scoped per menu, by both list and folder, so Egypt's photos are never shown for Guinea's identically-coded dishes.",
+    "Seven Guinean photographs carry a visible AI-generation watermark present in the restaurant's own menu artwork (J6, L6, L7, L8, L9, N6, S8). They were extracted unaltered; whether to crop or replace them is the owner's decision."
   ],
   "portfolioCard": {
     "title": "Authentic Chinese Restaurant - Trilingual Website & Delivery Platform",
@@ -1403,7 +1408,8 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
       "Simplified Chinese",
       "Arabic"
     ],
-    "dishPhotographs": 80,
+    "dishPhotographs": 193,
+    "dishPhotographsByBranch": { "eg": 80, "gn": 113 },
     "countries": [
       "Egypt (New Cairo) - en/ar/zh, EGP, 90-dish menu, online ordering",
       "Guinea (Conakry) - fr/en/zh, GNF, 131-dish menu, phone ordering"
@@ -1418,11 +1424,32 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
 
 ## Change Log
 
+### 2026-08-29 — Guinea dish photography extracted
+
+The Guinea branch's catalogue was browsable but illustrated only with category emoji. Its two menu PDFs carry a photograph for most dishes, and **113 of the 131** have now been extracted and wired in.
+
+**How they were matched.** Unlike the Egyptian menu — flattened page bitmaps, where every plate had to be detected and cut out of the page — these PDFs store each photograph as its own embedded image object, so each one comes out at full quality. The work was deciding which dish each belongs to. Every page prints its dish codes as headings, but two layouts are mixed: photo beside its heading, and photo stacked above or below it. Matching each photo to the *nearest heading above* — the obvious rule — reads the first layout correctly and the second one dish late, and it produced six collisions where two photos claimed one code. Measuring instead to the heading nearest the photo's vertical span, with each code taking at most one photo, resolved 105 of the 111 automatically.
+
+**The rest were settled by looking.** Every page was rendered with each photo's box drawn on it and labelled with the code the matcher had assigned, and checked against the printed code beside it. That found four pages where geometry alone is wrong and only the dish itself decides:
+
+- **D1/D2 (hot pot).** D1 had been given the section's decorative line-art, and the steak hot pot below D1's price had been read as D2's. The Tom Yum pot filling the bottom of the page is D2 — a real photograph used as the page background. Both corrected; the background cropped back to the pot.
+- **H4 (grilled fish).** The whole page *is* the dish. The matcher had taken a decorative leaf cut-out instead. The background is now cropped to the tray.
+- **X8 (steamed bao).** The bao sits between two headings and was read as X5's.
+- **K2 (lamb skewers).** Assigned to K3, which is whole grilled chicken wings — a photograph of skewered meat cannot be it. K3 is not photographed.
+
+**Verified.** All 113 crops were reviewed as labelled contact sheets, and each one is a dish photograph matching its printed code. In the browser, all six editions render correctly: Guinea shows 131 cards with 113 photographs and 18 emoji placeholders in French, English and Chinese, prices grouped per language (`200 000 FG`, `GNF 200 000`, `200 000 几内亚法郎`); Egypt is untouched at 90 cards and 80 photographs. No broken images, no 404s, no JavaScript errors, and no path crossing between the two branches.
+
+**Also fixed.** R10's French name had been overwritten by the correction applied to J1 (whose printed caption belongs to R10), leaving both dishes reading "Poulet épicé Longding". R10 now carries the caption printed under it. A duplicate-name sweep across both menus in all four languages now finds none.
+
+**Flagged, not changed.** Seven of the photographs carry a visible `豆包AI生成` watermark — the mark of the AI image tool used to produce them, present in the restaurant's own menu artwork (J6, L6, L7, L8, L9, N6, S8). They were extracted unaltered: cropping off a generation mark is the owner's decision, not ours.
+
+**Added** — `images/dishes-gn/` (113 WebP, 2.6 MB, 640 px long edge) and `tools/gnimg.py`, the extraction pipeline with its overrides and crops documented inline. `menu-data.js` gained `MENU_IMAGE_DIR` so each branch's photographs resolve from their own folder; the two menus reuse dish codes, so scoping by list alone was not enough.
+
 ### 2026-08-25 — Real menu added, fabricated data removed
 
 The site previously shipped an **entirely invented placeholder menu** (Har Gow, Peking Duck, Xiao Long Bao, and so on) alongside several pieces of fabricated demo content. The client supplied the official printed menu, and all of it has been replaced with verified data.
 
-**The pork problem.** The placeholder menu contained six pork dishes — Char Siu Bao, Braised Pork Belly, Sweet & Sour Pork, Twice-Cooked Pork, and pork fillings in two others — plus a `pork_belly.jpg` asset. The restaurant is **halal certified** (清真; its printed menu is branded "CHINA HALAL FOOD"). Serving pork is not merely inaccurate here, it inverts the restaurant's core proposition and would have been offensive to its primary audience. This is the clearest possible illustration of why placeholder content must never reach production.
+**The pork problem.** Ten of the placeholder menu's 27 items involved pork: four by name — Char Siu Bao, Braised Pork Belly, Sweet & Sour Pork, Twice-Cooked Pork — and six more that carried it in their descriptions, plus a `pork_belly.jpg` asset. The restaurant is **halal certified** (清真; its printed menu is branded "CHINA HALAL FOOD"). Serving pork is not merely inaccurate here, it inverts the restaurant's core proposition and would have been offensive to its primary audience. This is the clearest possible illustration of why placeholder content must never reach production.
 
 **Added**
 
