@@ -190,7 +190,7 @@
 <div class="grain-overlay"></div>
 
 <nav>
-    <a href="index.html" class="logo-text"><img src="images/logo.png" style="height:36px;width:auto;object-fit:contain;" alt="Loongdingxuan"><span style="margin-left:6px;">Loongdingxuan <span style="font-size:0.85rem;color:var(--text-muted);font-weight:400;">龙鼎轩</span></span></a>
+    <a href="index.html" class="logo-text"><img src="images/logo.png" style="height:36px;width:auto;object-fit:contain;" alt=""><span style="margin-left:6px;"><span id="brand-name">Loongdingxuan</span> <span style="font-size:0.85rem;color:var(--text-muted);font-weight:400;" id="brand-zh">龙鼎轩</span></span></a>
     <div style="display:flex;gap:1rem;align-items:center;" id="nav-right">
         <a href="menu.html" style="color:var(--text-muted);font-size:0.85rem;display:flex;align-items:center;gap:0.4rem;text-decoration:none;"><i class="fas fa-utensils" style="color:var(--accent)"></i> <span id="i-fullmenu"></span></a>
         <a href="track.html" style="color:var(--text-muted);font-size:0.85rem;display:flex;align-items:center;gap:0.4rem;text-decoration:none;"><i class="fas fa-location-arrow" style="color:var(--accent)"></i> <span id="i-track"></span></a>
@@ -296,10 +296,13 @@ const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.t
 const setPh  = (id, v) => { const el = document.getElementById(id); if (el) el.placeholder = v; };
 
 function paintChrome() {
-    document.title = T.docTitle;
+    document.title = withBrand(T.docTitle, BRANCH, LANG);
     document.documentElement.lang = LANG;
     document.documentElement.dir = I18N[LANG].dir;
     if (I18N[LANG].dir === 'rtl') document.body.classList.add('rtl');
+    // The name in the header belongs to the branch, not to the markup.
+    setTxt('brand-name', brandName(BRANCH, 'latin'));
+    setTxt('brand-zh', brandName(BRANCH, 'zh'));
 
     setTxt('i-fullmenu', T.navFullMenu);   setTxt('i-track', T.navTrack);
     setTxt('i-step1', T.step1);            setTxt('i-step2', T.step2);
@@ -525,7 +528,7 @@ function initMap() {
         attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
         subdomains: 'abcd', maxZoom: 19,
     }).addTo(mapInstance);
-    restaurantMarker = L.marker([lat, lng], { icon: makeIcon('#ef4444'), title: 'Loongdingxuan' }).addTo(mapInstance);
+    restaurantMarker = L.marker([lat, lng], { icon: makeIcon('#ef4444'), title: brandName(BRANCH, 'latin') }).addTo(mapInstance);
     mapInstance.on('click', function(e) {
         placeDeliveryPin(e.latlng.lat, e.latlng.lng);
         reverseGeocode(e.latlng.lat, e.latlng.lng);

@@ -28,7 +28,7 @@ try {
 // ─── STATIC CHROME ────────────────────────────────────────────────────────
 // Filled from the language block so the markup carries no language of its own.
 function paintChrome() {
-    document.title = T.docTitle;
+    document.title = withBrand(T.docTitle, BRANCH, LANG);
     const meta = document.querySelector('meta[name="description"]');
     if (meta) meta.setAttribute('content', T.metaDesc);
     document.documentElement.lang = LANG;

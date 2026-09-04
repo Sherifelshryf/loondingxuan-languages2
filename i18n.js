@@ -1,6 +1,6 @@
 /**
  * ╔══════════════════════════════════════════════════════════════════╗
- * ║   Loongdingxuan — interface strings                               ║
+ * ║   Loongdingxuan / Kipé — interface strings                               ║
  * ║   Every user-facing label, in every language any branch serves.   ║
  * ╚══════════════════════════════════════════════════════════════════╝
  *
@@ -29,8 +29,13 @@ const I18N = {
             orderByPhone: 'Order by phone',
         },
 
+        home: {
+            hoursEyebrow: 'When to Visit', hoursTitle: 'Opening Hours',
+            everyDay: 'Every Day', dining: 'Dine In', delivery: 'Delivery',
+        },
+
         menu: {
-            docTitle: 'Menu — Loongdingxuan',
+            docTitle: 'Menu — {brand}',
             metaDesc: 'The full halal Chinese menu. Order for delivery.',
             navHome: 'Home', navDineIn: 'Dine In', navOrder: 'Order', navTrack: 'Track Order',
             heroEyebrow: 'Browse & Order', heroTitleA: 'Our ', heroTitleB: 'Full Menu',
@@ -48,7 +53,7 @@ const I18N = {
         },
 
         order: {
-            docTitle: 'Order Delivery — Loongdingxuan',
+            docTitle: 'Order Delivery — {brand}',
             navFullMenu: 'Full Menu', navTrack: 'Track Order',
             step1: 'Location', step2: 'Details',
             backToMenu: 'Back to Menu', backToLocation: 'Back to Location',
@@ -89,7 +94,7 @@ const I18N = {
         },
 
         receipt: {
-            docTitle: 'Order Confirmed — Loongdingxuan',
+            docTitle: 'Order Confirmed — {brand}',
             confirmed: 'Order Confirmed!',
             confirmedLead: 'Your order has been received and our kitchen is preparing it right now. You will receive updates as your delivery progresses.',
             orderNo: 'Order #',
@@ -103,13 +108,13 @@ const I18N = {
             print: 'Print Receipt', share: 'Share', contact: 'Contact Us', newOrder: 'New Order',
             trackOrder: 'Track your order',
             notFound: 'Order not found. Please check your link or contact us.',
-            shareText: 'My Loongdingxuan delivery order',
+            shareText: 'My {brand} delivery order',
             copied: 'Link copied to clipboard.',
-            waMessage: function (id, name, phone) { return 'Hello Loongdingxuan! My order #' + id + ' — ' + name + ' — ' + phone; },
+            waMessage: function (id, name, phone) { return 'Hello {brand}! My order #' + id + ' — ' + name + ' — ' + phone; },
         },
 
         track: {
-            docTitle: 'Track Order — Loongdingxuan',
+            docTitle: 'Track Order — {brand}',
             liveTracking: 'Live Tracking',
             searchPlaceholder: 'Enter Order ID (e.g. ABC12345)',
             trackBtn: 'Track',
@@ -137,8 +142,13 @@ const I18N = {
             orderByPhone: 'اطلب عبر الهاتف',
         },
 
+        home: {
+            hoursEyebrow: 'مواعيد الزيارة', hoursTitle: 'ساعات العمل',
+            everyDay: 'كل يوم', dining: 'تناول في المطعم', delivery: 'التوصيل',
+        },
+
         menu: {
-            docTitle: 'القائمة — لونغدينغشوان',
+            docTitle: 'القائمة — {brand}',
             metaDesc: 'قائمة الطعام الصيني الحلال كاملة. اطلب التوصيل.',
             navHome: 'الرئيسية', navDineIn: 'تناول في المطعم', navOrder: 'اطلب الآن', navTrack: 'تتبع الطلب',
             heroEyebrow: 'تصفّح واطلب', heroTitleA: 'قائمتنا ', heroTitleB: 'الكاملة',
@@ -156,7 +166,7 @@ const I18N = {
         },
 
         order: {
-            docTitle: 'اطلب التوصيل — لونغدينغشوان',
+            docTitle: 'اطلب التوصيل — {brand}',
             navFullMenu: 'القائمة الكاملة', navTrack: 'تتبع الطلب',
             step1: 'الموقع', step2: 'البيانات',
             backToMenu: 'العودة إلى القائمة', backToLocation: 'العودة إلى الموقع',
@@ -197,7 +207,7 @@ const I18N = {
         },
 
         receipt: {
-            docTitle: 'تم تأكيد الطلب — لونغدينغشوان',
+            docTitle: 'تم تأكيد الطلب — {brand}',
             confirmed: 'تم تأكيد طلبك!',
             confirmedLead: 'استلمنا طلبك ومطبخنا يحضّره الآن. ستصلك التحديثات أولاً بأول.',
             orderNo: 'طلب رقم ',
@@ -211,13 +221,13 @@ const I18N = {
             print: 'اطبع الفاتورة', share: 'مشاركة', contact: 'تواصل معنا', newOrder: 'طلب جديد',
             trackOrder: 'تتبع طلبك',
             notFound: 'لم يتم العثور على الطلب. تحقق من الرابط أو تواصل معنا.',
-            shareText: 'طلب التوصيل من لونغدينغشوان',
+            shareText: 'طلب التوصيل من {brand}',
             copied: 'تم نسخ الرابط.',
-            waMessage: function (id, name, phone) { return 'مرحباً لونغدينغشوان! طلبي رقم ' + id + ' — ' + name + ' — ' + phone; },
+            waMessage: function (id, name, phone) { return 'مرحباً {brand}! طلبي رقم ' + id + ' — ' + name + ' — ' + phone; },
         },
 
         track: {
-            docTitle: 'تتبع الطلب — لونغدينغشوان',
+            docTitle: 'تتبع الطلب — {brand}',
             liveTracking: 'تتبع مباشر',
             searchPlaceholder: 'أدخل رقم الطلب (مثال ABC12345)',
             trackBtn: 'تتبع',
@@ -245,8 +255,13 @@ const I18N = {
             orderByPhone: '电话订餐',
         },
 
+        home: {
+            hoursEyebrow: '营业时间', hoursTitle: '营业时间',
+            everyDay: '每天', dining: '堂食', delivery: '外送',
+        },
+
         menu: {
-            docTitle: '菜单 — 龙鼎轩',
+            docTitle: '菜单 — {brand}',
             metaDesc: '全清真中餐菜单。可订外送。',
             navHome: '首页', navDineIn: '堂食', navOrder: '在线订餐', navTrack: '订单追踪',
             heroEyebrow: '浏览下单', heroTitleA: '我们的', heroTitleB: '完整菜单',
@@ -264,7 +279,7 @@ const I18N = {
         },
 
         order: {
-            docTitle: '外送下单 — 龙鼎轩',
+            docTitle: '外送下单 — {brand}',
             navFullMenu: '完整菜单', navTrack: '订单追踪',
             step1: '配送地址', step2: '订单信息',
             backToMenu: '返回菜单', backToLocation: '返回地址',
@@ -305,7 +320,7 @@ const I18N = {
         },
 
         receipt: {
-            docTitle: '订单已确认 — 龙鼎轩',
+            docTitle: '订单已确认 — {brand}',
             confirmed: '订单已确认！',
             confirmedLead: '我们已收到您的订单，厨房正在准备。配送进度将随时通知您。',
             orderNo: '订单号 ',
@@ -319,13 +334,13 @@ const I18N = {
             print: '打印收据', share: '分享', contact: '联系我们', newOrder: '再来一单',
             trackOrder: '追踪订单',
             notFound: '未找到订单。请检查链接或与我们联系。',
-            shareText: '我的龙鼎轩外送订单',
+            shareText: '我的{brand}外送订单',
             copied: '链接已复制。',
-            waMessage: function (id, name, phone) { return '您好，龙鼎轩！我的订单号 ' + id + ' — ' + name + ' — ' + phone; },
+            waMessage: function (id, name, phone) { return '您好，{brand}！我的订单号 ' + id + ' — ' + name + ' — ' + phone; },
         },
 
         track: {
-            docTitle: '订单追踪 — 龙鼎轩',
+            docTitle: '订单追踪 — {brand}',
             liveTracking: '实时追踪',
             searchPlaceholder: '输入订单号（例如 ABC12345）',
             trackBtn: '追踪',
@@ -353,8 +368,13 @@ const I18N = {
             orderByPhone: 'Commander par téléphone',
         },
 
+        home: {
+            hoursEyebrow: 'Nos horaires', hoursTitle: 'Heures d’ouverture',
+            everyDay: 'Tous les jours', dining: 'Sur place', delivery: 'Livraison',
+        },
+
         menu: {
-            docTitle: 'Menu — Loongdingxuan',
+            docTitle: 'Menu — {brand}',
             metaDesc: 'Le menu chinois halal complet. Commandez en livraison.',
             navHome: 'Accueil', navDineIn: 'Sur place', navOrder: 'Commander', navTrack: 'Suivre ma commande',
             heroEyebrow: 'Parcourir & Commander', heroTitleA: 'Notre ', heroTitleB: 'Menu Complet',
@@ -372,7 +392,7 @@ const I18N = {
         },
 
         order: {
-            docTitle: 'Commander en livraison — Loongdingxuan',
+            docTitle: 'Commander en livraison — {brand}',
             navFullMenu: 'Menu complet', navTrack: 'Suivre ma commande',
             step1: 'Adresse', step2: 'Informations',
             backToMenu: 'Retour au menu', backToLocation: 'Retour à l’adresse',
@@ -413,7 +433,7 @@ const I18N = {
         },
 
         receipt: {
-            docTitle: 'Commande confirmée — Loongdingxuan',
+            docTitle: 'Commande confirmée — {brand}',
             confirmed: 'Commande confirmée !',
             confirmedLead: 'Nous avons bien reçu votre commande et notre cuisine la prépare. Vous recevrez des mises à jour au fil de la livraison.',
             orderNo: 'Commande n° ',
@@ -427,13 +447,13 @@ const I18N = {
             print: 'Imprimer le reçu', share: 'Partager', contact: 'Nous contacter', newOrder: 'Nouvelle commande',
             trackOrder: 'Suivre votre commande',
             notFound: 'Commande introuvable. Vérifiez votre lien ou contactez-nous.',
-            shareText: 'Ma commande Loongdingxuan',
+            shareText: 'Ma commande {brand}',
             copied: 'Lien copié.',
-            waMessage: function (id, name, phone) { return 'Bonjour Loongdingxuan ! Ma commande n° ' + id + ' — ' + name + ' — ' + phone; },
+            waMessage: function (id, name, phone) { return 'Bonjour {brand} ! Ma commande n° ' + id + ' — ' + name + ' — ' + phone; },
         },
 
         track: {
-            docTitle: 'Suivi de commande — Loongdingxuan',
+            docTitle: 'Suivi de commande — {brand}',
             liveTracking: 'Suivi en direct',
             searchPlaceholder: 'Saisissez le n° de commande (ex. ABC12345)',
             trackBtn: 'Suivre',

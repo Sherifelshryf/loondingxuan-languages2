@@ -12,10 +12,10 @@
  *
  * Fields
  *   id     menu code as printed — also the cart/order key
- *   cat    category id (see MENU_CATEGORIES)
- *   price  EGP, as printed
- *   en/zh/ar   dish name in each language
- *   note_en / note_ar   ingredient detail where the printed menu gives it
+ *   cat    category id, into its own menu's `categories`
+ *   price  as printed, in the branch's own currency
+ *   en/zh/ar/fr   dish name in each language its branch serves
+ *   note_en / note_ar / note_fr   ingredient detail where the menu gives it
  *   veg    true when the dish contains no meat, poultry or seafood
  *   spicy  true when the printed menu marks it hot (辣 / حار / "Spicy")
  *

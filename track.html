@@ -95,7 +95,7 @@
 <div class="grain-overlay"></div>
 
 <nav>
-    <a href="index.html" class="logo-text"><div class="logo-dot"></div> Loongdingxuan <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400;">龙鼎轩</span></a>
+    <a href="index.html" class="logo-text"><div class="logo-dot"></div> <span id="brand-name">Loongdingxuan</span> <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400;" id="brand-zh">龙鼎轩</span></a>
     <span style="color:var(--text-muted);font-size:0.9rem;display:flex;align-items:center;gap:0.5rem;"><i class="fas fa-location-arrow" style="color:var(--accent)"></i> <span id="i-live"></span></span>
 </nav>
 
@@ -174,10 +174,13 @@ try {
 const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
 
 function paintChrome() {
-    document.title = T.docTitle;
+    document.title = withBrand(T.docTitle, BRANCH, LANG);
     document.documentElement.lang = LANG;
     document.documentElement.dir = I18N[LANG].dir;
     if (I18N[LANG].dir === 'rtl') document.body.classList.add('rtl');
+    // The name in the header belongs to the branch, not to the markup.
+    setTxt('brand-name', brandName(BRANCH, 'latin'));
+    setTxt('brand-zh', brandName(BRANCH, 'zh'));
     STATUS_LABELS = T.status;
     setTxt('i-live', T.liveTracking);
     setTxt('i-trackbtn', T.trackBtn);
@@ -208,7 +211,7 @@ function initMap() {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
         subdomains: 'abcd', maxZoom: 19,
     }).addTo(map);
-    restaurantMarker = L.marker([lat, lng], { icon: makeLeafletIcon('#ef4444'), title: 'Loongdingxuan' }).addTo(map);
+    restaurantMarker = L.marker([lat, lng], { icon: makeLeafletIcon('#ef4444'), title: brandName(BRANCH, 'latin') }).addTo(map);
 
     const params = new URLSearchParams(window.location.search);
     const orderId = params.get('orderId');

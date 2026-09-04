@@ -3,7 +3,7 @@
 **Repository analyzed:** `loondingxuan-languages2`
 **Analysis date:** 2026-07-28
 **Analysis method:** Full static inspection of every file in the repository (9 HTML pages, 2 JS files, 9 image assets, git history). No code was executed or modified.
-**Last updated:** 2026-08-29 — 113 dish photographs extracted from the Guinea menu PDFs and wired into that branch's catalogue. Earlier: the fabricated placeholder menu replaced with the restaurant's real printed menu, all fake/demo data removed, a fourth language and a second country added. See *Change Log* at the end.
+**Last updated:** 2026-09-03 — the Guinea branch now carries its own trading name (Kipé / 吉贝) and its supplied opening hours, and the marketing pages' signature-menu section was repaired. Earlier: 113 dish photographs extracted from the Guinea menu PDFs and wired into that branch's catalogue. Earlier: the fabricated placeholder menu replaced with the restaurant's real printed menu, all fake/demo data removed, a fourth language and a second country added. See *Change Log* at the end.
 **Purpose of this document:** Give another AI or designer enough accurate information to build a WebLite portfolio entry for this project without needing repository access.
 
 > **Accuracy note.** Everything in this dossier is derived from the source code and assets in this repository. No business outcomes, traffic figures, conversion data, client briefs, or testimonials are claimed, because none are evidenced in the repository. See **Section 13 — Evidence & Confidence** for a per-claim breakdown and **Questions for WebLite** for the gaps that only the owner can fill.
@@ -663,6 +663,8 @@ These must **not** be described as working features in any published portfolio c
 - **Dish photography now covers every Egyptian food item.** All 77 food dishes carry the restaurant's own photograph, extracted from the official printed menu and matched to each dish by its position on the page. Only 10 of the 13 drinks lack a photo — the printed menu itself only photographs three of them. The client has confirmed no higher-resolution originals exist, so the PDF is the final source; images are capped at 640 px on the long edge and never upscaled beyond what the file holds.
 - **Guinea's photography covers 113 of its 131 dishes.** The 18 without one are the 13 P-range drinks, R1, F11, K3, X4 and X5 — none of which the printed menu photographs in a way that can be tied to a single dish. X4 and X5 (beef and vegetarian dumplings) share one page whose only images are two full-bleed dumpling shots; neither is attributable, and guessing risks showing beef on the vegetarian dish, so both were left without a photo.
 - **Seven Guinean photographs carry a visible "豆包AI生成" watermark** — the mark of the AI image tool used to make them, present in the restaurant's own menu artwork (J6, L6, L7, L8, L9, N6, S8). They were extracted unaltered rather than cropped, because removing a generation mark is the owner's call, not ours. Flag these before any portfolio screenshot; the owner may prefer them cropped or replaced.
+- **Egypt's opening hours are unverified.** The weekday / weekend / delivery split in its marketing markup predates this work and has never been confirmed by the owner. Do not quote those hours in portfolio copy. Guinea's are confirmed (dining 11:00–23:00, delivery 11:00–22:00, every day) and come from the branch registry.
+- **The two branches trade under different names** — Loongdingxuan (龙鼎轩) in New Cairo, Kipé (吉贝) in Conakry — and the shared logo mark carries no wordmark, so it serves both. No Kipé-specific logo was supplied.
 - **The logo is a 553KB PNG** embedded twice as inline base64 in each marketing page, inflating each of the three files to roughly 300KB. An SVG or optimised raster would be substantially smaller.
 - **`GOOGLE_MAPS_API_KEY` is declared but never used** — vestigial from an approach later replaced by Leaflet.
 - **The tracking page retains an older colour palette** (blush accent on near-black) rather than the green-and-gold brand applied to the ordering and receipt pages — a visual inconsistency to note before capturing screenshots side by side.
@@ -1411,8 +1413,8 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
     "dishPhotographs": 193,
     "dishPhotographsByBranch": { "eg": 80, "gn": 113 },
     "countries": [
-      "Egypt (New Cairo) - en/ar/zh, EGP, 90-dish menu, online ordering",
-      "Guinea (Conakry) - fr/en/zh, GNF, 131-dish menu, phone ordering"
+      "Egypt (New Cairo) - trades as Loongdingxuan, en/ar/zh, EGP, 90-dish menu, online ordering",
+      "Guinea (Conakry) - trades as Kipe, en/fr/zh, GNF, 131-dish menu, phone ordering, 11:00-23:00 dining and 11:00-22:00 delivery"
     ]
   }
 }
@@ -1423,6 +1425,16 @@ Third, it tells a complete, legible story. A visitor can follow one order from a
 ---
 
 ## Change Log
+
+### 2026-09-03 — Guinea's own name and hours; signature-menu section repaired
+
+**The two branches trade under different names.** The owner confirmed the Conakry house is **Kipé (吉贝)**, not Loongdingxuan (龙鼎轩). The name was hard-coded in the markup of every page, and four of those pages are shared between the branches, so it now comes from the branch registry: `brand: { latin, zh, … }` per country, read through `brandName(country, form)`. Three forms are distinguished, because the site already used them differently — the Latin name in running text on every edition, the localized name in the page title and meta description, and the Chinese name as the hero logotype. Interface strings that named the restaurant (`docTitle`, the share text, the WhatsApp message) now carry a `{brand}` placeholder that `withBrand()` fills, alongside `{zh}`, `{country}` and `{city}`.
+
+**Guinea's hours, as supplied:** dining 11:00–23:00 and delivery 11:00–22:00, the same every day. Egypt's `hours` is left `null` on purpose — the hours in its marketing markup are a weekday/weekend/delivery split that has never been confirmed by the owner, and the page keeps showing exactly what it always has rather than acquiring a second, invented set. Only a branch that supplies hours paints over the markup.
+
+**A regression fixed.** The marketing pages' "Our Signature Menu" section had been empty on all four language editions, for both branches, since the multi-country change: it still called `MENU_CATEGORIES`, `menuItemsIn(id)` and `menuItemImage(item)`, which the per-country menu registry replaced. The resulting `ReferenceError` was swallowed by `resolveSite`'s try/catch, so it never surfaced as a page error and no test caught it. The section now reads the resolved branch's menu, prices through `formatMoney`, and hides itself outright if a branch has no menu rather than showing an empty grid.
+
+**Verified.** Egypt's title, meta description, hero logotype, about heading, footer and hours are byte-identical to before in all three of its editions; the only change to Egypt is that its signature-menu section renders again (22 items, all with photographs). Guinea shows Kipé / 吉贝 and its real hours across French, English and Chinese, with 24 signature items.
 
 ### 2026-08-29 — Guinea dish photography extracted
 

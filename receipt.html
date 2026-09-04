@@ -87,7 +87,7 @@
 <div class="global-blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
 <div class="grain-overlay"></div>
 <nav>
-    <a href="index.html" class="logo-text"><div class="logo-dot"></div> Loongdingxuan <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400;">龙鼎轩</span></a>
+    <a href="index.html" class="logo-text"><div class="logo-dot"></div> <span id="brand-name">Loongdingxuan</span> <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400;" id="brand-zh">龙鼎轩</span></a>
     <span style="color:var(--text-muted);font-size:0.85rem;" id="nav-order-id"></span>
 </nav>
 <div class="page-wrap">
@@ -170,10 +170,13 @@ function money(n) { return formatMoney(BRANCH, LANG, n); }
 const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
 
 function paintChrome() {
-    document.title = T.docTitle;
+    document.title = withBrand(T.docTitle, BRANCH, LANG);
     document.documentElement.lang = LANG;
     document.documentElement.dir = I18N[LANG].dir;
     if (I18N[LANG].dir === 'rtl') document.body.classList.add('rtl');
+    // The name in the header belongs to the branch, not to the markup.
+    setTxt('brand-name', brandName(BRANCH, 'latin'));
+    setTxt('brand-zh', brandName(BRANCH, 'zh'));
     setTxt('i-confirmed', T.confirmed);      setTxt('i-confirmlead', T.confirmedLead);
     setTxt('i-eta', T.estDelivery);          setTxt('eta-note', T.etaNote);
     setTxt('i-payment', T.payment);          setTxt('i-receipt', T.receipt);
@@ -186,7 +189,7 @@ function paintChrome() {
     setTxt('i-print', T.print);              setTxt('i-share', T.share);
     setTxt('i-contact', T.contact);          setTxt('i-neworder', T.newOrder);
     setTxt('i-trackorder', T.trackOrder);    setTxt('i-thanks', T.thanks);
-    setTxt('r-branch-line', 'Loongdingxuan · ' + (BRANCH.address[LANG] || BRANCH.address.en) + ' · ' + BRANCH.phones.order);
+    setTxt('r-branch-line', brandName(BRANCH, 'latin') + ' · ' + (BRANCH.address[LANG] || BRANCH.address.en) + ' · ' + BRANCH.phones.order);
     const newOrder = document.querySelector('a[href="order.html"]');
     if (newOrder) newOrder.setAttribute('href', pageFor('menu', LANG));
 }
@@ -243,14 +246,14 @@ function renderOrder(o) {
     document.getElementById('r-delivery').textContent = money(o.deliveryFee || 0);
     if (o.discount > 0) { document.getElementById('r-discount').textContent = '−' + money(o.discount); document.getElementById('r-discount-row').style.display = 'flex'; }
     document.getElementById('r-total').textContent = money(o.total || 0);
-    const msg = encodeURIComponent(T.waMessage(shortId, o.customerName, o.customerPhone));
+    const msg = encodeURIComponent(withBrand(T.waMessage(shortId, o.customerName, o.customerPhone), BRANCH, LANG));
     document.getElementById('whatsapp-btn').href = 'https://wa.me/' + BRANCH.phones.order.replace(/[^0-9]/g, '') + '?text=' + msg;
 }
 
 async function shareReceipt() {
     const url = window.location.href;
     if (navigator.share) {
-        try { await navigator.share({ title: T.docTitle, text: T.shareText, url }); } catch(e) {}
+        try { await navigator.share({ title: withBrand(T.docTitle, BRANCH, LANG), text: withBrand(T.shareText, BRANCH, LANG), url }); } catch(e) {}
     } else {
         await navigator.clipboard.writeText(url);
         alert(T.copied);

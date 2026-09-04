@@ -11,9 +11,11 @@
  *
  * Fields
  *   code          ISO 3166-1 alpha-2, lowercase — also the localStorage value
+ *   brand         the restaurant's name at this branch; see brandName()
  *   languages     languages this branch serves, in display order
  *   defaultLang   the language used when nothing else is known
  *   currency      { code, symbol per language, position }
+ *   hours         opening and delivery hours, or null where none were supplied
  *   menuId        key into MENUS in menu-data.js; null while no menu is loaded
  *   online        true when this branch can take orders through the website
  *   coordsConfirmed  false where the pin is approximate and still needs checking
@@ -24,6 +26,9 @@ const COUNTRIES = {
     eg: {
         code: 'eg',
         flag: '🇪🇬',
+        // latin is the name in running text on every edition; the others are
+        // the forms an edition uses to name the restaurant in its own script.
+        brand: { latin: 'Loongdingxuan', zh: '龙鼎轩', ar: 'لونغدينغشوان' },
         name: { en: 'Egypt', ar: 'مصر', zh: '埃及', fr: 'Égypte' },
         city: { en: 'New Cairo', ar: 'القاهرة الجديدة', zh: '新开罗', fr: 'Le Caire Nouveau' },
         languages: ['en', 'ar', 'zh'],
@@ -45,6 +50,10 @@ const COUNTRIES = {
         lat: 30.0549375,
         lng: 31.4924375,
         coordsConfirmed: true,
+        // The marketing page carries this branch's hours in its own markup, and
+        // they have never been confirmed by the owner. Left null so the page
+        // keeps showing what it always has rather than inventing a second set.
+        hours: null,
         delivery: { baseFee: 25, perKm: 5, maxRadiusKm: 20, prepMinutes: 30, driveMinutesPerKm: 3 },
         payments: ['cash', 'card', 'instapay', 'vodafone'],
         menuId: 'eg',
@@ -59,6 +68,8 @@ const COUNTRIES = {
     gn: {
         code: 'gn',
         flag: '🇬🇳',
+        // This branch trades under its own name, not the Egyptian one.
+        brand: { latin: 'Kipé', zh: '吉贝' },
         name: { en: 'Guinea', ar: 'غينيا', zh: '几内亚', fr: 'Guinée' },
         city: { en: 'Conakry', ar: 'كوناكري', zh: '科纳克里', fr: 'Conakry' },
         languages: ['fr', 'en', 'zh'],
@@ -83,6 +94,11 @@ const COUNTRIES = {
         lat: 9.607563,
         lng: -13.649062,
         coordsConfirmed: true,
+        // Supplied by the owner: one set of hours, the same every day.
+        hours: {
+            dining: { open: '11:00', close: '23:00' },
+            delivery: { open: '11:00', close: '22:00' },
+        },
         // Not supplied for this branch. Left null rather than copied from Egypt,
         // whose fees are in EGP and priced for a different city.
         delivery: null,
@@ -124,6 +140,42 @@ function formatMoney(country, lang, amount) {
     return (c.position[lang] || 'before') === 'before' ? sym + ' ' + n : n + ' ' + sym;
 }
 
+/**
+ * The restaurant's name at this branch.
+ *
+ * `form` is either a language code — giving the name as that edition writes
+ * it, which for most editions is simply the Latin one — or 'zh' to ask for
+ * the Chinese name directly, as the hero logotype does on every edition.
+ */
+function brandName(country, form) {
+    const b = (country && country.brand) || {};
+    return b[form] || b.latin || '';
+}
+
+/**
+ * Fill the placeholders a translated string may carry, so one string can name
+ * whichever branch the visitor is looking at.
+ *   {brand}  the restaurant's name in this language
+ *   {zh}     its Chinese name
+ *   {country} the branch's country in this language
+ *   {city}   the branch's city in this language
+ */
+function withBrand(text, country, lang) {
+    return String(text)
+        .replace(/\{brand\}/g, brandName(country, lang))
+        .replace(/\{zh\}/g, brandName(country, 'zh'))
+        .replace(/\{country\}/g, (country.name[lang] || country.name.en))
+        .replace(/\{city\}/g, (country.city[lang] || country.city.en));
+}
+
+/** "11:00 – 23:00", or '' where the branch supplied no hours. */
+function formatHours(span) {
+    return span ? span.open + ' – ' + span.close : '';
+}
+
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { COUNTRIES, COUNTRY_ORDER, ALL_LANGUAGES, getCountry, countrySpeaks, formatMoney };
+    module.exports = {
+        COUNTRIES, COUNTRY_ORDER, ALL_LANGUAGES,
+        getCountry, countrySpeaks, formatMoney, brandName, withBrand, formatHours,
+    };
 }
